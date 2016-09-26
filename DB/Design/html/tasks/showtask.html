@@ -1,0 +1,154 @@
+﻿{% extends "html\tasks\!tasks.html" %}
+
+{% block showtasks %}
+<style>
+    .editPanel {
+        position: absolute;
+        top: 100px;
+        left: -550px;
+        width: 500px;
+        height: 600px;
+        background-color: white;
+        opacity: 0.8;
+        border-radius: 20px;
+        text-align: center;
+        box-shadow: 23px 25px 45px 1px #000000;
+        visibility: hidden;
+        transition: 1s;
+        padding-left: 20px;
+        padding-top: 20px;
+        padding-right: 20px;
+    }
+     .value
+    {
+        width:100%;
+    }
+</style>
+
+
+<div class="editPanel" id="editTaskPanel">
+    <form name="edittask" action="/edittask/" method="post">
+        <input type="hidden" name="id" value={{task.id}}>
+        <table>
+            <tr>
+                <td width="10%">Дата: </td>
+                <td><input type="datetime-local" name="datetime" class="value" required></td>
+            </tr>            
+            <tr>
+                <td>Учреждение:</td>
+                <td>
+                    <select name="company_id" class="value" required>
+                        {% for company in companies %}
+                        <option value="{{company.id}}">{{company.city}}:{{company.name}}</option>
+                        {% endfor %}
+                    </select>
+                </td>
+            </tr>
+            
+            <tr>
+                <td>Описание: </td>
+                <td><input type="text" name="description" class="value"></td>
+            </tr>
+            <tr>
+                <td>Комментарий: </td>
+                <td><input type="text" name="comment" class=" value"></td>
+            </tr>           
+        </table>
+        <input type="submit" value="OK">
+        <input type="button" value="Отмена" onclick="closeEditPanel('editTaskPanel');">
+    </form>
+</div>
+
+<table border="1" width="100%">
+    <tr>
+        <td width="15%">Менеджер</td>
+        <td>{{task.manager.name}}</td>
+    </tr>
+    <tr>
+        <td>Компания</td>
+        <td>{{task.company.name}}</td>
+    </tr>
+    <tr>
+        <td>Дата</td>
+        <td>{{task.datetime}}</td>
+    </tr>
+    <tr>
+        <td>Описание</td>
+        <td>{{task.description}}</td>
+    </tr>
+    <tr>
+        <td>Комментарий</td>
+        <td>{{task.comment}}</td>
+    </tr>
+    <tr>
+        <td>Статус</td>
+        {%if task.status%}
+        <td>Активна</td>
+        {%else%}
+        <td>Закрыта</td>
+        {%endif%}
+    </tr>
+
+</table>
+<form name="deletetask" action="/deletetask/" method="post">
+    <input type="hidden" name="id" value={{task.id}}>
+</form>
+<table>
+    <tr>
+        <td><input type="button" name="editButton" value="Редактировать" onclick="openEditPanel('editTaskPanel')"></td>
+        <td> <input type="button" onclick="DeleteConfirm()" name="deleteButton" value="Удалить"></td>
+
+        {%if task.status%}
+        
+            <form action="/performtask/" method="post">
+                <input type="hidden" value="{{task.id}}" name="taskid">
+                <td>
+                    <input type="submit" value="Выполнить">
+                </td>
+        </form>
+
+        {%endif%}
+        
+
+    </tr>
+</table>
+<script>
+    function openEditPanel(panelID) {
+        var tasksPanel = document.getElementById(panelID);
+        if (tasksPanel.style.visibility != "visible") {
+            tasksPanel.style.visibility = "visible";
+            tasksPanel.style.left = "20px";
+        }
+
+
+
+
+    }
+    function closeEditPanel(panelID) {
+        var tasksPanel = document.getElementById(panelID);
+        tasksPanel.style.left = "-550px";
+        tasksPanel.style.visibility = "hidden";
+    }
+    function fillData() {
+        var formElement = document.forms.edittask.datetime;
+        formElement.value = "{{task.datetime|date:"Y-m-d\TH:i:s"}}"; //2014-01-02T11:42:13
+
+        formElement = document.forms.edittask.company_id;
+        formElement.value = "{{task.company.id}}";
+
+        formElement = document.forms.edittask.description;
+        formElement.value = "{{task.description}}";
+
+        formElement = document.forms.edittask.comment;
+        formElement.value = "{{task.comment}}";
+
+    }
+    function DeleteConfirm()
+    {
+        if(confirm("Вы уверены что хотите удалить задачу?"))
+            document.forms.deletetask.submit();
+    }
+    fillData();
+</script>
+
+{%endblock%}

@@ -1,0 +1,116 @@
+﻿{% extends "html\main.html" %}
+{% block body %}
+
+    <table align="center">
+        <tr><td align="center" colspan="2">Период:</td></tr>
+        <tr>
+            <td>
+                <input onchange="CheckDateInputs();" type="date" id="inputDTFrom" class="value"/>
+            </td>
+            <td>
+                <input onchange="CheckDateInputs();" type="date" id="inputDTTo" class="value" />
+            </td>
+        </tr>
+        <tr>
+            <td>Менеджер:</td>
+            <td>
+                <select onchange="FillStatsPanel();" id="managerSelect" class="value">
+                    {%for manager in managers%}
+                    {%if forloop.counter == 1%}
+                    <option selected value="{{manager.id}}">{{manager.name}}</option>
+                    {%else%}
+                    <option value="{{manager.id}}">{{manager.name}}</option>
+                    {%endif%}
+                    {%endfor%}
+                </select>
+            </td>
+        </tr>
+        <tr>
+        <td>
+                Город:
+            </td>
+            <td>
+                <select onchange="FillStatsPanel();" id="citySelect" class="value">
+                    {%for city in cities%}
+                    {%if forloop.counter == 1%}
+                    <option selected value="{{city.id}}">{{city.name}}</option>
+                    {%else%}
+                    <option value="{{city.id}}">{{city.name}}</option>
+                    {%endif%}
+                    {%endfor%}
+                </select>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                Шоу:
+            </td>
+            <td>
+                <select onchange="FillStatsPanel();" id="artistSelect" class="value">
+                    {%for artist in artists%}
+                    {%if forloop.counter == 1%}
+                    <option selected value="{{artist.id}}">{{artist.name}}</option>
+                    {%else%}
+                    <option value="{{artist.id}}">{{artist.name}}</option>
+                    {%endif%}
+                    {%endfor%}
+                </select>
+            </td>
+        </tr>
+        <tr>
+           <td><p></p></td>
+        </tr>
+        <tr><td align="center" colspan="2">Статистика:</td></tr>
+        <tr><td colspan="2"><div id="dinamicContent"></div>
+            
+            </td></tr>
+
+    </table>
+<script>
+    function FillStatsPanel() {
+        
+        dict = {
+            'dtFrom': document.getElementById("inputDTFrom").value,
+            'dtTo': document.getElementById("inputDTTo").value,
+            'manager': document.getElementById("managerSelect").value,
+            'city': document.getElementById("citySelect").value,
+            'artist': document.getElementById("artistSelect").value
+        }
+        sendAjaxRequest('POST', '/statsajax', dict, getAjaxResponseForStats);
+    }
+    function getAjaxResponseForStats(response) {
+
+        var element = document.getElementById("dinamicContent");
+        element.innerHTML = response;
+    }
+    function CheckDateInputs()    {
+        dateTimeNow = new Date();
+        var dtString = dateTimeNow.getFullYear() + "-" + (dateTimeNow.getMonth() + 1) + "-" + dateTimeNow.getDate();
+       
+        if (document.getElementById("inputDTTo").value < document.getElementById("inputDTFrom").value)
+            document.getElementById("inputDTTo").value = document.getElementById("inputDTFrom").value
+        
+        FillStatsPanel()
+    }
+    function fillDateTimeInputs()    {
+        dateTimeNow = new Date();
+        if(dateTimeNow.getMonth().length == 2)
+            var dtStringNow = dateTimeNow.getFullYear() + "-" + (dateTimeNow.getMonth() + 1) + "-" + "01";
+        else
+            var dtStringNow = dateTimeNow.getFullYear() + "-0" + (dateTimeNow.getMonth() + 1) + "-" + "01";
+        var from = document.getElementById("inputDTFrom");
+        var to = document.getElementById("inputDTTo");
+        from.value = dtStringNow;
+        if((dateTimeNow.getMonth() + 1).length == 2)
+            var dtStringNow = dateTimeNow.getFullYear() + "-" + (dateTimeNow.getMonth() + 2) + "-" + "01";
+        else
+            var dtStringNow = dateTimeNow.getFullYear() + "-0" + (dateTimeNow.getMonth() + 2) + "-" + "01";
+        to.value = dtStringNow;
+    }
+    
+</script>
+<script>
+    fillDateTimeInputs();
+    FillStatsPanel();
+</script>
+{%endblock%}

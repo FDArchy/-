@@ -1,0 +1,70 @@
+﻿{% extends "html\companies\!companies.html" %}
+{% block addcompany %}
+    {% load filters %}
+<style>
+    .value
+    {
+        width:70%;
+    }
+    
+</style>
+<form action="/savecompany/" name="data" method="POST">
+<table>
+
+    <tr >
+        <td width="10%">Тип учреждения: </td>
+        <td>
+            <select name="companytype" class="value">
+                <option value="ДC" selected>ДС</option>
+                <option value="ШК">ШК</option>
+                <option value="ДК">ДК</option>
+                <option value="ДО">ДО</option>
+            </select>
+        </td>
+    </tr>
+  <tr>
+    <td>Наименование: </td><td><input type="text" name="name" class="value" required></td>
+  </tr>
+ <tr>  
+    <td>Город: </td>
+     <td>
+         <select name="city" class="value" required>
+             {% for  city in cities %}
+             <option value="{{city.id}}">{{city.name}}</option>
+             {% endfor %}
+         </select>
+     </td>
+ <tr>
+    <td>Адрес: </td><td><input type="text" name="adress" class="value" required></td>
+  </tr>
+<tr>
+    <td>Телефон: </td><td><input type="text" name="telephone" class="value"></td>
+  </tr>
+<tr>
+                <td>Почта: </td>
+                <td><textarea name="email" class="value" rows="5">{{company.email}}</textarea></td>
+            </tr>
+             <tr>
+                <td>Сайт: </td>
+                <td><input type="text" name="site" class="value" value="{{company.site}}"></td>
+            </tr>
+<tr>
+    <td>Контакты: </td><td><input type="text" name="contact" class="value"></td>
+  </tr>
+<tr>
+    <td>Комментарии: </td>
+<td><textarea name="comment" class="value" rows="5"></textarea></td>
+  </tr>
+    <tr><td>
+        Возможные мероприятия:
+        </td>
+        <td>
+            {%for artist in artists%}
+            <input type="checkbox" checked value="{{artist.id}}" name="checks[]">{{artist.name}}
+            {%endfor%}
+        </td>
+    </tr>
+</table>
+<input type="submit" value="Добавить">
+</form>
+{% endblock %}

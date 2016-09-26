@@ -1,0 +1,58 @@
+﻿.col{
+    display:table-cell; 
+    border:solid 1px red; 
+}
+
+    .wrapper{
+   width:100%;   
+   
+}
+.header{
+   width:100%;   
+   text-align:center;
+} 
+.c33{
+   width:33%;   
+   text-align:center;
+}
+ 
+.c25{
+   width:25%;   
+}
+.c10{
+    width:10%;
+    text-align:center;
+}
+.hidden{
+    display:none;
+}
+.
+flash{
+    transition:0.5s;
+}
+.flash:hover{
+    cursor:pointer;
+    background-color:yellow;
+    font-weight:900;
+    font-size:18px;
+    color:red;
+    
+}
+     .hiddenInputForm{
+        position:absolute;
+        top:100px;
+        left:-550px;
+        width: 500px;
+        height: 600px;
+        background-color:white;
+        opacity:0.8;
+        border-radius:20px;
+        text-align:center;
+        box-shadow: 23px 25px 45px 1px #000000;
+        visibility:hidden;
+        transition: 1s;
+        padding-left:20px;
+        padding-top:20px;
+        padding-right:20px;
+        
+    }   

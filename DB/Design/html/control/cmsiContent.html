@@ -1,0 +1,18 @@
+﻿{%for company in free.all%}
+<label>
+    <div id="div{{company.id}}" class="row">
+        <input data-companyid="{{company.id}}" type="checkbox" /><span id="">{{company.id}}&nbsp;:&nbsp;{{company.name}}</span>
+
+    </div>
+</label>
+{%endfor%}
+
+{%for company in busy%}
+<label>
+    <div id="div{{company.id}}" class="row">
+        <input data-companyid="{{company.id}}" type="checkbox" /><span id="">{{company.id}}&nbsp;:&nbsp;{{company.name}}</span>
+
+    </div>
+</label>
+{%endfor%}
+

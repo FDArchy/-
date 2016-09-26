@@ -1,0 +1,10 @@
+
+<select id="presentator" onchange="UpdateCalendarData(new Date().getFullYear(), (new Date().getMonth() + 1));">
+{% for presentator in presentators %}
+    {% if forloop.counter == 1 %}
+        <option selected value="{{ presentator.id }}">{{ presentator.siteuser.name }}</option>
+    {% else %}
+        <option  value="{{ presentator.id }}">{{ presentator.siteuser.name }}</option>
+    {% endif %}
+{% endfor %}
+</select>

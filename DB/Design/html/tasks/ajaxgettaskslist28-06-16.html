@@ -1,0 +1,57 @@
+﻿{% load filters %}
+{% if tasks %}
+
+<style>
+    .refer{
+
+    }
+    .refer:hover{
+        color:red;
+        cursor: pointer;
+    }
+</style>
+<p class="headerM">Общий список задач:</p>
+<table width="100%" id="taskTable">
+
+    {% for task in tasks %}
+        {% if task.artist %}
+    <tr class="taskHeader" onclick="window.open('/company/{{task.company.id}}/');">
+        <td>{{ task.artist.name }} - {{ task.company.city }},{{ task.company.name }}</td>
+        <td></td>
+        <td>{{ task.description }}</td>
+        <td>{{ task.datetime.date }} </td>
+        <td>{{task.datetime|date:"Y-m-d"|datecountdown}}</td>
+    </tr>
+        {% endif %}
+    {% endfor %}
+
+
+
+
+
+
+</table>
+
+
+<div align="center">
+			{% if tasks.has_previous %}
+	                    <a class="refer" onclick="ChooseMode('all', {{ tasks.previous_page_number }})">&laquo</a>
+	                {% else %}
+	                   <a>&laquo;</a>
+	                {% endif %}
+	                {% for page in tasks.paginator.page_range %}
+	                    {% if page == tasks.number %}
+	                        <a>{{ page }}</a>
+	                    {% else %}
+	                        <a class="refer" onclick="ChooseMode('all', {{ page }})">{{ page }}</a>
+	                    {% endif %}
+	                {% endfor %}
+	                {% if tasks.has_next %}
+	                    <a class="refer" onclick="ChooseMode('all', {{ tasks.next_page_number }})">&raquo;</a>
+	                {% else %}
+	                   <a>&raquo;</a>
+	                {% endif %}
+</div>
+{% else %}
+    <p class="headerM">Общий список пуст:</p>
+{% endif %}

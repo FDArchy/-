@@ -1,0 +1,19 @@
+{% load filters %}
+
+<div align="center" id="pages" data-currentPage="{{ page.currentPage }}"> {% for pageInList in page.pagesList %}<span {% if pageInList == page.currentPage %}class="currentPage"{% else %} class="page"{% endif %} onclick="FillContentForAD({{ pageInList }})"> {{ pageInList }} </span>{% endfor %}</div>
+<table class="list" width="100%";>
+    <tr class="header">
+     </tr>
+    {% for company in filtredCompanies %}
+
+    <tr class="tableRow" {%if is_superuser%}onclick="SelectCheckBox('checkBox{{ company.id }}');"{% endif %} id="tr{{ company.id }}">
+        {%if is_superuser%}<td><input type="checkbox" data-companyID="{{ company.id }}" id="checkBox{{ company.id }}" ></td>{% endif %}
+        <td width="8%">{{ company.id}}<span class="move" onclick="goToCompany('/company/{{company.id}}')"> ►</span></td>
+        <td>{{ company.name}}</td><td>{{ company.adress}}</td>
+        <td>{% if company.lastcall.0 %} {{ company.lastcall.0.manager.name }} <br>{{ company.lastcall.0.datetime.date|datecountdown }} {% endif %}</td>
+        <td> {% if company.lastevent.0 %} {{ company.lastevent.0.manager.name }} <br>{{ company.lastevent.0.startTime.date|datecountdown }} {% endif %}</td>
+        <td>{% for manager in company.managers%} {{ manager }} {% endfor %}</td>
+    </tr>
+    {% endfor %}
+</table>
+

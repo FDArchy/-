@@ -1,0 +1,182 @@
+﻿.modalWindow{
+        position:absolute;
+        top:-1000px;
+        left:35%;
+        width: 500px;
+        height: 600px;
+        padding-top:15px;
+        padding-bottom:5px;
+        padding-left:30px;
+        padding-right:30px;
+        background-color:white;
+        opacity:1;
+        border-radius:40px;
+        box-shadow: 0px 0px 45px 3px #000000;
+        visibility:hidden;
+        transition: 0.5s;    
+        z-index:1001;    
+        text-align:right;
+        overflow-y:auto;
+        overflow-x:hidden;
+        
+    }
+.modalWindowHeader{
+    margin-bottom:20px;
+    font-family:Arial;
+    font-size:130%; 
+    font-weight:bold; 
+    color:black;
+}
+#modalWindowBackground{
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color:white;
+    opacity:0.4;
+    z-index:1000;
+    visibility:hidden;
+}
+
+.closecross{
+    
+    position:static;
+
+    
+}
+
+.textMiddle {
+    text-align: center;
+}
+    
+
+.eventInTable    {
+       display:block;
+       text-align:center;
+       padding-bottom:2px;
+       padding-top:2px;
+       margin-left:2px;
+       margin-right:2px;
+       margin-top:1px;
+       margin-bottom:1px;
+       border: 5px;
+       border-radius:7px 7px;
+       background-color: white;
+       font: bold 12px arial, verdana;   
+       transition:0.5s;
+       -webkit-user-select: none;
+        -moz-user-select: none;
+    }   
+.eventInTable:hover    {
+        cursor:pointer;
+        color:red;
+        
+    }
+    .value {
+        width: 100%;
+    }
+
+div.hiddenInputForm{
+        display:none;
+    }
+a{
+    text-decoration: none;
+    color: #000000;
+}
+a:hover{
+    text-decoration: none;
+    color: #000000;
+}
+
+/*NOTIFICATIONS*/
+/*container:*/
+.notification {
+  position: fixed;
+  left: 0px;
+  bottom: -50px;
+  width: 100%;
+  /* Set the fixed height of the footer here */
+  height: 10px;
+  opacity: 0.0;
+  text-align: center;
+
+
+}
+.container {
+  width: 100%;
+  max-width: 680px;
+  padding: 0 15px;
+}
+.container .text-muted {
+  margin: 20px 0;
+}
+.notification-error{
+    background-color: rgba(255, 0, 0, 0.4);
+    color: red;
+}
+.notification-success{
+    background-color: rgba(0, 255, 0, 0.4);
+    color: green;
+}
+.notification-info{
+    background-color: rgba(0, 0, 255, 0.4);
+    color: blue;
+}
+.notification-title{
+    padding-top: 7px;
+    font-size: large;
+
+}
+.notification-title-text{
+    margin-left: 8px;
+    vertical-align:text-top;
+
+}
+.notification-text{
+    padding-top: 9px;
+    font-size: small;
+}
+/*load animation*/
+.cssload-container {
+	width: 100%;
+    text-align: center;
+    margin: 0 auto;
+    padding-left: 40%;
+
+}
+.cssload-speeding-wheel {
+	width: 22px;
+	height: 22px;
+	border: 4px solid rgb(0, 0, 255);
+	border-radius: 50%;
+	border-left-color: transparent;
+	border-right-color: transparent;
+    float:left;
+    text-align: center;
+    left: 30%;
+    margin-right: 7px;
+	animation: cssload-spin 1000ms infinite linear;
+		-o-animation: cssload-spin 1000ms infinite linear;
+		-ms-animation: cssload-spin 1000ms infinite linear;
+		-webkit-animation: cssload-spin 1000ms infinite linear;
+		-moz-animation: cssload-spin 1000ms infinite linear;
+}
+@keyframes cssload-spin {
+	100%{ transform: rotate(360deg); transform: rotate(360deg); }
+}
+@-o-keyframes cssload-spin {
+	100%{ -o-transform: rotate(360deg); transform: rotate(360deg); }
+}
+@-ms-keyframes cssload-spin {
+	100%{ -ms-transform: rotate(360deg); transform: rotate(360deg); }
+}
+@-webkit-keyframes cssload-spin {
+	100%{ -webkit-transform: rotate(360deg); transform: rotate(360deg); }
+}
+@-moz-keyframes cssload-spin {
+	100%{ -moz-transform: rotate(360deg); transform: rotate(360deg); }
+}
+
+/*NOTIFICATIONS*/
+

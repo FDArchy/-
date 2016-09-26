@@ -1,0 +1,250 @@
+﻿
+{% load filters %}
+{%if event%}
+{%if not showonly%}
+    <table width="100%">
+        <tr>
+            <td width="25%">Учреждение:</td>
+            <td>
+                <input type="text" class="value" style="background-color:#36BBCE" onclick="showCompanyData({{event.company.id}});" value="{{event.company.name}}" readonly /> 
+                <input type="hidden" id="eventId" value="{{event.id}}" />
+                <input type="hidden" id="artistId" value="{{event.artist.id}}" />
+                <input type="hidden" id="companyId" value="{{event.company.id}}" />
+            </td>
+        </tr>
+        <tr>
+            <td width="25%">Менеджер: </td>
+            {% if is_superuser %}
+                <td>
+               <select class="value" id="selectedManager">
+                   {% for selectedmanager in managers %}
+                       {% if selectedmanager.id == event.manager.id %}
+                       <option selected value="{{ selectedmanager.id }}">{{ selectedmanager.name }}</option>
+                       {% else %}
+                       <option value="{{ selectedmanager.id }}">{{ selectedmanager.name }}</option>
+                       {% endif %}
+                   {% endfor %}
+               </select>
+                </td>
+
+                {% else %}
+                <td>
+                <select class="value" id="selectedManager" style="background-color:#36BBCE" >
+                    <option value="{{ manager.id }}">{{ manager.name }}</option>
+                    </select>
+            </td>
+            {% endif %}
+        </tr>
+        <tr>
+        <tr>
+            <td width="25%">Шоу:</td>
+            <td>
+                <input type="text" class="value" value="{{artist}}" readonly />
+            </td>
+        </tr>
+        <tr>
+            <td>Время начала: </td>
+            <td><input id="startTime" value="{{event.startTime|date:"Y-m-d\TH:i"}}" type="datetime-local" class="value"></td>
+        </tr>
+        <tr>
+            <td>Стоимость: </td>
+            <td><input id="price" type="number" value="{{event.price|replacepoint}}" class="value"></td>
+        </tr>
+        <tr>
+            <td>Процент: </td>
+            <td><input id="percent" value="{{event.percent}}" type="number" class="value"></td>
+        </tr>
+        <tr>
+            <td>Число детей: </td>
+            <td><input type="number" id="childCount" value="{{event.childCount}}" class=" value"></td>
+        </tr>
+        <tr>
+            <td>Примечание: </td>
+            <td><textarea id="note" class="value" rows="5">{{event.note}}</textarea></td>
+        </tr>
+        <tr>
+            <td>Позвонить за неделю?<input type="checkbox" id="attentionCallWeekBool" {%if event.attentionCallWeekBool%} checked{%endif%}> </td>
+            <td><input type="text" id="attentionCallWeekComment" class="value" value="{{event.attentionCallWeekComment}}"></td>
+        </tr>
+        <tr>
+            <td>Позвонить за день?<input type="checkbox" id="attentionCallDayBool" {%if event.attentionCallDayBool%} checked{%endif%}> </td>
+            <td><input type="text" id="attentionCallDayComment" class=" value" value="{{event.attentionCallDayComment}}"></td>
+        </tr>
+        <tr>
+            <td>Слетело?<input type="checkbox" id="crashBool" value="true" {%if event.crashBool%} checked{%endif%}> </td>
+            <td><input type="text" id="crash" class=" value" value="{{event.crash}}"></td>
+
+        </tr>
+        <tr>
+            <td>Комментарий артиста </td>
+            <td><textarea rows="5" id="artistNote" class="value" {%if is_manager %}readonly{%endif%}>{{event.artistNote}}</textarea></td>
+
+        </tr>
+        <tr>
+            <td>Итоговая сумма </td>
+            <td><input type="number" id="resultSum" class="value" value="{{event.resultSum|replacepoint}}" {%if is_manager%}readonly{%endif%}></td>
+
+        </tr>
+
+    </table>
+{%else%}
+<table width="100%">
+    <tr>
+        <td width="25%">Учреждение:</td>
+        <td>
+            <input type="text" class="value" onclick="showCompanyData({{event.company.id}});" style=" background-color:#36bbce" value="{{event.company.name}}" readonly />
+            <input type="hidden" id="eventId" value="{{event.id}}" />
+            <input type="hidden" id="artistId" value="{{event.artist.id}}" />
+            <input type="hidden" id="companyId" value="{{event.company.id}}" />
+        </td>
+    </tr>
+    <tr>
+        <td width="25%">Менеджер:</td>
+            <td>
+                <select class="value" id="selectedManager" style="background-color:#36BBCE" >
+                    <option value="{{ event.manager.id }}">{{ event.manager.name }}</option>
+                    </select>
+            </td>
+    </tr>
+    <tr>
+    <tr>
+        <td width="25%">Шоу:</td>
+        <td>
+            <input type="text" class="value" value="{{artist}}" readonly />
+        </td>
+    </tr>
+    <tr>
+        <td>Время начала: </td>
+        <td><input id="startTime" value="{{event.startTime|date:"Y-m-d\TH:i"}}" readonly type="datetime-local" class="value"></td>
+    </tr>
+    <tr>
+        <td>Стоимость: </td>
+        <td><input id="price" type="number" value="{{event.price|replacepoint}}" readonly class="value"></td>
+    </tr>
+    <tr>
+        <td>Процент: </td>
+        <td><input id="percent" value="{{event.percent}}" readonly type="number" class="value"></td>
+    </tr>
+    <tr>
+        <td>Число детей: </td>
+        <td><input type="number" id="childCount" value="{{event.childCount}}" readonly class=" value"></td>
+    </tr>
+    <tr>
+        <td>Примечание: </td>
+        <td><textarea id="note" class="value" rows="5" readonly>{{event.note}}</textarea></td>
+    </tr>
+    <tr>
+        <td>Позвонить за неделю?<input type="checkbox" id="attentionCallWeekBool" disabled {%if event.attentionCallWeekBool%} checked{%endif%}> </td>
+        <td><input type="text" id="attentionCallWeekComment" readonly class="value" value="{{event.attentionCallWeekComment}}"></td>
+    </tr>
+    <tr>
+        <td>Позвонить за день?<input type="checkbox" id="attentionCallDayBool" disabled {%if event.attentionCallDayBool%} checked{%endif%}> </td>
+        <td><input type="text" id="attentionCallDayComment" readonly class=" value" value="{{event.attentionCallDayComment}}"></td>
+    </tr>
+    <tr>
+        <td>Слетело?<input type="checkbox" id="crashBool" value="true" disabled {%if event.crashBool%} checked{%endif%}> </td>
+        <td><input type="text" id="crash" class=" value" readonly value="{{event.crash}}"></td>
+
+    </tr>
+    <tr>
+        <td>Комментарий артиста </td>
+        <td><textarea rows="5" id="artistNote" class="value" {%if is_manager%}readonly{%endif%}>{{event.artistNote}}</textarea></td>
+
+    </tr>
+    <tr>
+        <td>Итоговая сумма </td>
+        <td><input type="number" id="resultSum" value="{{event.resultSum|replacepoint}}" class="value" {%if is_manager%}readonly{%endif%}></td>
+
+    </tr>
+</table>
+{%endif%}
+{%else%}
+<table width="100%">
+    <tr>
+        <td width="25%">Учреждение:</td>
+        <td>
+            <input type="text" class="value" onclick="showCompanyData({{event.company.id}});" style=" background-color:#36bbce" value="{{company}}" readonly />
+            <input type="hidden" id="eventId" value="{{event.id}}" />
+            <input type="hidden" id="artistId" value="{{event.artist.id}}" />
+            <input type="hidden" id="companyId" value="{{event.company.id}}" />
+        </td>
+    </tr>
+    <tr>
+            <td width="25%">Менеджер: </td>
+            {% if is_superuser %}
+                <td>
+               <select class="value" id="selectedManager">
+                   {% for selectedmanager in managers %}
+                       {% if selectedmanager == manager %}
+                       <option selected value="{{ selectedmanager.id }}">{{ selectedmanager.name }}</option>
+                       {% else %}
+                       <option value="{{ selectedmanager.id }}">{{ selectedmanager.name }}</option>
+                       {% endif %}
+                   {% endfor %}
+               </select>
+                </td>
+
+                {% else %}
+                <td>
+                <select class="value" id="selectedManager" style="background-color:#36BBCE" >
+                    <option value="{{ manager.id }}">{{ manager.name }}</option>
+                    </select>
+            </td>
+            {% endif %}
+        </tr>
+    <tr>
+    <tr>
+        <td width="25%">Шоу:</td>
+        <td>
+            <select id="show" class="value">
+                {%for artist in artists%}
+                <option value="{{artist.show.id}}">{{artist.show.name}}</option>
+                {%endfor%}
+            </select>
+        </td>
+    </tr>
+    <tr>
+        <td>Время начала: </td>
+        <td><input id="startTime" value="{{date}}"  type="datetime-local" class="value"></td>
+    </tr>
+    <tr>
+        <td>Стоимость: </td>
+        <td><input id="price" type="number" value="{{event.price|replacepoint}}" class="value"></td>
+    </tr>
+    <tr>
+        <td>Процент: </td>
+        <td><input id="percent" value="{{event.percent}}" type="number" class="value"></td>
+    </tr>
+    <tr>
+        <td>Число детей: </td>
+        <td><input type="number" id="childCount" value="{{event.childCount}}" class=" value"></td>
+    </tr>
+    <tr>
+        <td>Примечание: </td>
+        <td><textarea id="note" class="value" rows="5">{{event.note}}</textarea></td>
+    </tr>
+    <tr>
+        <td>Позвонить за неделю?<input type="checkbox" id="attentionCallWeekBool" {%if event.attentioncallweekbool%} checked{%endif%}> </td>
+        <td><input type="text" id="attentionCallWeekComment" class="value" value="{{event.attentionCallWeekComment}}"></td>
+    </tr>
+    <tr>
+        <td>Позвонить за день?<input type="checkbox" id="attentionCallDayBool" {%if event.attentioncalldaybool%} checked{%endif%}> </td>
+        <td><input type="text" id="attentionCallDayComment" class=" value" value="{{event.attentionCallDayComment}}"></td>
+    </tr>
+    <tr>
+        <td>Слетело?<input type="checkbox" id="crashBool" value="true" {%if event.crashbool%} checked{%endif%}> </td>
+        <td><input type="text" id="crash" class=" value" value="{{event.crash}}"></td>
+
+    </tr>
+    <tr>
+        <td>Комментарий артиста </td>
+        <td><textarea rows="5" id="artistNote" class="value" {%if is_manager%}readonly{%endif%}>{{event.artistNote}}</textarea></td>
+
+    </tr>
+    <tr>
+        <td>Итоговая сумма </td>
+        <td><input type="number" id="resultSum" value="{{event.resultSum|replacepoint}}" class="value" {%if is_manager%}readonly{%endif%}></td>
+
+    </tr>
+</table>
+{%endif%}

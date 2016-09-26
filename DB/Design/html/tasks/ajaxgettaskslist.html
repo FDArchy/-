@@ -1,0 +1,66 @@
+{% load filters %}
+<p class="headerL">{{currentDateTime.date}}</p>
+<style>
+    .refer{
+
+    }
+    .refer:hover{
+        color:red;
+        cursor: pointer;
+    }
+</style>
+<hr />
+{%if tasks%}
+{%else%}
+<p class="headerM">Задачи отсутствуют</p>
+{%endif%}
+{%if tasks%}
+<p class="headerM">Общий список задач:</p>
+<table  width="100%" id="todayTasks">
+    {%for task in tasks%}
+    {%if task.done%}
+    <tr class="executedTask" id="trTodayTasks{{task.id}}" onclick="DoneTask('TodayTasks{{task.id}}', {{task.id}})" onmouseover="ShowButton('todayTasks{{task.id}}');" onmouseleave="HideButton('todayTasks{{task.id}}');">
+        <td width="1%"><input type="checkbox" checked id="checkTodayTasks{{task.id}}" onclick="CorrectCheckBox('checkTodayTasks{{task.id}}')" /></td>
+        {%else%}
+    <tr class="taskHeader" id="trTodayTasks{{task.id}}"  onclick="DoneTask('TodayTasks{{task.id}}', {{task.id}})" onmouseover="ShowButton('todayTasks{{task.id}}');" onmouseleave="HideButton('todayTasks{{task.id}}');">
+        <td width="1%"><input type="checkbox" id="checkTodayTasks{{task.id}}" onclick="CorrectCheckBox('checkTodayTasks{{task.id}}')" /></td>
+        {%endif%}
+
+
+        <td width="60%">
+            {{ task.artist.name }} - {{task.company.city.name}},&nbsp{{task.company.name}}
+        </td>
+        <td width="10%">{{task.description}}</td>
+         <td>{{ task.datetime.date }} </td>
+        <td>{{task.datetime|date:"Y-m-d"|datecountdown}}</td>
+        <td><div class="buttonGoToCompany" onclick="goToCompany('/company/{{task.company.id}}/', 'todayTasks{{task.id}}');" id="todayTasks{{task.id}}">▶</div></td>
+    </tr>
+    {%endfor%}
+</table>
+{%endif%}
+
+<div align="center">
+			{% if tasks.has_previous %}
+	                    <a class="refer" onclick="ChooseMode('all', {{ tasks.previous_page_number }})">&laquo</a>
+	                {% else %}
+	                   <a>&laquo;</a>
+	                {% endif %}
+	                {% for page in tasks.paginator.page_range %}
+	                    {% if page == tasks.number %}
+	                        <a style="color:red; font-size: large">{{ page }}</a>
+	                    {% else %}
+	                        <a class="refer" onclick="ChooseMode('all', {{ page }})">{{ page }}</a>
+	                    {% endif %}
+	                {% endfor %}
+	                {% if tasks.has_next %}
+	                    <a class="refer" onclick="ChooseMode('all', {{ tasks.next_page_number }})">&raquo;</a>
+	                {% else %}
+	                   <a>&raquo;</a>
+	                {% endif %}
+</div>
+
+
+
+
+
+

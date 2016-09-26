@@ -1,0 +1,365 @@
+﻿{% extends "html\main.html" %}
+{% block body %}
+
+<style>
+    #leftCompanyPanel {
+    }
+
+    #rightCompanyPanel {
+    }
+
+    .companyPanel {
+        border: 1px solid;
+        height: 300px;
+        overflow-y: scroll;
+    }
+
+    #leftFilterPanel {
+    }
+
+    #rightFilterPanel {
+    }
+
+    .filterPanel {
+        padding: 10px 10px 10px 10px;
+        border: 1px solid;
+    }
+
+    .tdallign {
+        vertical-align: top;
+    }
+    .changePageArrow{
+        font-size:xx-large;
+        color:#36BBCE;
+      
+    }
+    .changePageArrow:hover{
+        border:outset;
+        cursor:pointer;
+        color:red;
+           
+        
+    }
+    .row{
+        width:100%;
+        margin:0 auto;
+        
+        background-color: #36BBCE;
+    }
+    .row:hover{
+        cursor:pointer;
+        background-color: #1E90FF;
+    }
+    .row:nth-match(div){
+        
+    }
+</style>
+<div id="container">
+    <table width="100%">
+        <tr>
+            <td class="tdallign" width="45%">
+                <table id="leftFilterPanel" class="filterPanel">
+                    <tr>
+                        <td>Менеджер</td>
+                        <td>Город</td>
+                        <td>Тип</td>
+                        <td>Шоу</td>
+                    </tr>
+                    <tr>
+                        <td width="32%">
+                            <select id="leftPanelManager" onchange="FillLeftPanel(0);">
+                                <option value="0">НЕЗАНЯТЫЕ</option>
+                                {%for manager in managers%}
+                                {%if forloop.counter == 1%}
+                                <option value="{{manager.id}}" selected>{{manager.name}}</option>
+                                {%else%}
+                                <option value="{{manager.id}}">{{manager.name}}</option>
+                                {%endif%}
+                                {%endfor%}
+                            </select>
+                        </td>
+                        <td width="25%">
+                            <select id="leftPanelCity" onchange="SyncFilterInputs(document.getElementById('leftPanelCity'), document.getElementById('rightPanelCity'));">
+                                {%for city in cities%}
+                                {%if forloop.counter == 1%}
+                                <option selected value="{{city.id}}">{{city.name}}</option>
+                                {%else%}
+                                <option value="{{city.id}}">{{city.name}}</option>
+                                {%endif%}
+                                {%endfor%}
+                            </select>
+                        </td>
+                        <td width="10%">
+                            <select id="leftPanelType" onchange="FillLeftPanel(0);">
+                                <option value="0" selected>Все</option>
+                                {%for type in types%}
+                                <option value="{{type}}">{{type}}</option>
+                                {%endfor%}
+                            </select>
+                        </td>
+                        <td width="33%">
+                            <select onchange="SyncFilterInputs(document.getElementById('leftPanelShow'), document.getElementById('rightPanelShow'));" id="leftPanelShow">
+                                {%for artist in artists%}
+                                {%if forloop.counter == 1%}
+                                <option selected value="{{artist.id}}">{{artist.name}}</option>
+                                {%else%}
+                                <option value="{{artist.id}}">{{artist.name}}</option>
+                                {%endif%}
+                                {%endfor%}
+                            </select>
+                        </td>
+                        
+                    </tr>
+                    <tr>
+                        <td  colspan="1" width="100%">
+                            <hr />
+                            <label><input id="selectallleft"  onclick="SelectAllCheckBox('left')" type="checkbox" /><span>Выбрать все</span></label>
+
+                        </td>
+                        <td align="right" colspan="3" width="100%">
+                            <hr />
+                            Отображать
+                            <select onchange="FillLeftPanel(0);" id="leftCompanyCount">
+                                <option value="10">10</option>
+                                <option value="20">20</option>
+                                <option selected value="50">50</option>
+                                <option value="100">100</option>
+                                <option value="200">200</option>
+                            </select>
+                            компаний
+                            <input id="leftPage" value="0" type="hidden">
+                        </td>
+                    </tr>
+
+                </table>
+                <div id="leftCompanyPanel" class="companyPanel">test1</div>
+                <table width="100%" class="filterPanel">
+                    <tr >
+                        <td align="center">
+                            <span class="changePageArrow" onclick="ChangePage((-1), 'left')">◄</span>&nbsp;<span class="changePageArrow" onclick="ChangePage(1, 'left')">►</span>
+                        </td>                        
+                    </tr>
+                </table>                
+            </td>
+            <td align="center"><span class="changePageArrow" onclick="ajaxChangeCompanyPermission('right', 'left')">⇐</span>&nbsp;<span class="changePageArrow" onclick="    ajaxChangeCompanyPermission('left', 'right')">⇒</span></td><!--ВЫНЕСТИ ФОРМАТИРОВАНИЕ ОТДЕЛЬНО-->
+            <td width="45%" class="tdallign">
+                <table id="rightFilterPanel" class="filterPanel">
+                    <tr>
+                        <td>Менеджер</td>
+                        <td>Город</td>
+                        <td>Тип</td>
+                        <td>Шоу</td>
+                    </tr>
+                    <tr>
+                        <td width="32%">
+                            <select id="rightPanelManager" onchange="FillRightPanel(0);">
+                                <option value="0" selected>НЕЗАНЯТЫЕ</option>
+                                {%for manager in managers%}
+                                <option value="{{manager.id}}">{{manager.name}}</option>
+                                {%endfor%}
+                            </select>
+                        </td>
+                        <td width="25%">
+                            <select id="rightPanelCity" onchange="SyncFilterInputs(document.getElementById('rightPanelCity'), document.getElementById('leftPanelCity'));">
+                                {%for city in cities%}
+                                {%if forloop.counter == 1%}
+                                <option selected value="{{city.id}}">{{city.name}}</option>
+                                {%else%}
+                                <option value="{{city.id}}">{{city.name}}</option>
+                                {%endif%}
+                                {%endfor%}
+                            </select>
+                        </td>
+                        <td width="10%">
+                            <select id="rightPanelType" onchange="FillRightPanel(0);">
+                                <option value="0" selected>Все</option>
+                                {%for type in types%}
+                                <option value="{{type}}">{{type}}</option>
+                                {%endfor%}
+                            </select>
+                        </td>
+                        <td width="33%">
+                            <select onchange="SyncFilterInputs(document.getElementById('rightPanelShow'), document.getElementById('leftPanelShow'));" id="rightPanelShow">
+                                {%for artist in artists%}
+                                {%if forloop.counter == 1%}
+                                <option selected value="{{artist.id}}">{{artist.name}}</option>
+                                {%else%}
+                                <option value="{{artist.id}}">{{artist.name}}</option>
+                                {%endif%}
+                                {%endfor%}
+                            </select>
+                        </td>
+
+                    </tr>
+                    <tr>
+                        <td colspan="1" width="100%">
+                            <hr />
+                            <label><input id="selectallright" onclick="SelectAllCheckBox('right')" type="checkbox" /><span>Выбрать все</span></label>
+
+                        </td>
+                        <td align="right" colspan="3" width="100%">
+                            <hr />
+                            Отображать
+                            <select onchange="FillRightPanel(0);" id="rightCompanyCount">
+                                <option value="10">10</option>
+                                <option value="20">20</option>
+                                <option selected value="50">50</option>
+                                <option value="100">100</option>
+                                <option value="200">200</option>
+                            </select>
+                            компаний
+                            
+                        </td>
+                        
+                    </tr>
+
+                </table>
+                <div id="rightCompanyPanel" class="companyPanel">test1</div>
+                <table width="100%" class="filterPanel">
+                    <tr>
+                        <td align="center">
+                            <span onclick="ChangePage((-1), 'right')" class="changePageArrow">◄</span>&nbsp;<span class="changePageArrow"><input type="hidden" id="rightPage" value="0" readonly></span>&nbsp;<span onclick="ChangePage((1), 'right')" class="changePageArrow">►</span>
+                        </td>
+                    </tr>
+                </table>   
+            </td>
+        </tr>
+    </table>
+
+</div>
+<script>
+    function FillLeftPanel(_page) {
+        dict = {
+            'manager': document.getElementById("leftPanelManager").value,
+            'city': document.getElementById("leftPanelCity").value,
+            'type': document.getElementById("leftPanelType").value,
+            'artist': document.getElementById("leftPanelShow").value,
+            'count': document.getElementById("leftCompanyCount").value,
+            'page': _page
+        }
+
+        sendAjaxRequest('POST', '/cmsLinkReturn', dict, getAjaxResponseLeftCompanyPanel)
+
+
+    }
+    function FillRightPanel(_page) {
+        dict = {
+            'manager': document.getElementById("rightPanelManager").value,
+            'city': document.getElementById("rightPanelCity").value,
+            'type': document.getElementById("rightPanelType").value,
+            'artist': document.getElementById("rightPanelShow").value,
+            'count': document.getElementById("rightCompanyCount").value,
+            'page': _page
+        }
+
+        sendAjaxRequest('POST', '/cmsLinkReturn', dict, getAjaxResponseRightCompanyPanel)
+    }
+    function getAjaxResponseLeftCompanyPanel(response) {
+        var element = document.getElementById("leftCompanyPanel");
+        element.innerHTML = response;
+    }
+    function getAjaxResponseRightCompanyPanel(response) {
+        var element = document.getElementById("rightCompanyPanel");
+        element.innerHTML = response;
+    }
+    function ajaxChangeCompanyPermission(_from, _to)
+    {
+        var fromCompanyContainer = document.getElementById(_from + "CompanyPanel");
+        var toCompanyContainer = document.getElementById(_to + "CompanyPanel");
+        
+        var fromManager = document.getElementById(_from + "PanelManager").value;
+        var toManager = document.getElementById(_to + "PanelManager").value;
+
+        if (fromManager == toManager) {
+            alert("Операция не имеет смысла.");
+            return;
+        }
+
+        var checkBoxes = fromCompanyContainer.getElementsByTagName("input");
+        var div;
+        var changedList = []
+        debugger;
+        for (var i = 0; i < checkBoxes.length; i++) {
+            if (checkBoxes[i].type == 'checkbox' && checkBoxes[i].checked)
+            {
+                changedList.push(checkBoxes[i].getAttribute("data-companyId"));
+                checkBoxes[i].checked = false;
+                
+            }
+
+        }
+      
+        dict = {
+            'artist': document.getElementById(_to + "PanelShow").value,
+            'changedList': changedList,
+            'from': fromManager,
+            'to': toManager
+        }
+        sendAjaxRequest('POST', '/changePermission', dict, ChangePermissions);
+        for(var i = 0; i < changedList.length; i++)
+        {
+            div = document.getElementById("div" + changedList[i]);
+            toCompanyContainer.appendChild(div);
+        }
+    }
+    function ChangePermissions(response)
+    {
+        
+                
+    }
+    function fillPanels(_page) {
+
+        FillRightPanel(_page);
+        FillLeftPanel(_page);
+    }
+    function SyncFilterInputs(_changed, _sync) {
+        _sync.value = _changed.value;
+        fillPanels(0);
+    }
+    function SelectAllCheckBox(_panel)
+    {
+
+        var companyContainer = document.getElementById(_panel + "CompanyPanel");
+        var checkAll = document.getElementById("selectall" + _panel);
+        checkBoxes = companyContainer.getElementsByTagName("input");
+        if (checkAll.checked)
+            for(var i = 0; i < checkBoxes.length; i++)
+            {
+                if (checkBoxes[i].type == 'checkbox')
+                    checkBoxes[i].checked = true;
+            }
+        else
+            for (var i = 0; i < checkBoxes.length; i++) {
+                if (checkBoxes[i].type == 'checkbox')
+                    checkBoxes[i].checked = false;
+            }
+    }
+    function ChangePage(_page, _panel)
+    {
+        var element;
+               
+        if (_panel == "left")
+        {
+            element = document.getElementById("leftPage");
+            element.value = +element.value + _page;
+            if (+element.value < 0)
+                element.value = 0;
+            FillLeftPanel(element.value);
+            
+        }            
+        else
+        {
+            element = document.getElementById("rightPage");
+            element.value = +element.value + _page;
+            if (+element.value < 0)
+                element.value = 0;
+            FillRightPanel(element.value);
+        }
+            
+    }
+</script>
+<script>
+    fillPanels(0);
+</script>
+{%endblock%}
+

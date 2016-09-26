@@ -1,0 +1,1011 @@
+﻿{% extends "html\companies\!companies.html" %}
+{% block companypage%}
+{% load filters %}
+<style>
+    td.header{
+        font-weight:900;
+        font-size:18px;
+        text-align:center;
+        column-span:all;
+    }
+    td.datacell    {
+        font-weight:700;
+    }
+     .value    {
+        width:100%;
+    }
+   
+  .calendarArrow-right {
+  width: 0;
+  height: 0;
+  border: 12px solid transparent; 
+  border-left-color: #36BBCE;  
+  border-right: 0;
+  display: inline-block;
+  margin-left:7px;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  }
+  .calendarArrow-right:hover{      
+      cursor:pointer;
+      border-left-color: red;
+  }
+  .calendarArrow-left {
+  width: 0;
+  height: 0;
+  border: 12px solid transparent; 
+  border-right-color: #36BBCE;  
+  border-left: 0;
+  display: inline-block;
+  margin-right:7px;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  }
+  .calendarArrow-left:hover{
+      cursor:pointer;
+      border-right-color: red;
+  }
+  .calendarCircle {
+    width: 80px;
+    height: 80px;
+    background: #36BBCE;
+    -moz-border-radius: 50px;
+    -webkit-border-radius: 50px;
+    border-radius: 50px;
+    padding-top:10px;
+    padding-left:10px;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+
+}
+  .calendarCircle:hover{
+      cursor:pointer;
+      background: red;
+  }
+ #calendar{
+     text-align:center;
+     margin-top:15px;
+     margin-bottom:15px;
+ }
+ #calendarMonthName{
+     color:#1E90FF;
+     position:center;
+ }
+ #calendarCity{
+     font-family:Arial;
+     font-size:90%; 
+     font-weight:300; 
+     float:none;
+     color:#1E90FF;    
+ }
+.table{
+   display:table;   
+   width:100%;   
+}
+
+
+.row{
+   display:table-row;      
+}
+
+div#days table,div#days tr
+    { 
+    	background-color:#EFEDEB;   
+		table-layout: fixed;
+		width: 100%; /* Ширина таблицы */
+        border-spacing:0px;
+        vertical-align:text-bottom;  
+        -webkit-user-select: none;
+        -moz-user-select: none;
+   	}
+div#days td{       
+        border:1px solid #36BBCE;	
+		table-layout: fixed;
+		width: 100%; /* Ширина таблицы */
+        border-spacing:0px;
+        vertical-align:text-bottom;  
+        margin:auto;  
+        -webkit-user-select: none;
+        -moz-user-select: none;  
+        
+}
+div#days td.active{       
+        -webkit-user-select: none;
+        -moz-user-select: none;  
+        cursor:crosshair;          
+}
+div#days td.active:hover{
+    border-color: red;    
+}
+div#days td.busy{
+        text-align: center;
+        background-color:#36BBCE;
+
+    }
+    div#days td.busy:hover{
+        cursor:pointer;
+    }
+#calendar{
+    background-color:#EFEDEB;   
+    padding:10px 10px 10px 10px;
+    border-radius:30px 5px;
+    border:5px outset;
+    
+}
+.borderRadiusLeft{
+    border-radius: 30px 0px 0px 0px;
+    -moz-border-radius: 30px 0px 0px 0px;
+    -webkit-border-radius: 30px 0px 0px 0px;
+    border: 0px outset #000000;
+}
+.borderRadiusRight{
+    border-radius: 0px 0px 30px 0px;
+    -moz-border-radius: 0px 0px 30px 0px;
+    -webkit-border-radius: 0px 0px 30px 0px;
+    border: 0px outset #000000;
+}
+.dayOfWeekTD
+{
+    background-color: #36BBCE;
+    text-align:center;
+}
+.dayOfMonthWeekDay
+    {
+        margin-bottom: 10px;
+        font-weight:bolder;    
+        color: black;
+        text-align:center;
+        background: #36BBCE;
+        width: 20px; 
+        height: 20px;  
+        top:0; 
+        right:0;
+       -webkit-box-shadow: 2px 2px 12px 2px rgba(3,108,188,1);
+        -moz-box-shadow: 2px 2px 12px 2px rgba(3,108,188,1);
+        box-shadow: 2px 2px 12px 2px rgba(3,108,188,1);
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        cursor:default;
+       
+    }
+.nonDisplay{
+    display:none;
+    
+}
+.displayInline{
+    display:block;
+}
+.ourEvent{
+    border:3px solid red;
+}
+</style>
+
+<div id="modalWindowBackground" ></div>
+<div class="modalWindow" id="modalWindow">
+    <a class="closecross" onclick="showModalWindow('modalWindow', false, hideDeleteButton);"> &times </a>
+    <div class="modalWindowHeader textMiddle" id="modalWindowHeader"></div>
+    <div class="textMiddle" id="modalInside"></div>
+    <div class="textMiddle">
+        <div class="textFooter displayInline">
+            <input type="button" value="OK" id="modalWindowOkButton">
+            &nbsp;
+            <input type="button" value="Удалить" id="modalWindowDeleteButton" class="nonDisplay" />
+        </div>
+    </div>
+</div>
+<div id="dinamicContent">
+    <table border="1" width=100%>
+        <tr><td class="header" colspan="2">Общая информация:<p><input type="button" value="Редактировать" onclick="showEditCompanyPanel();"></p></td></tr>
+        <tr>
+            <td width="8%">Тип: </td>
+            <td>{{company.ctype|replacenone}}</td>
+        </tr>
+        <tr>
+            <td width="8%">Название: </td>
+            <td>{{company.name|replacenone}}</td>
+        </tr>
+        <tr>
+            <td width="8%">Город: </td>
+            <td>{{company.city}}</td>
+        </tr>
+        <tr>
+            <td width="8%">Адрес: </td>
+            <td><a target="_blank" href="https://yandex.ru/maps/?text={{ company.city }}%20{{ company.adress }}" id="adressMapsHref" style="color:blue;">{{company.adress|replacenone}}</a> </td>
+        </tr>
+        <tr>
+            <td width="8%">Телефон: </td>
+            <td>{{company.telephone|replacenone}}</td>
+        </tr>
+        <tr>
+            <td width="8%">Контакты: </td>
+            <td>{{company.contacts|replacenone}}</td>
+        </tr>
+        <tr>
+        <td width="8%">Почта: </td>
+        <td>{{company.email|replacenone}}</td>
+        </tr>
+        <tr>
+            <td width="8%">Сайт: </td>
+            <td>{{company.site|replacenone}}</td>
+        </tr>
+        <tr>
+            <td width="8%">Комментарий: </td>
+            <td>{{company.comment|replacenone}}</td>
+        </tr>
+        <tr>
+            <td width="10%">Шоу: </td>
+            <td>
+                <select id="artist" class="value" onchange="UpdateCompanyData();">
+                    {%for artist in artists%}
+                    <option value="{{artist.id}}">{{artist.name}}</option>
+                    {%endfor%}
+                </select>
+            </td>
+        </tr>
+
+    </table>
+    <div class="hiddenInputForm" id="editCompanyPanel">
+        <table>
+            <tr>
+                <td width="10%">Тип учреждения: </td>
+                <td>
+                    <select id="companyEditType" class="value">
+                        <option value="ДC" selected>ДС</option>
+                        <option value="ШК">ШК</option>
+                        <option value="ДК">ДК</option>
+                        <option value="ДО">ДО</option>
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <td>Наименование: </td>
+                <td><input type="text" id="companyEditName" class="value" value="{{company.name}}"></td>
+            </tr>
+            <tr>
+                <td>Адрес: </td>
+                <td><input type="text" id="companyEditAdress" class="value" value="{{company.adress}}"></td>
+            </tr>
+            <tr>
+                <td>Телефон: </td>
+                <td><input type="text" id="companyEditTelephone" class="value" value="{{company.telephone}}"></td>
+            </tr>
+            <tr>
+                <td>Контакты: </td>
+                <td><input type="text" id="companyEditContacts" class="value" value="{{company.contacts}}"></td>
+            </tr>
+            <tr>
+                <td>Почта: </td>
+                <td><textarea id="companyEditEmail" class="value" rows="5">{{company.email}}</textarea></td>
+            </tr>
+             <tr>
+                <td>Сайт: </td>
+                <td><input type="text" id="companyEditSite" class="value" value="{{company.site}}"></td>
+            </tr>
+            <tr>
+                <td>Комментарий: </td>
+                <td><textarea id="companyEditComment" class="value" rows="5">{{company.comment}}</textarea></td>
+            </tr>
+        </table>
+        <script>
+        function fillType() {
+            var optionBox = document.getElementById("companyEditType");
+            optionBox.value = "{{company.ctype}}";
+        }
+        </script>
+    </div>
+    <div class="hiddenInputForm" id="editTaskPanel">
+        <table width="100%">
+            <tr>
+                <td width="10%">Дата: </td>
+                <td><input type="date" id="editTaskDate" class="value" value='{{last_task.0.datetime|date:"Y"}}-{{last_task.0.datetime|date:"m"}}-{{last_task.0.datetime|date:"d"}}'></></td>
+            </tr>
+            <tr>
+                <td>Описание: </td>
+                <td><input type="text" id="editTaskDescription" class="value" value="{{last_task.0.description}}"></td>
+            </tr>
+            <tr>
+                <td>Комментарий: </td>
+                <td><textarea id="editTaskComment" class=" value" rows="5">{{last_task.0.comment}}</textarea> </td>
+            </tr>
+        </table>
+
+    </div>
+</div>
+    <br>
+    Артист:<span id = "presentatorSpan"></span>
+<div id="calendar" class="calendar">
+    <div id="calendarHeader">
+        <div id="calendarCity" >{{company.city.name}}</div><div>
+                                 <a id="calendarMonthName" class="modalWindowHeader"></a>
+        </div>
+        <div style="padding: 10px 10px 10px 10px;">
+            <span class="calendarArrow-left" onclick="MonthBack();"></span>
+            <a class="calendarCircle" onclick="MonthNow();">&nbsp&nbsp&nbsp&nbsp</a>
+            <span class="calendarArrow-right" onclick="MonthForward();"></span>
+        </div>
+        </div>
+    <div id="days"></div>
+</div>
+
+
+
+
+<input type="hidden" id="city" value="{{ company.city.id }}">
+<div class="hiddenInputForm" id="callmarkPanel">    
+        <table>
+
+            
+            <tr>
+                <td valign="top" width="15%">Комментарии: </td>
+                <td><textarea id="markCallComment" class="value" rows="5" ></textarea></td>
+            </tr>
+            <tr>
+                <td colspan="1">&nbsp;</td>
+            </tr>
+            <tr>
+                <td align="left"></td>
+                <td  align="left"><input type="checkbox" id="markCallAddTaskCheckBox" onchange="markCallTaskAddCheckBox();">Добавить задачу?</td>
+            </tr>
+            <tr>
+                <td valign="top">Дата: </td>
+                <td><input type="date" class="value" id="markCallAddTaskDate" disabled></td>
+            </tr>
+            <tr>
+                <td valign="top">Описание: </td>
+                <td><input type="text" class="value" value="Позвонить" id="markCallAddTaskDescription" disabled></td>
+            </tr>
+            <tr>
+                <td valign="top">Комментарий: </td>
+                <td><textarea class="value" rows="5" id="markCallAddTaskComment" disabled></textarea></td>
+            </tr>
+            
+            
+        </table>       
+</div>
+<div class="hiddenInputForm" id="addTaskPanel">
+    <table>
+        
+        <tr>
+            <td width="15%">Дата: </td>
+            <td><input type="date" id="addTaskDate" class="value"></td>
+        </tr>
+        <tr>
+        
+        <tr>
+        <td>Описание: </td>
+        <td><input type="text" id="addTaskDescription" value="Позвонить" class="value"></td>
+        </tr>
+        <tr>
+            <td>Комментарий: </td>
+            <td><textarea id="addTaskComment" class=" value" rows="5"></textarea> </td>
+        </tr>
+    </table>
+</div>  
+
+
+
+    <script>
+        function showTaskHistory() {
+            var element = document.getElementById("modalInside");
+            element.innerHTML = "Подождите, данные загружаются...";
+            dict = { 'company': '{{company.id}}', 'artist': document.getElementById("artist").value }
+            sendAjaxRequest('POST', '/ajaxtaskhistory', dict, getAjaxResponseFillModal)
+            var modalHeaderElement = document.getElementById("modalWindowHeader");
+            modalHeaderElement.innerHTML = "История задач";
+            showModalWindow('modalWindow', true);
+
+            var okButton = document.getElementById("modalWindowOkButton");
+            okButton.onclick = function(){
+
+                showModalWindow('modalWindow', false, hideDeleteButton);
+            }
+
+        }
+        function showCallHistory() {
+            var element = document.getElementById("modalInside");
+            element.innerHTML = "Подождите, данные загружаются...";
+            dict = { 'company': '{{company.id}}', 'artist': document.getElementById("artist").value }
+            sendAjaxRequest('POST', '/ajaxcallhistory', dict, getAjaxResponseFillModal)
+            var modalHeaderElement = document.getElementById("modalWindowHeader");
+            modalHeaderElement.innerHTML = "История звонков";
+            showModalWindow('modalWindow', true);
+
+            var okButton = document.getElementById("modalWindowOkButton");
+            okButton.onclick = function(){
+
+                showModalWindow('modalWindow', false, hideDeleteButton);
+            }
+
+        }
+        function showMarkCallPanel() {
+
+            showModalWindow('modalWindow', true);
+            var modalHeaderElement = document.getElementById("modalWindowHeader");
+            modalHeaderElement.innerHTML = "Отметить звонок";
+            var modalElement = document.getElementById("modalInside");
+            modalElement.innerHTML = document.getElementById("callmarkPanel").innerHTML;
+
+            var okButton = document.getElementById("modalWindowOkButton");
+            okButton.onclick = markCall;
+
+        }
+        function markCall() {
+            if (document.getElementById("markCallAddTaskCheckBox").checked && document.getElementById("markCallAddTaskDescription").value == "") {
+                alert("Пожалуйста заполните поле <Описание>");
+                document.getElementById("markCallAddTaskDescription").setAttribute("style", "border:1px solid red");
+                document.getElementById("markCallAddTaskDescription").focus();
+
+                return;
+            }
+            showModalWindow('modalWindow', false);
+            dict = {
+                'company': '{{company.id}}',
+                'artist': document.getElementById("artist").value,
+                'callComment': document.getElementById("markCallComment").value,
+                'addTask': document.getElementById("markCallAddTaskCheckBox").checked,
+                'taskDate': document.getElementById("markCallAddTaskDate").value,
+                'taskComment': document.getElementById("markCallAddTaskComment").value,
+                'taskDescription': document.getElementById("markCallAddTaskDescription").value
+            }
+
+            sendAjaxRequest('POST', '/ajaxmarkcall', dict, getAjaxResponseFillModal)
+            setTimeout(UpdateCompanyData, 1000);
+
+
+        }
+        function markCallTaskAddCheckBox() {
+            if (document.getElementById("markCallAddTaskCheckBox").checked) {
+                document.getElementById("markCallAddTaskDate").disabled = false;
+                document.getElementById("markCallAddTaskComment").disabled = false;
+                document.getElementById("markCallAddTaskDescription").disabled = false;
+                FillDateTimeAtPage();
+            }
+            else {
+                document.getElementById("markCallAddTaskDate").disabled = true;
+                document.getElementById("markCallAddTaskComment").disabled = true;
+                document.getElementById("markCallAddTaskDescription").disabled = true;
+            }
+        }
+        function showAddTaskPanel() {
+
+            showModalWindow('modalWindow', true);
+            var modalHeaderElement = document.getElementById("modalWindowHeader");
+            modalHeaderElement.innerHTML = "Добавить задачу";
+            var modalElement = document.getElementById("modalInside");
+            modalElement.innerHTML = document.getElementById("addTaskPanel").innerHTML;
+
+            var okButton = document.getElementById("modalWindowOkButton");
+            okButton.onclick = addTask;
+            FillDateTimeAtPage();
+        }
+        function addTask() {
+            if (document.getElementById("addTaskComment").value == "") {
+                alert("Пожалуйста заполните поле <Комментарий>");
+                document.getElementById("addTaskComment").setAttribute("style", "border:1px solid red");
+                document.getElementById("addTaskComment").focus();
+                return;
+            }
+            showModalWindow('modalWindow', false);
+            dict = { 'company': '{{company.id}}', 'artist': document.getElementById("artist").value,'addTask': true, 'taskDate': document.getElementById("addTaskDate").value, 'taskComment': document.getElementById("addTaskComment").value, 'taskDescription': document.getElementById("addTaskDescription").value }
+
+            sendAjaxRequest('POST', '/ajaxmarkcall', dict, getAjaxResponseFillModal)
+
+            setTimeout(UpdateCompanyData, 1000);
+
+        }
+        function showEditTaskPanel() {
+
+            showModalWindow('modalWindow', true);
+            var modalHeaderElement = document.getElementById("modalWindowHeader");
+            modalHeaderElement.innerHTML = "Редактировать текущую задачу";
+            var modalElement = document.getElementById("modalInside");
+            modalElement.innerHTML = document.getElementById("editTaskPanel").innerHTML;
+            var okButton = document.getElementById("modalWindowOkButton");
+            okButton.onclick = editTask;
+        }
+        function editTask() {
+            if (document.getElementById("editTaskComment").value == "") {
+                alert("Пожалуйста заполните поле <Комментарий>");
+                document.getElementById("editTaskComment").setAttribute("style", "border:1px solid red");
+                document.getElementById("editTaskComment").focus();
+                return;
+            }
+            showModalWindow('modalWindow', false);
+            dict = { 'company': '{{company.id}}', 'edittask':true, 'oldTask': '{{last_task.0.id}}', 'artist': document.getElementById("artist").value, 'addTask': true, 'taskDate': document.getElementById("editTaskDate").value, 'taskComment': document.getElementById("editTaskComment").value, 'taskDescription': document.getElementById("editTaskDescription").value }
+            sendAjaxRequest('POST', '/ajaxmarkcall', dict, getAjaxResponseFillModal)
+            setTimeout(UpdateCompanyData, 1500);
+
+        }
+        function showEditCompanyPanel() {
+
+            showModalWindow('modalWindow', true);
+            var modalHeaderElement = document.getElementById("modalWindowHeader");
+            modalHeaderElement.innerHTML = "Редактировать компанию";
+            var modalElement = document.getElementById("modalInside");
+            modalElement.innerHTML = document.getElementById("editCompanyPanel").innerHTML;
+
+            var okButton = document.getElementById("modalWindowOkButton");
+            okButton.onclick = editCompany;
+            fillType();
+
+        }
+        function editCompany() {
+            if (document.getElementById("companyEditType").value == "" || document.getElementById("companyEditName").value == "" || document.getElementById("companyEditAdress").value == "") {
+                alert("Поля <Тип>, <Название>, <Адрес> должны быть заполнены");
+                document.getElementById("companyEditType").setAttribute("style", "border:1px solid red");
+                document.getElementById("companyEditName").setAttribute("style", "border:1px solid red");
+                document.getElementById("companyEditAdress").setAttribute("style", "border:1px solid red");
+                return;
+            }
+            showModalWindow('modalWindow', false);
+            dict = {
+                'id': '{{company.id}}',
+                'companytype': document.getElementById("companyEditType").value,
+                'name': document.getElementById("companyEditName").value,
+                'adress': document.getElementById("companyEditAdress").value,
+                'telephone': document.getElementById("companyEditTelephone").value,
+                'contact': document.getElementById("companyEditContacts").value,
+                'comment': document.getElementById("companyEditComment").value,
+                'email':document.getElementById("companyEditEmail").value,
+                'site':document.getElementById("companyEditSite").value
+
+            }
+            sendAjaxRequest('POST', '/editcompany/', dict, getAjaxResponseFillModal)
+
+            setTimeout(UpdateCompanyData, 1500);
+
+        }
+        function showEditEventPanel(_showOnly, _eventId, _artist, _company)        {
+            
+            showModalWindow('modalWindow', true);
+            var modalHeaderElement = document.getElementById("modalWindowHeader");
+            modalHeaderElement.innerHTML = "Редактировать мероприятие";
+            var modalElement = document.getElementById("modalInside");            
+            if (_showOnly)
+            {
+                modalHeaderElement.innerHTML = "Просмотреть мероприятие";
+                var deleteButton = document.getElementById("modalWindowDeleteButton");
+                deleteButton.setAttribute("style", "display:inline");
+                deleteButton.setAttribute("onclick", "deleteEvent()");
+            }
+
+            dict = { 'showOnly': _showOnly, 'eventId': _eventId, 'companyId': _company, 'artist':_artist }
+            sendAjaxRequest('POST', '/geteventdata', dict, getAjaxResponseFillModal);
+
+            var okButton = document.getElementById("modalWindowOkButton");
+            okButton.onclick = editEvent;
+
+
+        }
+        function editEvent(_companyId)        {
+            showModalWindow('modalWindow', false);
+            hideDeleteButton();
+            dict = {
+                'new':'false',
+                'eventId': document.getElementById("eventId").value,
+                'artistId': document.getElementById("artistId").value,
+                'companyId' : _companyId,
+                'startTime': document.getElementById("startTime").value,
+                'price': document.getElementById("price").value,
+                'percent': document.getElementById("percent").value,
+                'childCount': document.getElementById("childCount").value,
+                'note': document.getElementById("note").value,
+                'attentionCallWeekBool': document.getElementById("attentionCallWeekBool").checked,
+                'attentionCallWeekComment': document.getElementById("attentionCallWeekComment").value,
+                'attentionCallDayBool': document.getElementById("attentionCallDayBool").checked,
+                'attentionCallDayComment': document.getElementById("attentionCallDayComment").value,
+                'crashBool': document.getElementById("crashBool").checked,
+                'crash': document.getElementById("crash").value,
+                'artistNote': document.getElementById("artistNote").value,
+                'resultSum': document.getElementById('resultSum').value,
+                'manager':document.getElementById("selectedManager").value
+            }
+            sendAjaxRequest('POST', '/editevent/', dict, getAjaxResponseFillModalCalendarData);
+            
+            
+        }
+        function showAddEventPanel(_date) {
+            showModalWindow('modalWindow', true);
+            var modalHeaderElement = document.getElementById("modalWindowHeader");
+            modalHeaderElement.innerHTML = "Добавить мероприятие";
+            var modalElement = document.getElementById("modalInside");
+
+
+
+            dict = {'companyId' : "{{company.id}}", 'dateString':_date}
+            sendAjaxRequest('POST', '/geteventdata', dict, getAjaxResponseFillModal)
+            
+            var okButton = document.getElementById("modalWindowOkButton");
+            okButton.onclick = addEvent;
+        }
+        function addEvent() {
+            showModalWindow('modalWindow', false);
+            dict = {
+                'new': 'true',
+                'artistId': document.getElementById("show").value,
+                'companyId': "{{company.id}}",
+                'showId': document.getElementById("show").value,
+                'startTime': document.getElementById("startTime").value,
+                'price': document.getElementById("price").value,
+                'percent': document.getElementById("percent").value,
+                'childCount': document.getElementById("childCount").value,
+                'note': document.getElementById("note").value,
+                'attentionCallWeekBool': document.getElementById("attentionCallWeekBool").checked,
+                'attentionCallWeekComment': document.getElementById("attentionCallWeekComment").value,
+                'attentionCallDayBool': document.getElementById("attentionCallDayBool").checked,
+                'attentionCallDayComment': document.getElementById("attentionCallDayComment").value,
+                'crashBool': document.getElementById("crashBool").checked,
+                'crash': document.getElementById("crash").value,
+                'manager':document.getElementById("selectedManager").value
+            }
+            sendAjaxRequest('POST', '/editevent/', dict, getAjaxResponseFillModalCalendarData);
+
+
+
+        }
+        function deleteEvent()        {
+            if (confirm("Вы уверены что хотите удалить мероприятие?"))
+            {
+                
+                dict = {
+                    'eventId': document.getElementById("eventId").value
+                }
+                sendAjaxRequest('POST', '/ajaxdeleteevent/', dict, getAjaxResponseFillModalCalendarData);
+                showModalWindow('modalWindow', false);
+                hideDeleteButton();
+            }
+            
+        }
+        function hideDeleteButton()        {
+            var deleteButton = document.getElementById("modalWindowDeleteButton");
+            deleteButton.setAttribute("style", "display:none");
+            deleteButton.setAttribute("onclick", "deleteEvent()");
+        }
+        
+        function getAjaxResponseFillModal(response) {
+            var element = document.getElementById("modalInside");
+            element.innerHTML = response;
+        }
+        function getAjaxResponseFillModalCalendarData(response) {
+            var element = document.getElementById("modalInside");
+            element.innerHTML = response;
+            
+            var calendarHeader = document.getElementById("calendarHeader");
+            var year = calendarHeader.getAttribute("data-year");
+            var month = +calendarHeader.getAttribute("data-month");
+            month++;
+            UpdateCalendarData(year, month);
+
+        }
+        function getAjaxResponseUpdateCompanyData(response)        {
+            var element = document.getElementById("dinamicContent");
+            element.innerHTML = response;
+        }
+        function getAjaxResponseUpdateCalendarData(response)        {
+            UpdateCompanyData();
+            var element = document.getElementById("days");
+            eval(response);
+        }
+        function UpdateCompanyData() {
+            dict = {
+                'id': '{{company.id}}',
+                'artist': document.getElementById("artist").value
+            }
+            sendAjaxRequest('POST', '/showcompanyupdate/', dict, getAjaxResponseUpdateCompanyData)
+        }
+
+    function FormatDateString(date) {//Функция преобразует дату из формата javascript в формат html.datetime
+        var year = date.getFullYear();
+        var month = (date.getMonth() + 1).toString();
+        var day = (date.getDate()).toString();
+        //var hour = date.getHours().toString();
+        //var minute = date.getMinutes().toString();
+
+        if (month.length == 1)
+            month = "0" + month;
+        if (day.length == 1)
+            day = "0" + day;
+        //if (hour.length == 1)
+            //hour = "0" + hour;
+        //if (minute.length == 1)
+        //    minute = "0" + minute;
+        var convertedDateTimeString = year + "-" + month + "-" + day;// + "T" + hour + ":" + minute;
+        return convertedDateTimeString;
+    }
+    function FillDateTimeAtPage() { //Функция выставляет дату в элементе datetime в сегодняшнее значение
+        var today = new Date();
+        today.setHours(0, 0);
+        var calendar = document.getElementById("markCallAddTaskDate");
+        calendar.value = FormatDateString(today);
+        calendar = document.getElementById("addTaskDate");
+        calendar.value = FormatDateString(today);
+        //"2015-05-05" - Формат строки
+
+    }
+
+
+    function FillCalendarFrame(_year, _month)    {
+
+        var daysOfWeek = ["Понедельник", "Вторник", "Среда", "Четверг", "Пятница", "Суббота", "Воскресение"];
+
+
+        var daysContainer = document.getElementById("days");
+        daysContainer.innerHTML = "";
+        var table = document.createElement("table");
+
+
+        var startdate = new Date(_year, (_month - 1), 1);
+        //startdate.setDate(startdate.getDate() - 6);
+        while (startdate.getDay() != 1)
+        {
+            startdate.setDate(startdate.getDate() - 1);
+        }
+        var trElement = document.createElement("tr");
+        var tdElement;
+
+        trElement.id = "daysOfWeek";
+        for (i = 0; i < daysOfWeek.length ; i++)
+        {
+            tdElement = document.createElement("td");
+            tdElement.innerHTML = daysOfWeek[i];            
+            if (i == 0)
+                tdElement.classList.add("borderRadiusLeft");
+            tdElement.classList.add("dayOfWeekTD");
+            trElement.appendChild(tdElement);
+        }
+        table.appendChild(trElement);
+
+        for (i = 0; i < 6; i++)
+        {
+            trElement = document.createElement("tr");
+            for(j = 0; j < 7; j++)
+            {
+                tdElement = document.createElement("td");
+
+                var month = startdate.getMonth() + 1;
+                var day = startdate.getDate();
+                month = month.toString();
+                day = day.toString();
+                if (month.length == 1)
+                    month = "0" + month;
+                if (day.length == 1)
+                    day = "0" + day;
+                tdElement.id = "td" + startdate.getFullYear() + "-" + (startdate.getMonth() + 1) + "-" + startdate.getDate();
+                
+                if (i == 5 && j == 6)
+                {
+                    tdElement.classList.add("borderRadiusRight");
+                }
+                if ((startdate.getMonth() + 1) == _month)
+                {
+
+                    {% if is_manager or is_superuser %}
+                    tdElement.setAttribute("onclick", ("showAddEventPanel(\"" + (startdate.getFullYear() + "-" + month + "-" + day + "T00:00") + "\");"));
+                    tdElement.classList.add("active");
+                    {% else %}
+                        htmlDateView = FormatDateString(startdate);
+                        tdElement.classList.add("active");
+                        tdElement.setAttribute("onclick", "addPresentatorEvent('new'," +"\"" +  htmlDateView +"\"" +")");
+                    {% endif %}
+                }
+                if ((startdate.getMonth() + 1) == _month)
+                {
+                    if ((startdate.getDate() == new Date().getDate()) && (startdate.getMonth() == new Date().getMonth()) && (startdate.getFullYear() == new Date().getFullYear())) {
+
+                        tdElement.innerHTML = "<div class = \"dayOfMonthWeekDay\" style=\"background-color:#84FE67\">" + startdate.getDate() + "</div>";
+                    }
+                    else
+                    {
+                        tdElement.innerHTML = "<div class = \"dayOfMonthWeekDay\">" + startdate.getDate() + "</div>";
+                    }
+
+                }
+                else
+                {
+                    tdElement.innerHTML = "<font color=\"#696969\">" + startdate.getDate() + "</font>";
+                }
+                trElement.appendChild(tdElement);
+                startdate.setDate(startdate.getDate() + 1);
+            }
+
+            table.appendChild(trElement);
+        }
+
+        daysContainer.appendChild(table);
+    }
+    function UpdateCalendarHeader(_year, _month)    {
+        var calendarTittle = document.getElementById("calendarMonthName");
+        var month = ["Январь", "Февраль", "Март", "Апрель", "Май", "Июнь", "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь"];
+        calendarTittle.innerHTML = month[_month - 1] + ", " + _year;
+        var calendarHeader = document.getElementById("calendarHeader");
+        calendarHeader.setAttribute("data-year", _year);
+        calendarHeader.setAttribute("data-month", (_month - 1));
+    }
+    function UpdateCalendarData(_year, _month)    {
+        UpdateCalendarHeader(_year, _month);
+        FillCalendarFrame(_year, _month);
+        if(document.getElementById("presentator") != null)        {
+            presentator = document.getElementById("presentator").value;
+        }
+        else        {
+            presentator = "None";
+        }
+
+        dict = { 'year': _year, 'month': _month, 'company': "{{company.id}}", 'city': "{{ company.city.id }}", 'presentator':presentator}
+        sendAjaxRequest('POST', '/fillcalendar', dict, getAjaxResponseUpdateCalendarData);
+
+    }
+    function classifyEvent(_day, _month, _year, _time, _name, _company, _color, _event, _artist, _showOnly, _crashed)    {
+        var elementID = "td" + _year + "-" + _month + "-" + _day;
+        var tdElement = document.getElementById(elementID);
+        var divElement = document.createElement("div");
+        
+        divElement.id = _event;
+        
+        if(_crashed)
+            divElement.innerHTML += "<div>СЛЕТЕЛО!</div>";
+        divElement.innerHTML += _time + " " + _name;
+        divElement.setAttribute("data-companyid", _company);
+        divElement.setAttribute("data-datetime", (FormatDateString(new Date(_year, (_month - 1), _day)) + "T" + _time));
+        divElement.setAttribute("data-artist", _name);
+        divElement.classList.add("eventInTable");
+        divElement.setAttribute("style", ("background-color:" + _color));
+        if (_showOnly)
+            divElement.classList.add("ourEvent");
+        divElement.setAttribute("onclick", ("showEditEventPanel(" + _showOnly + "," + _event  +", \"" + _artist + "\", " + _company +");"));
+        divElement.addEventListener("click", stopEvent, false);
+
+        tdElement.appendChild(divElement);
+
+    }
+    function checkOffDays(_firstDatePart, _secondDatePart, _startTime, _endTime, _fullDay, _description, _comment, _id){
+
+        if(String(_secondDatePart[0]) == 0)
+            _secondDatePart = _secondDatePart[1]
+
+        id = "td" + _firstDatePart + _secondDatePart;
+        cell = document.getElementById(id);
+        if(_fullDay == "True"){
+
+            cell.removeAttribute("onclick");
+            cell.removeAttribute("class");
+            cell.setAttribute("vertical-align", "middle")
+            cell.setAttribute("class", "busy");
+            cell.innerHTML +="ДЕНЬ ЗАНЯТ:<br>";
+            cell.innerHTML += _description;
+
+
+            {% if not is_manager or is_superuser %}
+                cell.setAttribute("onclick", "deletePresentatorEvent(" + _id + ");");
+            {% else %}
+
+            {% endif %}
+        }
+        else
+        {
+            var divElement = document.createElement("div");
+
+            divElement.innerHTML += "ЗАНЯТО:<br>"
+            divElement.innerHTML += _startTime + " - " + _endTime;
+            divElement.innerHTML += "<br>"
+            divElement.innerHTML += _description;
+            divElement.id = "presentatorEvent" +
+            //divElement.innerHTML += "ДЕНЬ ЗАНЯТ<br>";
+            divElement.classList.add("eventInTable");
+            divElement.setAttribute("style", ("background-color:" + "#36BBCE"));
+            //divElement.setAttribute("onclick", ("showEditEventPanel(" + _showOnly + "," + _event  +", \"" + _artist + "\", " + _company +");"));
+            divElement.addEventListener("click", stopEvent, false);
+
+
+            {% if not is_manager or is_superuser %}
+                divElement.setAttribute("onclick", "deletePresentatorEvent(" + _id + ");");
+            {% else %}
+
+            {% endif %}
+            cell.appendChild(divElement);
+        }
+
+    }
+    function stopEvent(event) {
+
+        event.stopPropagation();
+
+    }//Отмена передачи события по DOM (разделить клик на ячейку таблицы и на элемент таблицы)
+    function MonthForward() {
+        var calendarHeader = document.getElementById("calendarHeader");
+        var currentDate = new Date(calendarHeader.getAttribute("data-year"), calendarHeader.getAttribute("data-month"));
+        currentDate.setMonth(currentDate.getMonth() + 1);
+        UpdateCalendarData(currentDate.getFullYear(), (currentDate.getMonth() + 1));
+
+    }
+    function MonthBack() {
+        var calendarHeader = document.getElementById("calendarHeader");
+        var currentDate = new Date(calendarHeader.getAttribute("data-year"), calendarHeader.getAttribute("data-month"));
+        currentDate.setMonth(currentDate.getMonth() - 1);
+        UpdateCalendarData(currentDate.getFullYear(), (currentDate.getMonth() + 1));
+    }
+    function MonthNow() {
+        var calendarHeader = document.getElementById("calendarHeader");
+        UpdateCalendarData(new Date().getFullYear(), new Date().getMonth() + 1);
+
+    }
+    function FillYandexMapsHref()    {
+        var hrefElement = document.getElementById("adressMapsHref");
+        var adressMass = "{{company.adress}}".split(' ');
+        var searchString = "{{company.city}}";
+        for(i = 0; i<adressMass.length; i++)
+        {
+            searchString += "%20" + adressMass[i];
+        }
+        var adressString = "https://maps.yandex.ru/239/sochi/?ll=39.722882%2C43.581509&z=10&text=" + searchString;
+        //<a href="https://maps.yandex.ru/239/sochi/?ll=39.722882%2C43.581509&z=10&text=Любой%20текст&sll=39.722882%2C43.581509&sspn=1.628723%2C0.642919">YandexMaps</a>
+        hrefElement.setAttribute("href", adressString);
+    }
+    function addPresentatorEvent(_new, _date){
+        var modalHeaderElement = document.getElementById("modalWindowHeader");
+        modalHeaderElement.innerHTML = "Добавить событие";
+        showModalWindow('modalWindow', true);
+        dict = {'date':_date}
+        sendAjaxRequest('POST', '/addPresentatorEvent/', dict, getAjaxResponsePresentatorEvent);
+        var okButton = document.getElementById("modalWindowOkButton");
+        okButton.onclick = addPresentatorEventValue;
+    }
+    function addPresentatorEventValue()    {
+        showModalWindow('modalWindow', false);
+        dict = {
+            'fullday':document.getElementById("fullday").checked,
+            'timeFrom':document.getElementById("timeFrom").value,
+            'timeTo':document.getElementById("timeTo").value,
+            'presentatorEventDescription':document.getElementById("presentatorEventDescription").value,
+            'presentatorEventComment':document.getElementById("presentatorEventComment").value,
+            'city':document.getElementById("city").value,
+            'date': document.getElementById("presentatorEventDate").value
+        }
+
+        sendAjaxRequest('POST', '/addPresentatorEventSave/', dict, getAjaxResponseFillModalCalendarData);
+    }
+    function deletePresentatorEvent(_presentatorEvent){
+        if(confirm("Удалить событие?"))
+        {
+            dict = {'id':_presentatorEvent}
+            sendAjaxRequest('POST', '/deletePresentatorEvent/', dict, getAjaxResponseFillModalCalendarData)
+        }
+
+
+    }
+    function ChangeSelect()    {
+        if(document.getElementById("fullday").checked)
+        {
+            document.getElementById("timeFrom").disabled = true;
+            document.getElementById("timeTo").disabled = true;
+        }
+        else{
+            document.getElementById("timeFrom").disabled = false;
+            document.getElementById("timeTo").disabled = false;
+        }
+
+    }
+    function getAjaxResponsePresentatorEvent(response){
+        var element = document.getElementById("modalInside");
+        element.innerHTML = response;
+    }
+    function FillPresentator()    {
+        dict = {
+            'city':document.getElementById("city").value,
+            'artist':document.getElementById("artist").value
+        };
+        sendAjaxRequest('POST', '/getpresentatorslist', dict, getAjaxResponseUpdatePresentatorsList);
+
+    }
+    function getAjaxResponseUpdatePresentatorsList(response)    {
+        document.getElementById("presentatorSpan").innerHTML = response;
+        UpdateCalendarData(new Date().getFullYear(), (new Date().getMonth() + 1));
+    }
+    </script>
+    <script>
+        FillPresentator();
+        //UpdateCalendarData(new Date().getFullYear(), (new Date().getMonth() + 1));
+        FillYandexMapsHref();
+    </script>
+
+    {%endblock%}

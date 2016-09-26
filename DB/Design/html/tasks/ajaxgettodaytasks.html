@@ -1,0 +1,110 @@
+﻿{% load filters %}
+<p class="headerL">{{currentDateTime.date}}</p>
+
+<hr />
+{%if tasks or tasksExpired or eventsWeekCalls or eventsDayCalls or eventsRecentlyCrashed%}
+{%else%}
+<p class="headerM">Задачи на этот день отсутствуют</p>
+{%endif%}
+{%if tasks%}
+<p class="headerM">Задачи на сегодня:</p>
+<table  width="100%" id="todayTasks">
+    {%for task in tasks%}
+    {%if task.done%}
+    <tr class="executedTask" id="trTodayTasks{{task.id}}" onclick="DoneTask('TodayTasks{{task.id}}', {{task.id}})" onmouseover="ShowButton('todayTasks{{task.id}}');" onmouseleave="HideButton('todayTasks{{task.id}}');">
+        <td width="1%"><input type="checkbox" checked id="checkTodayTasks{{task.id}}" onclick="CorrectCheckBox('checkTodayTasks{{task.id}}')" /></td>
+        {%else%}
+    <tr class="taskHeader" id="trTodayTasks{{task.id}}"  onclick="DoneTask('TodayTasks{{task.id}}', {{task.id}})" onmouseover="ShowButton('todayTasks{{task.id}}');" onmouseleave="HideButton('todayTasks{{task.id}}');">
+        <td width="1%"><input type="checkbox" id="checkTodayTasks{{task.id}}" onclick="CorrectCheckBox('checkTodayTasks{{task.id}}')" /></td>
+        {%endif%}
+
+        
+        <td width="70%">
+            {{ task.artist.name }} - {{task.company.city.name}},&nbsp{{task.company.name}}
+        </td>
+        <td width="29%">{{task.description}}</td>
+        <td><div class="buttonGoToCompany" onclick="goToCompany('/company/{{task.company.id}}/', 'todayTasks{{task.id}}');" id="todayTasks{{task.id}}">▶</div></td>
+    </tr>
+    {%endfor%}
+</table>
+{%endif%}
+{%if tasksExpired%}
+<p class="headerM">Просроченные задачи:</p>
+<table width="100%" id="expiredTasks">
+    {%for task in tasksExpired%}
+    <tr class="taskHeader" id="trExpiredTasks{{task.id}}" onclick="DoneTask('ExpiredTasks{{task.id}}', {{task.id}})" onmouseover="ShowButton('expiredTasks{{task.id}}');" onmouseleave="HideButton('expiredTasks{{task.id}}');">
+        <td width="1%"><input type="checkbox" id="checkExpiredTasks{{task.id}}" onclick="CorrectCheckBox('checkExpiredTasks{{task.id}}')" /></td>
+
+
+        <td width="70%">
+            {{ task.artist.name }} - {{task.company.city.name}},&nbsp{{task.company.name}}
+        </td>
+        <td width="29%">{{task.description}}</td>
+        <td><div class="buttonGoToCompany" onclick="goToCompany('/company/{{task.company.id}}/', 'expiredTasks{{task.id}}');" id="expiredTasks{{task.id}}">▶</div></td>
+    </tr>
+    {%endfor%}
+</table>
+{%endif%}
+{%if eventsWeekCalls%}
+<p class="headerM">Звонки за неделю:</p> 
+     <table width="100%" id="weekCalls">
+         {%for event in eventsWeekCalls%}
+         {%if event.attentionCallWeekDone%}
+         <tr class="executedTask" id="trWeekCalls{{event.id}}" onclick="DoneCall('WeekCalls{{event.id}}', '{{event.id}}', 'week')" onmouseover="ShowButton('weekCalls{{event.id}}');" onmouseleave="HideButton('weekCalls{{event.id}}');">
+             <td width="1%"><input type="checkbox" checked id="checkWeekCalls{{event.id}}" /></td>
+             {%else%}
+         <tr class="taskHeader" id="trWeekCalls{{event.id}}" onclick="DoneCall('WeekCalls{{event.id}}', '{{event.id}}', 'week')" onmouseover="ShowButton('weekCalls{{event.id}}');" onmouseleave="HideButton('weekCalls{{event.id}}');">
+             <td width="1%"><input type="checkbox" id="checkWeekCalls{{event.id}}" /></td>
+             {%endif%}
+
+             <td width="70%">
+                 {{ event.artist.name }} - {{event.company.city.name}}, &nbsp{{event.company.name}}
+             </td>
+             <td width="15%">{{event.attentionCallWeekComment}}</td>
+             <td width="15%">{{event.startTime|date:"Y-m-d"|datecountdown}}</td>
+             <td><div class="buttonGoToCompany" onclick="window.open('/company/{{event.company.id}}/');" id="weekCalls{{event.id}}">▶</div></td>
+         </tr>
+         {%endfor%}
+</table>
+{%endif%}
+
+{%if eventsDayCalls%}
+    <p class="headerM">Звонки за день:</p>    
+    <table  width="100%" id="dayCalls">
+        {%for event in eventsDayCalls%}
+        {%if event.attentionCallDayDone%}
+        <tr class="executedTask" id="trDayCalls{{event.id}}" onclick="DoneCall('DayCalls{{event.id}}', '{{event.id}}', 'day')" onmouseover="ShowButton('dayCalls{{event.id}}');" onmouseleave="HideButton('dayCalls{{event.id}}');">
+            <td width="1%"><input type="checkbox" checked id="checkDayCalls{{event.id}}" /></td>
+            {%else%}
+        <tr class="taskHeader" id="trDayCalls{{event.id}}" onclick="DoneCall('DayCalls{{event.id}}', '{{event.id}}', 'day')" onmouseover="ShowButton('dayCalls{{event.id}}');" onmouseleave="HideButton('dayCalls{{event.id}}');">
+            <td width="1%"><input type="checkbox" id="checkDayCalls{{event.id}}" /></td>
+            {%endif%}
+
+            <td width="70%">
+                {{ event.artist.name }} - {{event.company.city.name}}, &nbsp{{event.company.name}}
+            </td>
+            <td width="15%">{{event.attentionCallDayComment}}</td>
+            <td width="15%">{{event.startTime|date:"Y-m-d"|datecountdown}}</td>
+            <td><div class="buttonGoToCompany" onclick="window.open('/company/{{event.company.id}}/');" id="dayCalls{{event.id}}">▶</div></td>
+        </tr>
+        {%endfor%}
+</table>
+{%endif%}
+{%if eventsRecentlyCrashed%}
+<p class="headerM">Недавно слетевшие:</p>
+    
+<table width="100%" id="resentlyCrashed">
+    {%for event in eventsRecentlyCrashed %}
+    <tr class="taskHeader" onmouseover="ShowButton('resentlyCrashed{{event.id}}');" onmouseleave="HideButton('resentlyCrashed{{event.id}}');">
+        <td width="70%">
+            {{ event.artist.name }} - {{event.company.city.name}}, &nbsp{{event.company.name}}
+        </td>
+        <td width="15%">{{event.crash}}</td>
+        <td width="15%">{{event.startTime|date:"Y-m-d"|datecountdown}}</td>
+        <td><div class="buttonGoToCompany" onclick="window.open('/company/{{event.company.id}}/');" id="resentlyCrashed{{event.id}}">▶</div></td>
+    </tr>
+    {%endfor%}
+</table>
+{%endif%}
+
+   

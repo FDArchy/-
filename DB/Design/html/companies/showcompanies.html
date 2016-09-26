@@ -1,0 +1,183 @@
+﻿{% extends "html\companies\!companies.html" %}
+
+{% block showcompanies %} 
+    {% load filters %}
+<style>
+	table.list
+    { 
+    		
+		table-layout: fixed;
+		width: 100%; /* Ширина таблицы */
+    	border-spacing: 0; /* Расстояние между ячейками */
+        border-width:3px;
+   	}    
+   
+    table.filter
+    {
+        table-layout: fixed;
+    	border-spacing: 10; /* Расстояние между ячейками */
+        border-width:3px;
+    }
+    
+	td.list
+    {
+       
+        font-size:12px;
+	    empty-cells:show;
+        
+	}
+   	tr.list:nth-child(1)
+    {
+    	background: #666; /* Цвет фона */
+    	color: #fff;  /*Цвет текста */
+   	} 
+    tr.list:nth-child(1):hover
+    {
+        cursor:auto;
+        background-color:#666;
+    }
+    tr.list:hover
+    {
+        cursor:pointer;
+        background-color:#ffac00;
+    }
+    select
+    {
+        width:100%;
+    }
+
+ </style>
+
+<form action="/showcompanies/page/1/" name="filter" method="post">
+    <table class="filter">
+        <tr>
+            <td>
+                Тип учреждения
+            </td>
+            <!--<td>
+                Город
+            </td>-->
+            <td>
+                Шоу
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <select name="ctype_filter">
+                    <option selected value="Все">Все</option>
+                    <option value="ДС">ДС</option>
+                    <option value="ШК">ШК</option>
+                    <option value="ДК">ДК</option>
+                    <option value="ДО">ДО</option>
+                </select>
+            </td>
+
+            <td>
+                <select name="artist_filter">
+                    <option selected value="Все">Все</option>
+                    {%for artist in artists%}
+                    <option value="{{artist.id}}">{{artist.name}}</option>
+                    {%endfor%}
+                </select>
+                <!--<input type="text" value="{{ search_filter }}" name="search_filter">-->
+
+            </td>
+        </tr>
+        <tr>
+            <td><input type="submit" value="Применить"></td>
+            <td></td>
+            <td></td>
+        </tr>
+    </table>    
+</form>
+
+<hr />
+<form action="/addcompany/" method="post">
+    <input type="submit" value="Добавить клиента">
+
+</form>
+
+
+	
+
+	<hr>
+	<table id="companiesTable" class="list" border="1">
+	
+		
+        <tr class="list">
+            <!--<td width = "8%">Код в базе </td>-->
+            <td width="10%">Тип учреждения </td>
+            <td>Название учреждения </td>
+            <td>Город </td>
+            <td>Адрес </td>
+            <td>Шоу</td>
+            <td>Последний звонок</td>
+            <td>Последняя задача</td>
+            <td>Последнее мероприятие</td>
+        </tr>
+
+	{% for company in allowedCompanies %}
+        <tr class="list" onclick="window.open('/company/{{company.company.company__id}}/');">
+            <td width="8%">{{company.company.company__ctype}} </td>
+            <td>{{company.company.company__name}} </td>
+            <td>{{company.company.company__city__name}} </td>
+            <td>{{company.company.company__adress}} </td>
+            <td>{{company.company.show__name}}</td>
+            
+            {%if company.call.0.datetime%}
+            <td>{{company.call.0.datetime|date:"Y-m-d"|datecountdown}}</td>
+            {%else%}
+            <td>Звонков не было</td>
+            {%endif%}
+            {%if company.task.0.datetime%}
+            <td>{{company.task.0.datetime|date:"Y-m-d"|datecountdown}}</td>
+            {%else%}
+            <td>Задачи отсутствуют</td>
+            {%endif%}
+            {%if company.event.0.startTime%}
+            <td>{{company.event.0.startTime|date:"Y-m-d"|datecountdown}}</td>
+            {%else%}
+            <td>Мероприятия еще не назначены</td>
+            {%endif%}
+
+        </tr>
+	{%endfor%}
+
+        
+	</table>
+
+			{% if current_companies.has_previous %}
+	                    <a href="/showcompanies/page/{{ current_companies.previous_page_number }}/">&laquo</a>
+	                {% else %}
+	                   <a href="">&laquo;</a>
+	                {% endif %}
+	                {% for page in current_companies.paginator.page_range %}
+	                    {% if page == current_companies.number %}
+	                        <a style="font-size:24px; color:red;" href="/showcompanies/page/{{ page }}/">{{ page }}</a>
+	                    {% else %}
+	                        <a href="/showcompanies/page/{{ page }}/">{{ page }}</a>
+	                    {% endif %}
+	                {% endfor %}
+	                {% if current_companies.has_next %}
+	                    <a href="/showcompanies/page/{{ current_companies.next_page_number }}/">&raquo;</a></li>
+	                {% else %}
+	                   <a href="">&raquo;</a>
+	                {% endif %}
+
+<script>
+    getPreviousData();
+    function getPreviousData()//Задает значения предыдущей выбранной даты (чтобы не сбрасывались)
+    {
+        if ("{{request.session.ctype_filter}}" != "None" && "{{request.session.ctype_filter}}" != "")
+            document.forms.filter.ctype_filter.value = "{{request.session.ctype_filter}}";
+        //if ("{{request.session.city_filter}}" != "")
+            //document.forms.filter.city_filter.text = "{{previous_data.city}}";
+        if ("{{request.session.artist_filter}}" != "None" && "{{request.session.artist_filter}}" != "")
+            document.forms.filter.artist_filter.value = "{{request.session.artist_filter}}";
+
+    }
+
+
+</script>
+
+{%endblock%}
