@@ -124,8 +124,7 @@ function showModalWindow(_windowID, currentStatus, resFunction, tittle){
 }
 
 
-function showModalWindow_new(_button_types, _tittle, _content, _on_ok, _other_buttons)
-{
+function showModalWindow_new(_button_types, _tittle, _content, _on_ok, _other_buttons){
     var modalModule = $('<div>').attr("id", "modal-module");
 
     var background = $('<div>').attr("id", "modal-window-background");
@@ -155,56 +154,47 @@ function showModalWindow_new(_button_types, _tittle, _content, _on_ok, _other_bu
     var buttons = $('<div>').addClass("textFooter displayInline");
     $(container).append(buttons);
 
-
-
-
-
-    /*
-
-
-    <div class="textMiddle">
-        <div class="textFooter displayInline">
-            <input type="button" value="OK" id="modalWindowOkButton">
-            &nbsp;
-            <input type="button" value="Удалить" id="modalWindowDeleteButton" class="nonDisplay" />
-        </div>
-    </div>
-</div>*/
     switch (_button_types) {
         case "ok":
             var button = $('<input>').attr("type", "button").addClass("btn btn-default").attr("onclick", 'hideModalWindow("' + modalWindowID + '");').val("Oк");
             $(buttons).append(button);
-
-
             break;
         case "okcancel":
-            debugger;
-            var button = $('<input>').attr("type", "button").addClass("btn btn-default").attr("onclick", _on_ok()).val("OК");
+            var button = $('<input>').attr("type", "button").addClass("btn btn-default").val("OК");
+            $(button).click(_on_ok);
             $(buttons).append(button);
-            $(buttons).append('<span>&nbsp<span>')
+            $(buttons).append('<span>&nbsp</span>');
             var button = $('<input>').attr("type", "button").addClass("btn btn-default").attr("onclick", 'hideModalWindow("' + modalWindowID + '");').val("Отмена");
             $(buttons).append(button);
             break;
         case "custom":
 
-           var button = $('<input>').attr("type", "button").addClass("btn btn-default").attr("onclick", _on_ok()).val("OК");
+           var button = $('<input>').attr("type", "button").addClass("btn btn-default").val("OК");
+            $(button).click(_on_ok);
             $(buttons).append(button);
+            $(buttons).append('<span>&nbsp</span>');
             var button = $('<input>').attr("type", "button").addClass("btn btn-default").attr("onclick", 'hideModalWindow("' + modalWindowID + '");').val("Отмена");
             $(buttons).append(button);
+            $(buttons).append('<span>&nbsp</span>');
             for(key in _other_buttons){
-                var button = $('<input>').attr("type", "button").addClass("btn btn-default").click(_other_buttons[key]).val(key);
+                var button = $('<input>').attr("type", "button").addClass("btn btn-default").val(key);
+                button.click(_other_buttons[key]);
                 $(buttons).append(button);
-                $(buttons).html("&nbsp;");
+                $(buttons).append('<span>&nbsp</span>');
             }
             break;
         default:
             break;
 
     }
+
+
     $(modalWindow.append(container));
     modalModule.append(modalWindow);
     $('body').append(modalModule);
 
+
+    
 
     var modalElement = document.getElementById(modalWindowID);
         modalElement.style.visibility = "visible";
@@ -219,8 +209,7 @@ function showModalWindow_new(_button_types, _tittle, _content, _on_ok, _other_bu
 
 
 }
-function hideModalWindow(_windowID)
-{
+function hideModalWindow(_windowID){
     var modalWindow = $('#' + _windowID)
     modalWindow.css("visibility", "hidden");
     modalWindow.css("top", "-1000px");

@@ -243,7 +243,7 @@ div.container-settings{
             </div>
             </div>
     </div>
-    <input type="button" value="test" onclick='showModalWindow_new("okcancel", "История задач", "Другой", function(){});'>
+    <input type="button" value="test" onclick='showModalWindow_new("custom", "История задач", "Другой", tempor, {"Одна":tempor1, "Вторая":tempor2});'>
     <script>
     function changeTab(tab){
 
@@ -289,6 +289,18 @@ div.container-settings{
 
         }
 
+    function tempor()
+    {
+        alert("test");
+    }
+    function tempor1()
+    {
+        alert("test1");
+    }
+    function tempor2()
+    {
+        alert("test2");
+    }
     </script>
 
 
