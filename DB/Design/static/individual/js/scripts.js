@@ -125,16 +125,44 @@ function showModalWindow(_windowID, currentStatus, resFunction, tittle){
 
 
 function showModalWindow_new(_button_types, _tittle, _content, _on_ok, _other_buttons){
-    var modalModule = $('<div>').attr("id", "modal-module");
 
-    var background = $('<div>').attr("id", "modal-window-background");
+    var allModalWindows = $('.modalWindow');
+
+    for(i = 0; i < allModalWindows.length; i++)
+    {
+        var newLeftIndent = parseInt($(allModalWindows[i]).css("left")) - 600;
+        $(allModalWindows[i]).animate({
+            left: newLeftIndent + "px"
+        }, 50)
+    }
+    var currentModalWindowID = allModalWindows.length;
+
+
+    var modalModule;
+    if($('#modal-module').val() == undefined){//Если контейнера нет, тогда создать его
+
+        var modalModule = $('<div>').attr("id", "modal-module");
+
+        var background = $('<div>').attr("id", "modalWindowBackground");
+        background.attr('onclick', "hideAllModalWindows();");
+
+        $(modalModule).append(background);
+        $('body').append(modalModule);
+    }
+    else{
+        modalModule = $('#modal-module');
+        var background = $('#modalWindowBackground');
+    }
     background.css("visibility", "visible");
-    $(modalModule).append(background);
+
+
 
 
     var modalWindow = $('<div>').addClass("modalWindow");
     modalWindowID = "modalWindow" + $('.modalWindow').length;
     modalWindow.attr("id", modalWindowID);
+
+
 
     var closeCross = $('<a>').addClass("closecross").attr("onclick", "hideModalWindow('" + modalWindowID + "');");
     var crossIcon = $('<span>').addClass("glyphicon glyphicon-remove btn btn-default");
@@ -191,22 +219,37 @@ function showModalWindow_new(_button_types, _tittle, _content, _on_ok, _other_bu
 
     $(modalWindow.append(container));
     modalModule.append(modalWindow);
-    $('body').append(modalModule);
+
+    var topCoord = -1000;
+    topCoord -= $(modalWindow).offset().top  - $(window).scrollTop();
+    topCoord += 60;
+
+    modalWindow.animate({
+        top:topCoord + "px"
+    }, 50).css("visibility", "visible");
 
 
-    
+    //modalElement.style.visibility = "visible";
+    //$(modalWindow).css("top", topCoord + "px");
+    /*
+    var topCoord = -1000;
+    topCoord -= $(modalWindow).offset().top  - $(window).scrollTop();
+    topCoord += 60;
+    $(modalWindow).css("top", topCoord + "px");
 
-    var modalElement = document.getElementById(modalWindowID);
+
+    debugger;
         modalElement.style.visibility = "visible";
         var topCoord = -1000;
+
         topCoord -= modalElement.getBoundingClientRect().top;
         topCoord += 60;
 
-
+/*
         //modalElement.style.top = "15%";
         modalElement.style.top = topCoord + "px";
 
-
+*/
 
 }
 function hideModalWindow(_windowID){
@@ -218,7 +261,19 @@ function hideModalWindow(_windowID){
     $('#modalWindowBackground').css("visibility", "hidden");
     setTimeout(function(){$(modalWindow).remove()},200);
 }
+function hideAllModalWindows(){
 
+    var modalWindows = $('.modalWindow');
+    for (i = 0; i < modalWindows.length; i++)
+    {
+        var modalWindow = $('#' + $(modalWindows[i]).attr('id'));
+        modalWindow.css("visibility", "hidden");
+        modalWindow.css("top", "-1000px");
+    }
+    $('#modalWindowBackground').css("visibility", "hidden");
+
+    setTimeout(function(){$('#modal-module').remove()},200);
+}
 function getCurrentDate() {
     var currentDate = new Date();
     var months = ["Январь", "Февраль", "Март", "Апрель", "Май", "Июнь", "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь"];
