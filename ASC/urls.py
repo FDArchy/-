@@ -45,7 +45,7 @@ from DB.views import cmsLinkReturn
 from DB.views import changePermission
 
 
-from DB.views import changeFilterValues
+
 from DB.views import  statsajax
 from  DB.views import companiescontrol
 from  DB.views import ajaxTasksHistory
@@ -61,7 +61,7 @@ from DB.views import login
 from DB.views import logout
 #COMPANIES:
 from DB.views import showcompany_new
-
+from DB.views import din_working_company_content
 
 admin.autodiscover()
 
@@ -109,7 +109,7 @@ urlpatterns = patterns('',
     (r'^saveartistcomment/$', saveartisttcomment),
     (r'^$', redirecttomain),
 
-    (r'changeFilterValues', changeFilterValues),
+
     (r'cmsLinkReturn', cmsLinkReturn),
     (r'changePermission', changePermission),
     (r'companiescontrol', companiescontrol),
@@ -124,6 +124,7 @@ urlpatterns = patterns('',
     (r'^logout/$', logout),
 #COMPANIES
     (r'^company_new/(\d+)/$', showcompany_new),
+    (r'aj_workingcompanycontent/$', din_working_company_content),
 
     # Examples:
     # url(r'^$', 'ASC.views.home', name='home'),

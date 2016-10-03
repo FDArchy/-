@@ -471,17 +471,6 @@ def ajaxgetcompanydata(request):
 
 
 
-
-#ДОРАБОТАТЬ, СДЕЛАТЬ ЧЕРЕЗ КУКИ ИЛИ СЕССИЮ, А НЕ ЧЕРЕЗ БД, В ДАННЫЙ МОМЕНТ НЕ ИСПОЛЬЗУЕТСЯ
-def changeFilterValues(request):
-    suser = SiteUser.objects.get(user = request.user)
-    suser.city = City.objects.get(id = request.POST.get("city"))
-    suser.artist = Artist.objects.get(id = request.POST.get("artist"))
-    suser.save()
-    return  HttpResponse("success")
-
-#=======================================================================================================================
-
 #=========МЕРОПРИЯТИЯ АРТИСТОВ (ЗАНЯТОЕ ВРЕМЯ)==========================================================================
 def addPresentatorEvent(request):
     date = request.POST.get("date")
@@ -1109,7 +1098,8 @@ def help(request):
 #=====================================CONTROL================================================================================
 ###########УПРАВЛЕНИЕ ДОСТУПОМ МЕНЕДЖЕРОВ###################################################################
 def companiescontrol(request):
-    managers = Manager.objects.exclude(name = 'archy')
+    #managers = Manager.objects.exclude(name = 'archy')
+    managers = Manager.objects.all()
     artists = Artist.objects.all()
     cities = City.objects.all()
     types = ["ДС","ШК","ДК", "ДО"]
@@ -1501,12 +1491,43 @@ def showcompany_new(request, company_number):
         if(CMSILink.objects.filter(company__id = company.id, manager = manager).count() == 0):
             return redirect('/showcompaniesnew')
 
-    siteUser = SiteUser.objects.get(user = request.user)
+    site_user = SiteUser.objects.get(user = request.user)
+
+    allowed_shows = Artist.objects.filter(id__in = CMSILink.objects.filter(manager = manager, company__id = company.id).values("show"))
+
+    print(allowed_shows);
+
+
+    return render_to_response('Design/html/companies/company_page/showcompany.html', {'company':company, 'user':site_user, 'shows':allowed_shows})
+def din_working_company_content(request):
+
+    company = Company.objects.get(id = request.POST.get('company'))
+    manager = Manager.objects.get(username = request.user.username)
+    all = False
+    if(request.POST.get('artist') == '0'):
+        artist = Artist.objects.filter(id__in = CMSILink.objects.filter(manager = manager, company__id = company.id).values("show"))
+        all = True
+
+    else:
+        artist = Artist.objects.filter(id = request.POST.get('artist'))
+
+    last_call = Call.objects.filter(company = company, artist__in = artist).order_by("-datetime")[:1]
+    last_task = Task.objects.filter(company = company.id, artist__in = artist, datetime__lte = datetime.now()).order_by("-datetime")[:1]
+    next_task = Task.objects.filter(company = company.id, artist__in = artist, datetime__gte = datetime.now()).order_by("-datetime")[:1]
+    last_event = Event.objects.filter(company = company.id, startTime__lte = datetime.now(), artist__in = artist).order_by("-startTime")[:1]
+    next_event = Event.objects.filter(company = company.id, startTime__gte = datetime.now(), artist__in = artist).order_by("startTime")[:1]
 
 
 
-    return render_to_response('Design/html/companies/company_page/showcompany.html', {'company':company})
+
+    #АДМИНСКАЯ ЛАБУДА
+    # if(request.user.has_perm("DB.is_siteadmin")):
+    #     artists = Artist.objects.all()
+    # else:
+    #     artists = CMSILink.objects.filter(manager = Manager.objects.get(username = request.user.username), company__id = company.id)
 
 
+
+    return render_to_response('Design/html/companies/company_page/din_working_company_content.html', {'last_call':last_call, 'last_task':last_task, 'next_task':next_task, 'last_event':last_event, 'next_event':next_event, 'all_button':all}, context_instance=RequestContext(request))
 
 #############################################################################################

@@ -35,11 +35,10 @@
     color: #5cb85c;
 
 }
-
-.vcenter {
-    display: flex;
-    align-items: center;
+.inheritanceTextColor{
+    color:inherit;
 }
+
 
 hr.primary{
     color: #428bca; /* Цвет линии для остальных браузеров */
@@ -52,7 +51,7 @@ div.container-settings{
     padding-bottom: 15px;
     margin-bottom: 15px;
 }
-#interactive_content{
+#dinamic_content{
     padding-top: 5px;
     padding-bottom: 10px;
     padding-left: 7px;
@@ -64,7 +63,7 @@ div.container-settings{
 </style>
 
     <div style="width: 80%" class="container panel panel-primary">
-        <div class="row panel-heading">
+        <div class="row panel-heading " >
             <div class="col-md-11">
                 {% if company.ctype %}
                 <span class="companyType">{{ company.ctype }}</span>
@@ -75,7 +74,7 @@ div.container-settings{
         <div class="panel-body">
             <div class="row" title="Показать на карте">
                 <div class="col-md-12 text-left ">
-                    <button type="button" class="btn btn-default" onclick="window.open('https://yandex.ru/maps/?text={{ company.city }}%20{{ company.adress }}')"> <span class="glyphicon glyphicon-road text-primary" ></span><span> {{ company.city }}, {{ company.adress }}</span></button>
+                    <button type="button" class="btn btn-default" style="white-space: normal" onclick="window.open('https://yandex.ru/maps/?text={{ company.city }}%20{{ company.adress }}')"> <span class="glyphicon glyphicon-road text-primary" ></span><span> {{ company.city }}, {{ company.adress }}</span></button>
                 </div>
             </div>
              <hr class="primary">
@@ -128,126 +127,32 @@ div.container-settings{
         </div>
         <div  class="container container-settings">
             <ul class="nav nav-tabs" >
-                <li   class="active" onclick="changeTab('0')" data-id="0" data-color="#555"><a href="" data-toggle="tab">Все</a></li>
-                <li  onclick="changeTab(1)" data-id="1" data-color="#00ff00"><a href="" data-toggle="tab">Песочное шоу</a></li>
-                <li onclick="changeTab(2);" data-id="2" data-color="#0000ff"><a href="" data-toggle="tab">Тесла</a></li>
+                {% if shows.count == 1 %}
+                    <li   class="active" onclick="changeTab('{{ shows.0.id }}')" data-id="{{ shows.0.id }}" data-color="{{ shows.0.color }}"><a href="" data-toggle="tab">{{ shows.0.name }}</a></li>
+                {% else %}
+                    <li   class="active" onclick="changeTab('0')" data-id="0" data-color="#555"><a href="" data-toggle="tab">Все</a></li>
+                    {% for show in shows %}
+                        <li  onclick="changeTab('{{ show.id }}')" data-id="{{ show.id }}" data-color="{{ show.color }}"><a href="" data-toggle="tab">{{ show.name }}</a></li>
+                    {% endfor %}
+                {% endif %}
+
+
             </ul>
-            <div class="container" id="interactive_content">
-                <div   class="row">
-                    <div class="col-md-4 text-left">
-                        <span title="Последний звонок"  class="glyphicon glyphicon-earphone icon text-primary"></span><span class="text-primary">Нагуманов Артем</span>
-                    </div>
-                    <div class="col-md-3 text-left">
-                        <span class="text-primary">24.05.16</span>
-                    </div>
-                    <div class="col-md-3 text-left">
-                        <span class="text-primary">Результат</span>
-                    </div>
-                    <div style="padding-left:0px;" class="col-md-2 text-right">
-                        <span id="mark-call-button" title="Отметить звонок" onclick="markCall();"  class="glyphicon glyphicon-ok-circle icon-pressed text-primary"></span>
-                        <span title="Отметить звонок и добавить задачу"  class="glyphicon glyphicon-plus icon-pressed text-primary"></span>
-                        <span title="История"  class="glyphicon glyphicon-list icon-pressed text-primary"></span>
-                    </div>
+                <div class="container" id="dinamic_content">
+
                 </div>
-                <hr class="primary">
-                <div class="row vcenter">
-                    <div class="col-md-10 ">
-                        <div class="row">
-                            <div class="col-md-5 text-left">
-                        <span class="icon" title="Предыдущая задача">
-                            <span   class="glyphicon glyphicon-chevron-left text-primary"></span>
-                            <span   class="glyphicon glyphicon-flag  text-primary"></span>
-                        </span>
-                                <span class="text-primary">Нагуманов Артем</span>
-                            </div>
-                            <div class="col-md-2 text-left">
-                                <span class="text-primary">24.05.16</span>
-                            </div>
-                            <div class="col-md-2 text-right">
-                                <span class="text-primary">Результат</span>
-                            </div>
-                            <div class="col-md-1 text-right">
-                                <span title="Подробнее"  class="glyphicon glyphicon-info-sign icon-pressed text-primary"></span>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-5 text-left">
-                        <span class="icon" title="Следующая задача">
-                            <span   class="glyphicon glyphicon-chevron-right text-primary"></span>
-                            <span   class="glyphicon glyphicon-flag  text-primary"></span>
-                        </span>
-                                <span class="text-primary">Нагуманов Артем</span>
-                            </div>
-                            <div class="col-md-2 text-left">
-                                <span class="text-primary">24.05.16</span>
-                            </div>
-                            <div class="col-md-2 text-right">
-                                <span class="text-primary">Результат</span>
-                            </div>
-                            <div class="col-md-1 text-right">
-                                <span title="Подробнее"  class="glyphicon glyphicon-info-sign icon-pressed text-primary"></span>
-                            </div>
-                        </div>
-                    </div>
-                    <div style="padding-left: 0px;" class="col-md-2 text-right" >
-                        <span title="Добавить задачу"  class="glyphicon glyphicon-plus icon-pressed text-primary"></span>
-                        <span title="История"  class="glyphicon glyphicon-list icon-pressed text-primary"></span>
-                    </div>
-                </div>
-                <hr class="primary">
-                <hr class="primary">
-                <div class="row vcenter">
-                    <div class="col-md-10 ">
-                        <div class="row">
-                            <div class="col-md-5 text-left">
-                        <span class="icon" title="Предыдущее мероприятие">
-                            <span   class="glyphicon glyphicon-chevron-left text-primary"></span>
-                            <span   class="glyphicon glyphicon-play-circle  text-primary"></span>
-                        </span>
-                                <span class="text-primary">Нагуманов Артем</span>
-                            </div>
-                            <div class="col-md-2 text-left">
-                                <span class="text-primary">24.05.16</span>
-                            </div>
-                            <div class="col-md-2 text-center">
-                                <span title="Запланировано"  class="glyphicon glyphicon-time icon  text-primary"></span>
-                            </div>
-                            <div class="col-md-1 text-right">
-                                <span title="Подробнее"  class="glyphicon glyphicon-info-sign icon-pressed text-primary"></span>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-5 text-left">
-                        <span class="icon" title="Следующее мероприятие">
-                            <span   class="glyphicon glyphicon-chevron-right text-primary"></span>
-                            <span   class="glyphicon glyphicon-play-circle  text-primary"></span>
-                        </span>
-                                <span class="text-primary">Нагуманов Артем</span>
-                            </div>
-                            <div class="col-md-2 text-left">
-                                <span class="text-primary">24.05.16</span>
-                            </div>
-                            <div class="col-md-2 text-center">
-                                <span title="Успешно"  class="glyphicon glyphicon-check icon  text-success"></span>
-                            </div>
-                            <div class="col-md-1 text-right">
-                                <span title="Подробнее"  class="glyphicon glyphicon-info-sign icon-pressed text-primary"></span>
-                            </div>
-                        </div>
-                    </div>
-                    <div style="padding-left: 0px;" class="col-md-2 text-right" >
-                        <span title="Добавить задачу"  class="glyphicon glyphicon-plus icon-pressed text-primary"></span>
-                        <span title="История"  class="glyphicon glyphicon-list icon-pressed text-primary"></span>
-                    </div>
-                </div>
-            </div>
             </div>
     </div>
-    <input type="button" value="test" onclick='showModalWindow_new("custom", "История задач", "Другой", tempor, {"Одна":tempor1, "Вторая":tempor2});'>
+
     <script>
+
+
     function changeTab(tab){
 
             //Дизайн
+            $.post("/aj_workingcompanycontent/", {company:"{{ company.id }}", artist:tab}, function(response){
+                $('#dinamic_content').html(response);
+            })
 
             //Переводим свойства всех зависимых элементов в стандартное значение.
             $('.nav li a').css("border-left", "1px solid #fff");
@@ -267,9 +172,9 @@ div.container-settings{
 
             $('li[data-id=' + tab +'] a').css('border-top', '1px solid ' + $('li[data-id=' + tab +']').data("color"));
 
-            $('#interactive_content').css('border-left', '1px solid ' + $('li[data-id=' + tab +']').data("color"));
-            $('#interactive_content').css('border-right', '1px solid ' + $('li[data-id=' + tab +']').data("color"));
-            $('#interactive_content').css('border-bottom', '1px solid ' + $('li[data-id=' + tab +']').data("color"));
+            $('#dinamic_content').css('border-left', '1px solid ' + $('li[data-id=' + tab +']').data("color"));
+            $('#dinamic_content').css('border-right', '1px solid ' + $('li[data-id=' + tab +']').data("color"));
+            $('#dinamic_content').css('border-bottom', '1px solid ' + $('li[data-id=' + tab +']').data("color"));
 
             $('.nav').css("border-bottom", "1px solid" + $('li[data-id=' + tab +']').data("color"));
 
@@ -287,23 +192,13 @@ div.container-settings{
 
             }
 
-        }
+        }//Отметка звонка
 
-    function tempor()
-    {
-        showModalWindow_new("ok", "Tittle", "Content");
-    }
-    function tempor1()
-    {
-        alert("test1");
-    }
-    function tempor2()
-    {
-        alert("test2");
-    }
     </script>
 
-
+    <script>
+    $('ul.nav li:first').trigger("click");
+    </script>
 
 
     {%endblock%}

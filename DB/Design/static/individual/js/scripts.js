@@ -93,7 +93,7 @@ function sendAjaxRequest(_type, _adress, _params, _getResponseFunction, _errorFu
 }
 ///END AJAX MODULE////////////////////////////////////////////////////////////////////////////////
 
-
+//MODAL WINDOWS Module////////////////////////////////////////////////////////////////////////////////
 function showModalWindow(_windowID, currentStatus, resFunction, tittle){
     
     if (currentStatus)    {
@@ -103,8 +103,6 @@ function showModalWindow(_windowID, currentStatus, resFunction, tittle){
         topCoord -= modalElement.getBoundingClientRect().top;
         topCoord += 60;
 
-        
-        //modalElement.style.top = "15%";
         modalElement.style.top = topCoord + "px";
         var modalBackground = document.getElementById("modalWindowBackground");
         modalBackground.style.visibility = "visible";
@@ -121,22 +119,19 @@ function showModalWindow(_windowID, currentStatus, resFunction, tittle){
             resFunction();
     }
     
-}
+}//Переделать на новую функцию
 
 
 function showModalWindow_new(_button_types, _tittle, _content, _on_ok, _other_buttons){
 
     var allModalWindows = $('.modalWindow');
 
-    for(i = 0; i < allModalWindows.length; i++)
-    {
+    for(i = 0; i < allModalWindows.length; i++)    {
         var newLeftIndent = parseInt($(allModalWindows[i]).css("left")) - 600;
         $(allModalWindows[i]).animate({
             left: newLeftIndent + "px"
         }, 50)
-    }
-    var currentModalWindowID = allModalWindows.length;
-
+    }//Сдвигаем все открытые окна влево на 600
 
     var modalModule;
     if($('#modal-module').val() == undefined){//Если контейнера нет, тогда создать его
@@ -156,19 +151,14 @@ function showModalWindow_new(_button_types, _tittle, _content, _on_ok, _other_bu
     background.css("visibility", "visible");
 
 
-
-
     var modalWindow = $('<div>').addClass("modalWindow");
     modalWindowID = "modalWindow" + $('.modalWindow').length;
     modalWindow.attr("id", modalWindowID);
-
-
 
     var closeCross = $('<a>').addClass("closecross").attr("onclick", "hideModalWindow('" + modalWindowID + "');");
     var crossIcon = $('<span>').addClass("glyphicon glyphicon-remove btn btn-default");
     closeCross.append(crossIcon);
     modalWindow.append(closeCross);
-
 
     var modalTittle = $('<div>').addClass("modalWindowHeader textMiddle");
     modalTittle.html(_tittle);
@@ -178,7 +168,7 @@ function showModalWindow_new(_button_types, _tittle, _content, _on_ok, _other_bu
     modalContent.html(_content);
     $(modalWindow).append(modalContent);
 
-    var container = $('<div>').addClass("textMiddle")
+    var container = $('<div>').addClass("textMiddle");
     var buttons = $('<div>').addClass("textFooter displayInline");
     $(container).append(buttons);
 
@@ -229,37 +219,45 @@ function showModalWindow_new(_button_types, _tittle, _content, _on_ok, _other_bu
     }, 50).css("visibility", "visible");
 
 
-    //modalElement.style.visibility = "visible";
-    //$(modalWindow).css("top", topCoord + "px");
-    /*
-    var topCoord = -1000;
-    topCoord -= $(modalWindow).offset().top  - $(window).scrollTop();
-    topCoord += 60;
-    $(modalWindow).css("top", topCoord + "px");
-
-
-    debugger;
-        modalElement.style.visibility = "visible";
-        var topCoord = -1000;
-
-        topCoord -= modalElement.getBoundingClientRect().top;
-        topCoord += 60;
-
-/*
-        //modalElement.style.top = "15%";
-        modalElement.style.top = topCoord + "px";
-
-*/
 
 }
-function hideModalWindow(_windowID){
-    var modalWindow = $('#' + _windowID)
-    modalWindow.css("visibility", "hidden");
-    modalWindow.css("top", "-1000px");
+function hideModalWindow(_modalWindowID){
+
+    var modalWindow = $('#' + _modalWindowID);
+
+    var allModalWindows = $('.modalWindow');
+
+    var modalWindowNumber = parseInt(_modalWindowID.replace("modalWindow",""));
+    var modalWindowNumberLast = allModalWindows.length - 1;
+    var modalWindowNumberFirst = 0;
+    var shift = modalWindowNumberLast - modalWindowNumber + 1;
 
 
-    $('#modalWindowBackground').css("visibility", "hidden");
-    setTimeout(function(){$(modalWindow).remove()},200);
+    $(modalWindow).css("visibility", "hidden");
+    $(modalWindow).css("top", "-1000px");
+
+    setTimeout(function(){$(modalWindow).remove()},100);
+
+
+    for(i = modalWindowNumber; i < modalWindowNumberLast + 1; i++){
+            $(allModalWindows[i]).css("visibility", "hidden");
+            $(allModalWindows[i]).css("top", "-1000px");
+            setTimeout(function(){$(allModalWindows[i]).remove()},100);
+
+            //setTimeout(function(){$(modalWindow).remove()},300);
+        }//Если закрывается рождающее, тогда порожденные удаляются
+        for(i = modalWindowNumberFirst; i < modalWindowNumberLast; i++)    {
+            var newLeftIndent = parseInt($(allModalWindows[i]).css("left")) + 600 * shift;
+            $(allModalWindows[i]).animate({
+                left: newLeftIndent + "px"
+                }, 50);
+            }
+    if(modalWindowNumber == 0){
+        $('#modalWindowBackground').css("visibility", "hidden");
+        setTimeout(function(){$('#modal-module').remove()},200);
+    }
+
+
 }
 function hideAllModalWindows(){
 
@@ -274,21 +272,14 @@ function hideAllModalWindows(){
 
     setTimeout(function(){$('#modal-module').remove()},200);
 }
+//END MODAL WINDOWS Module/////////////////////////////////////////////////////////////////////////////
+
+
 function getCurrentDate() {
     var currentDate = new Date();
     var months = ["Январь", "Февраль", "Март", "Апрель", "Май", "Июнь", "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь"];
     var resultString = currentDate.getDate() + " " + months[currentDate.getMonth()] + " " + currentDate.getFullYear();
     return resultString;
-}
-
-function SetCookie(name, value){
-    document.cookie = name + "=" + "value";
-}
-function GetCookie(name){
-    var matches = document.cookie.match(new RegExp(
-    "(?:^|; )" + name.replace(/([\.$?*|{}\(\)\[\]\\\/\+^])/g, '\\$1') + "=([^;]*)"
-  ));
-  return matches ? decodeURIComponent(matches[1]) : undefined;
 }
 
 
@@ -429,14 +420,3 @@ function HideNotify(){
 }
 ///END NOTIFY MODULE//////////////////////////////////////////////////////
 
-function SHIT(e)//Доделать
-{
-
-    /*if(e.target.classList.item(0) == )
-    for(i = 0; i < e.target.classList.item.length; i++)
-    {
-        alert();
-        //if(document.getElementsByClassName())
-    }
-*/
-}
