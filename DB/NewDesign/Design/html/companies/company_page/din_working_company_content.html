@@ -49,7 +49,7 @@
 
 </div>
 <hr class="primary">
-<div class="row">
+<div class="row vcenter">
     {% if last_task.0 %}
         <div class="col-md-10 ">
         <div class="row">
@@ -70,7 +70,7 @@
                 {% endif %}
             </div>
             <div class="col-md-2 text-right">
-                <span class="text-primary">{{ last_task.0.description|cutter:15 }}</span>
+                <span title="{{ last_task.0.description }}" class="text-primary">{{ last_task.0.description|cutter:15 }}</span>
             </div>
             <div class="col-md-1 text-right">
                 <span title="Подробнее" class="glyphicon glyphicon-info-sign icon-pressed text-primary"></span>
@@ -99,7 +99,7 @@
 <div class="row">
     {% if next_task.0 %}
                             <div class="col-md-4 text-left">
-                        <span style="color:{{ next_task.0.artist.color }}" class="icon" title="Следующая задача">
+                        <span style="color:{{ next_task.0.artist.color }}" class="icon" title="Следующая задача: {{ next_task.0.artist.name }}">
                             <span   class="glyphicon glyphicon-chevron-right text-primary inheritanceTextColor"></span>
                             <span   class="glyphicon glyphicon-flag  text-primary inheritanceTextColor"></span>
                         </span>
@@ -109,7 +109,7 @@
                                 <span title="{{next_task.0.datetime|date:"DATETIME_FORMAT"}}" class="text-primary">{{ next_task.0.datetime.date|datecountdown }}</span>
                             </div>
                             <div class="col-md-2 text-right">
-                                <span class="text-primary">Результат</span>
+                                <span title="{{ next_task.0.description }}" class="text-primary">{{ next_task.0.description|cutter:15 }}</span>
                             </div>
                             <div class="col-md-1 text-right">
                                 <span title="Подробнее"  class="glyphicon glyphicon-info-sign icon-pressed text-primary"></span>
@@ -123,17 +123,14 @@
                             <span   class="glyphicon glyphicon-chevron-right text-primary "></span>
                             <span   class="glyphicon glyphicon-flag  text-primary "></span>
                         </span>
-                                <span title="Добавьте задачу, нажав кнопку справа" class="text-primary">Нет предыдущей задачи</span>
+                                <span title="Добавьте задачу, нажав кнопку справа" class="text-primary">Нет следующей задачи</span>
                             </div>
                             <div class="col-md-3 text-left">
-                                <span title="{{next_task.0.datetime|date:"DATETIME_FORMAT"}}" class="text-primary">{{ next_task.0.datetime.date|datecountdown }}</span>
-                            </div>
+                                </div>
                             <div class="col-md-2 text-right">
-                                <span class="text-primary">Результат</span>
-                            </div>
+                                </div>
                             <div class="col-md-1 text-right">
-                                <span title="Подробнее"  class="glyphicon glyphicon-info-sign icon-pressed text-primary"></span>
-                            </div>
+                                </div>
                         </div>
                     </div>
 {% endif %}
@@ -144,9 +141,29 @@
                     </div>
                 </div>
                 <hr class="primary">
-                <div class="row">
+                <div class="row vcenter">
                     <div class="col-md-10 ">
-                        <div class="row">
+                        {% if last_event.0 %}
+                            <div class="row">
+                            <div class="col-md-4 text-left">
+                        <span style="color:{{ last_event.0.artist.color }}" class="icon" title="Предыдущее мероприятие: {{ last_event.0.artist.name }}">
+                            <span   class="glyphicon glyphicon-chevron-left text-primary inheritanceTextColor"></span>
+                            <span   class="glyphicon glyphicon-play-circle  text-primary inheritanceTextColor"></span>
+                        </span>
+                                <span class="text-primary">{{ last_event.0.manager.name }}</span>
+                            </div>
+                            <div class="col-md-3 text-left">
+                                <span title="{{ last_event.0.startTime|date:"DATETIME_FORMAT"}}" class="text-primary">{{ last_event.0.startTime.date|datecountdown}}</span>
+                            </div>
+                            <div class="col-md-2 text-center">
+                                <span title="Запланировано"  class="glyphicon glyphicon-time icon  text-primary"></span>
+                            </div>
+                            <div class="col-md-1 text-right">
+                                <span title="Подробнее"  class="glyphicon glyphicon-info-sign icon-pressed text-primary"></span>
+                            </div>
+                        </div>
+                            {% else %}
+                            <div class="row">
                             <div class="col-md-5 text-left">
                         <span style="color:red" class="icon" title="Предыдущее мероприятие">
                             <span   class="glyphicon glyphicon-chevron-left text-primary inheritanceTextColor"></span>
@@ -164,6 +181,8 @@
                                 <span title="Подробнее"  class="glyphicon glyphicon-info-sign icon-pressed text-primary"></span>
                             </div>
                         </div>
+                        {% endif %}
+
                         <div class="row">
                             <div class="col-md-5 text-left">
                         <span style="color:red" class="icon" title="Следующее мероприятие">
