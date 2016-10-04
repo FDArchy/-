@@ -54,7 +54,8 @@ def dateCountdown(_value):
 def cutter(_value, _symb_count):
     result = _value[:_symb_count - 3]
     if(result != _value):
-        result += "..."
+        result = result.strip() + "..."
+
 
     return  result
 

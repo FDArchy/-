@@ -1495,7 +1495,7 @@ def showcompany_new(request, company_number):
 
     allowed_shows = Artist.objects.filter(id__in = CMSILink.objects.filter(manager = manager, company__id = company.id).values("show"))
 
-    print(allowed_shows);
+
 
 
     return render_to_response('Design/html/companies/company_page/showcompany.html', {'company':company, 'user':site_user, 'shows':allowed_shows})
