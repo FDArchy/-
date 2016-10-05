@@ -1,0 +1,231 @@
+{% extends "html\companies\!companies.html" %}
+{% block companypage%}
+{% load filters %}
+{% load staticfiles %}
+
+
+<style>
+
+/*ИСПРАВИТЬ СТИЛИ, ОБОБЩИТЬ*/
+.companyType{
+    width: 25px;
+    height: 25px;
+    background-color: #ffffff;
+    padding: 5px 5px 5px 5px;
+    color: #428bca;
+    border-radius: 15px;
+    font-weight: 900;
+
+
+}
+.icon{
+    margin-right: 6px;
+}
+.icon:hover{
+    cursor: help;
+}
+.icon-pressed{
+    border: 1px solid #fff;
+    margin-right: 6px;
+    font-size: 17px;
+}
+.icon-pressed:hover{
+
+    cursor: pointer;
+    color: #5cb85c;
+
+}
+.icon-small-pressed{
+    border: 1px transparent outset;
+    border-radius: 8px;
+}
+.icon-small-pressed:hover{
+    border: 1px red outset;
+    border-radius: 8px;
+    cursor: pointer;
+    color: #5cb85c;
+
+}
+.inheritanceTextColor{
+    color:inherit;
+}
+.vcenter {
+    display: flex;
+    align-items: center;
+}
+hr.primary{
+    color: #428bca; /* Цвет линии для остальных браузеров */
+    background-color: #428bca; /* Цвет линии для браузера Firefox и Opera */
+    height: 1px;
+    margin-bottom: 7px;
+}
+div.container-settings{
+    padding-top: 15px;
+    padding-bottom: 15px;
+    margin-bottom: 15px;
+}
+#dinamic_content{
+    padding-top: 5px;
+    padding-bottom: 10px;
+    padding-left: 7px;
+    padding-right: 7px;
+    border-left: 1px solid #ddd;
+    border-right: 1px solid #ddd;
+    border-bottom: 1px solid #ddd;
+}
+</style>
+
+    <div style="width:85%" class="container-fluid panel panel-primary">
+        <div class="row panel-heading " >
+            <div class="col-md-10">
+                {% if company.ctype %}
+                <span class="companyType">{{ company.ctype }}</span>
+                {% endif %}
+                <span class="h1 panel-title "> {{ company.name }}</span></div>
+            <div class="col-md-2 text-right">
+                <button title="Редактировать учреждение" type="button" class="btn btn-primary" onclick="ShowEditCompanyPanel();">
+                    <span class="glyphicon glyphicon-pencil"></span>
+                </button>
+                <button title="Удалить учреждение" type="button" class="btn btn-primary" onclick="RemoveCompany();">
+                    <span class="glyphicon glyphicon glyphicon-trash"></span>
+                </button>
+            </div>
+        </div>
+        <div class="panel-body">
+            <div class="row" title="Показать на карте">
+                <div class="col-md-12 text-left ">
+                    <button type="button" class="btn btn-default" style="white-space: normal" onclick="window.open('https://yandex.ru/maps/?text={{ company.city }}%20{{ company.adress }}')"> <span class="glyphicon glyphicon-road text-primary" ></span><span> {{ company.city }}, {{ company.adress }}</span></button>
+                </div>
+            </div>
+             <hr class="primary">
+            <div class="row" >
+                <div class="col-md-12 text-left">
+                    <span title="Телефон" class="glyphicon glyphicon-phone text-primary icon"></span>
+                    {% if company.telephone %}
+                        <span>{{ company.telephone }}</span><br>
+                    {% else %}
+                        <span class="text-primary">Телефоны не указаны.</span>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="row" >
+                <div class="col-md-12 text-left">
+                    <span title="Контактные данные" class="glyphicon glyphicon-user text-primary icon"></span>
+                    {% if company.contacts %}
+                    <span>{{ company.contacts }}</span><br>
+                    {% else %}
+                    <span class="text-primary">Контактные данные отсутствуют.</span>
+                    {% endif %}
+                </div>
+            </div>
+            {% if company.comment %}
+            <hr class="primary">
+            <div class="row">
+                <div class="col-md-12 text-left">
+                    <span title="Комментарий"  class="glyphicon glyphicon-comment text-primary icon"></span><span>{{ company.comment }}</span><br>
+                </div>
+            </div>
+            {% endif %}
+            {% if company.email or company.site %}
+                <hr class="primary">
+            {% else %}
+            {% endif %}
+                {% if company.email %}
+                    <div class="row">
+                        <div class="col-md-12 text-left">
+                            <span title="Электронная почта"  class="glyphicon glyphicon-envelope text-primary icon"></span><span class="text-primary">{{ company.email }}</span><br>
+                        </div>
+                    </div>
+                {% endif %}
+                {% if company.site %}
+                <div class="row">
+                    <div class="col-md-12 text-left">
+                        <span title="Сайт"  class="glyphicon glyphicon-globe text-primary icon"></span><span class="text-primary">{{ company.site }}</span><br>
+                    </div>
+                </div>
+                {% endif %}
+        </div>
+        <div  class="container-fluid container-settings">
+            <ul class="nav nav-tabs" >
+                {% if shows.count == 1 %}
+                    <li   class="active" onclick="ChangeTab('{{ shows.0.id }}')" data-id="{{ shows.0.id }}" data-color="{{ shows.0.color }}"><a href="" data-toggle="tab">{{ shows.0.name }}</a></li>
+                {% else %}
+                    <li   class="active" onclick="ChangeTab('0')" data-id="0" data-color="#555"><a href="" data-toggle="tab">Все</a></li>
+                    {% for show in shows %}
+                        <li  onclick="ChangeTab('{{ show.id }}')" data-id="{{ show.id }}" data-color="{{ show.color }}"><a href="" data-toggle="tab">{{ show.name }}</a></li>
+                    {% endfor %}
+                {% endif %}
+
+
+            </ul>
+                <div class="container-fluid" id="dinamic_content">
+
+                </div>
+            </div>
+    </div>
+
+    <script>
+
+    function ChangeTab(tab){
+
+            //Дизайн
+            $.post("/aj_company_manager_work/", {company:"{{ company.id }}", artist:tab}, function(response){
+                $('#dinamic_content').html(response);
+            })
+
+            //Переводим свойства всех зависимых элементов в стандартное значение.
+            $('.nav li a').css("border-left", "1px solid #fff");
+            $('.nav li a').css("border-right", "1px solid #fff");
+            $('.nav li a').css("border-top", "1px solid #fff");
+
+            $('.nav li a').each(function (i, elem) {
+                $(this).css("color", $(this).parent('li').data("color"));
+
+            })
+
+            $('li[data-id=' + tab +'] a').css('border-left', '1px solid ' + $('li[data-id=' + tab +']').data("color"));
+
+            $('li[data-id=' + tab +'] a').css('border-left', '1px solid ' + $('li[data-id=' + tab +']').data("color"));
+            $('li[data-id=' + tab +'] a').css('border-right', '1px solid ' + $('li[data-id=' + tab +']').data("color"));
+            $('li[data-id=' + tab +'] a').css('border-top', '1px solid ' + $('li[data-id=' + tab +']').data("color"));
+
+            $('li[data-id=' + tab +'] a').css('border-top', '1px solid ' + $('li[data-id=' + tab +']').data("color"));
+
+            $('#dinamic_content').css('border-left', '1px solid ' + $('li[data-id=' + tab +']').data("color"));
+            $('#dinamic_content').css('border-right', '1px solid ' + $('li[data-id=' + tab +']').data("color"));
+            $('#dinamic_content').css('border-bottom', '1px solid ' + $('li[data-id=' + tab +']').data("color"));
+
+            $('.nav').css("border-bottom", "1px solid" + $('li[data-id=' + tab +']').data("color"));
+
+
+        }//Переключение вкладки
+    function MarkCall(){
+            if($('#mark-call-button').hasClass("glyphicon-ok-sign")){
+                $('#mark-call-button').removeClass("glyphicon-ok-sign");
+                $('#mark-call-button').addClass("glyphicon-ok-circle");
+                $('#mark-call-button').attr("style", "color:#428bca");
+            }
+            else{
+                $('#mark-call-button').addClass("glyphicon-ok-sign");
+                $('#mark-call-button').removeClass("glyphicon-ok-circle");
+                $('#mark-call-button').attr("style", "color:#5CB85C");
+
+            }
+
+        }//Отметка звонка
+    function ShowEditCompanyPanel(){}//Отображение панели редактирования учреждения
+    function RemoveCompany(){
+        $.post("/aj_company_remove/", {id:"{{ company.id }}"}, function(response){
+            var parsed = $.parseJSON(response);
+            ShowNotify(parsed.type, parsed.text, parsed.close_type, parsed.show_time);
+            })
+    }//Удаление учреждения
+
+    </script>
+
+    <script>
+    $('ul.nav li:first').trigger("click");
+    </script>
+
+
+    {%endblock%}

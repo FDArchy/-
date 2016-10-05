@@ -336,14 +336,14 @@ function ShowNotify(_type, _notifyText, _closeType, _showTime){
 
     $('.notification').remove();
     var type = {
-        error:1,
-        success:2,
-        info:3,
-        load:0
+        error:"1",
+        success:"2",
+        info:"3",
+        load:"0"
     };
     var closeType = {
-        auto : 0,
-        manual : 1
+        auto : "0",
+        manual : "1"
     };
     var notifyElement = $('<div/>', {
         class: 'notification'
@@ -358,7 +358,9 @@ function ShowNotify(_type, _notifyText, _closeType, _showTime){
     closeButton.addClass('close');
     closeButton.attr("onclick", "HideNotify();");
     notifyElement.append(closeButton);
+    debugger;
     switch (_type) {
+
         case type.error:
             notifyTitle.append($('<span/>').html("Ошибка"));
             notifyTitle.children("span").addClass("notification-title-text");

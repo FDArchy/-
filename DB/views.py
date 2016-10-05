@@ -11,6 +11,7 @@ import logging
 from datetime import datetime
 from datetime import timedelta
 import  os
+import json
 from django.utils import timezone
 from django.core.servers.basehttp import FileWrapper
 from django.db.models import Q
@@ -1259,7 +1260,7 @@ def noneToEmptyString(_value):
 def testfunc(request):#Вспомогательная функция для выполнения индивидуальных скриптов админа
 
     c1 = Company.objects.get(id = 36)
-    return render_to_response('Design/html/companies/company_page/showcompany.html', {'company':c1})
+    return render_to_response('Design/html/companies/company_page/page.html', {'company':c1})
 
 
     if(request.user.username == "archy"):
@@ -1476,7 +1477,8 @@ def logout(request):
     auth.logout(request)
     return redirect('/logon/')
 #Companies:=================================================================================
-def showcompany_new(request, company_number):
+@login_required(login_url='/logon/')
+def company_show_page(request, company_number):
     try:
         company = Company.objects.get(id = company_number)
     except Company.DoesNotExist:
@@ -1498,8 +1500,9 @@ def showcompany_new(request, company_number):
 
 
 
-    return render_to_response('Design/html/companies/company_page/showcompany.html', {'company':company, 'user':site_user, 'shows':allowed_shows})
-def din_working_company_content(request):
+    return render_to_response('Design/html/companies/company_page/page.html', {'company':company, 'user':site_user, 'shows':allowed_shows})
+@login_required(login_url='/logon/')
+def company_show_manager_work_content(request):
 
     company = Company.objects.get(id = request.POST.get('company'))
     manager = Manager.objects.get(username = request.user.username)
@@ -1520,6 +1523,7 @@ def din_working_company_content(request):
 
 
 
+
     #АДМИНСКАЯ ЛАБУДА
     # if(request.user.has_perm("DB.is_siteadmin")):
     #     artists = Artist.objects.all()
@@ -1528,6 +1532,21 @@ def din_working_company_content(request):
 
 
 
-    return render_to_response('Design/html/companies/company_page/din_working_company_content.html', {'last_call':last_call, 'last_task':last_task, 'next_task':next_task, 'last_event':last_event, 'next_event':next_event, 'all_button':all}, context_instance=RequestContext(request))
+    return render_to_response('Design/html/companies/company_page/aj_manager_work.html', {'last_call':last_call, 'last_task':last_task, 'next_task':next_task, 'last_event':last_event, 'next_event':next_event, 'all_button':all}, context_instance=RequestContext(request))
+def company_remove(request):
+    company = Company.objects.get(id = request.POST.get('id'))
+    result = {}
+    if request.user.has_perm("DB.is_siteadmin"):
+
+        result["type"] = "2"
+        result["text"] = "Учреждение \"" + company.name + "\" было успешно удалено из базы. Автоматическая переадресация через 5 секунд"
+        result["show_time"] = 5000
+        result["close_type"] = 0
+        #company.delete()
+        serialized = json.dumps(result)
+        return HttpResponse(serialized)
+
+
+    return True
 
 #############################################################################################

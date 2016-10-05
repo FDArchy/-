@@ -60,8 +60,10 @@ from DB.views import logon
 from DB.views import login
 from DB.views import logout
 #COMPANIES:
-from DB.views import showcompany_new
-from DB.views import din_working_company_content
+from DB.views import company_show_page
+from DB.views import company_show_manager_work_content
+from DB.views import company_remove
+
 
 admin.autodiscover()
 
@@ -123,9 +125,9 @@ urlpatterns = patterns('',
     (r'^logging/$', login),
     (r'^logout/$', logout),
 #COMPANIES
-    (r'^company_new/(\d+)/$', showcompany_new),
-    (r'aj_workingcompanycontent/$', din_working_company_content),
-
+    (r'^company_new/(\d+)/$', company_show_page),
+    (r'aj_company_manager_work/$', company_show_manager_work_content),
+    (r'aj_company_remove/$', company_remove),
     # Examples:
     # url(r'^$', 'ASC.views.home', name='home'),
     # url(r'^blog/', include('blog.urls')),

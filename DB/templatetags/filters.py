@@ -52,7 +52,10 @@ def dateCountdown(_value):
 
 @register.filter(name='cutter')
 def cutter(_value, _symb_count):
+    if _value == None:
+        return ""
     result = _value[:_symb_count - 3]
+
     if(result != _value):
         result = result.strip() + "..."
 
