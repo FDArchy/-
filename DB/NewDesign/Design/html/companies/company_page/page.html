@@ -215,9 +215,18 @@ div.container-settings{
         }//Отметка звонка
     function ShowEditCompanyPanel(){}//Отображение панели редактирования учреждения
     function RemoveCompany(){
-        $.post("/aj_company_remove/", {id:"{{ company.id }}"}, function(response){
-            var parsed = $.parseJSON(response);
-            ShowNotify(parsed.type, parsed.text, parsed.close_type, parsed.show_time);
+        if(!confirm("Вы уверены что хотите удалить компанию?"))
+            return
+
+        $.post("/aj_company_remove/", {noway:37212}, function(response){
+            var responseResult = $.parseJSON(response);
+            ShowNotify(responseResult.q, responseResult.w, responseResult.d, responseResult.e);
+            if(responseResult.type == 2){
+                setTimeout(function () {
+                            (window.location = "showcompaniesnew/")
+                        }, 5000);
+            }
+
             })
     }//Удаление учреждения
 

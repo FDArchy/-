@@ -334,6 +334,7 @@ function ShowDropDownMenu(menuItemID)//Передает код элемента 
 ///NOTIFY MODULE//////////////////////////////////////////////////////////
 function ShowNotify(_type, _notifyText, _closeType, _showTime){
 
+        _type = String(_type);
     $('.notification').remove();
     var type = {
         error:"1",
@@ -358,7 +359,6 @@ function ShowNotify(_type, _notifyText, _closeType, _showTime){
     closeButton.addClass('close');
     closeButton.attr("onclick", "HideNotify();");
     notifyElement.append(closeButton);
-    debugger;
     switch (_type) {
 
         case type.error:

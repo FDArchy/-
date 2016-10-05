@@ -1533,20 +1533,43 @@ def company_show_manager_work_content(request):
 
 
     return render_to_response('Design/html/companies/company_page/aj_manager_work.html', {'last_call':last_call, 'last_task':last_task, 'next_task':next_task, 'last_event':last_event, 'next_event':next_event, 'all_button':all}, context_instance=RequestContext(request))
+
+@login_required(login_url='/logon/')
 def company_remove(request):
-    company = Company.objects.get(id = request.POST.get('id'))
+    #company = Company.objects.get(id = request.POST.get('noway'))
+    company = Company.objects.get(id = 37212)
     result = {}
+    type = ""
+    text = ""
+    show_time = 0
+    close_type = 0
     if request.user.has_perm("DB.is_siteadmin"):
+        type = "2"
+        text = "Учреждение \"" + company.name + "\" было успешно удалено из базы. Автоматическая переадресация через 5 секунд"
+        show_time = 5000
+        close_type = 0
+        company.delete()
+    elif CMSILink.objects.filter(company__id = company.id, manager = Manager.objects.get(username = request.user.username)).count() > 0:
+        print(datetime.now())
+        print(company.date.replace(tzinfo=None))
+        if (int((datetime.now() - company.date.replace(tzinfo=None)))) > 10: #Если со времени добавления компании прошло менее 10 минут, то ее можно удалить
+            type = "2"
+            text = "Учреждение \"" + company.name + "\" было успешно удалено из базы. Автоматическая переадресация через 5 секунд"
+            show_time = 5000
+            close_type = 0
+            company.delete()
+        else:
+            type = "1"
+            text = "С момента добавления учреждения прошло более 10 минут, для удаления учреждения свяжитесь с администратором. Окно будет закрыто автоматически через 10 секунд."
+            show_time = 10000
+            close_type = 0
+    result["q"] = type
+    result["w"] = text
+    result["e"] = show_time
+    result["d"] = close_type
+    serialized = json.dumps(result)
+    return HttpResponse(serialized)
 
-        result["type"] = "2"
-        result["text"] = "Учреждение \"" + company.name + "\" было успешно удалено из базы. Автоматическая переадресация через 5 секунд"
-        result["show_time"] = 5000
-        result["close_type"] = 0
-        #company.delete()
-        serialized = json.dumps(result)
-        return HttpResponse(serialized)
 
-
-    return True
 
 #############################################################################################
