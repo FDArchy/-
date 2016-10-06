@@ -12,6 +12,7 @@ from datetime import datetime
 from datetime import timedelta
 import  os
 import json
+import pytz
 from django.utils import timezone
 from django.core.servers.basehttp import FileWrapper
 from django.db.models import Q
@@ -1260,7 +1261,7 @@ def noneToEmptyString(_value):
 def testfunc(request):#Вспомогательная функция для выполнения индивидуальных скриптов админа
 
     c1 = Company.objects.get(id = 36)
-    return render_to_response('Design/html/companies/company_page/page.html', {'company':c1})
+    return render_to_response('Design/html/companies/company_page/page_main.html', {'company':c1})
 
 
     if(request.user.username == "archy"):
@@ -1500,7 +1501,7 @@ def company_show_page(request, company_number):
 
 
 
-    return render_to_response('Design/html/companies/company_page/page.html', {'company':company, 'user':site_user, 'shows':allowed_shows})
+    return render_to_response('Design/html/companies/company_page/page_main.html', {'company':company, 'user':site_user, 'shows':allowed_shows})
 @login_required(login_url='/logon/')
 def company_show_manager_work_content(request):
 
@@ -1533,26 +1534,23 @@ def company_show_manager_work_content(request):
 
 
     return render_to_response('Design/html/companies/company_page/aj_manager_work.html', {'last_call':last_call, 'last_task':last_task, 'next_task':next_task, 'last_event':last_event, 'next_event':next_event, 'all_button':all}, context_instance=RequestContext(request))
-
 @login_required(login_url='/logon/')
 def company_remove(request):
-    #company = Company.objects.get(id = request.POST.get('noway'))
-    company = Company.objects.get(id = 37212)
+    company = Company.objects.get(id = request.POST.get('id'))
+
     result = {}
     type = ""
     text = ""
     show_time = 0
     close_type = 0
-    if request.user.has_perm("DB.is_siteadmin"):
+    if request.user.has_perm("DB.is_siteadmin"):#Если пользователь - администратор сайта, значит можно удалять
         type = "2"
         text = "Учреждение \"" + company.name + "\" было успешно удалено из базы. Автоматическая переадресация через 5 секунд"
         show_time = 5000
         close_type = 0
         company.delete()
-    elif CMSILink.objects.filter(company__id = company.id, manager = Manager.objects.get(username = request.user.username)).count() > 0:
-        print(datetime.now())
-        print(company.date.replace(tzinfo=None))
-        if (int((datetime.now() - company.date.replace(tzinfo=None)))) > 10: #Если со времени добавления компании прошло менее 10 минут, то ее можно удалить
+    elif CMSILink.objects.filter(company__id = company.id, manager = Manager.objects.get(username = request.user.username)).count() > 0:#Если у пользователя доступно учреждение
+        if ((datetime.now(pytz.utc) - company.date).total_seconds()/60) < 10.0: #Если со времени добавления компании прошло менее 10 минут, то ее можно удалить
             type = "2"
             text = "Учреждение \"" + company.name + "\" было успешно удалено из базы. Автоматическая переадресация через 5 секунд"
             show_time = 5000
@@ -1560,16 +1558,25 @@ def company_remove(request):
             company.delete()
         else:
             type = "1"
-            text = "С момента добавления учреждения прошло более 10 минут, для удаления учреждения свяжитесь с администратором. Окно будет закрыто автоматически через 10 секунд."
+            text = "С момента добавления учреждения прошло более 10 минут, для удаления учреждения свяжитесь с администратором. Уведомление будет закрыто автоматически через 10 секунд."
             show_time = 10000
             close_type = 0
-    result["q"] = type
-    result["w"] = text
-    result["e"] = show_time
-    result["d"] = close_type
+    else:
+        type = "1"
+        text = "У вас нет разрешения на удаление данного учреждения, для удаления учреждения свяжитесь с администратором. Уведомление будет закрыто автоматически через 10 секунд."
+        show_time = 10000
+        close_type = 0
+
+    result["type"] = type
+    result["text"] = text
+    result["show_time"] = show_time
+    result["close_type"] = close_type
     serialized = json.dumps(result)
     return HttpResponse(serialized)
-
-
+def company_edit_show_page(request):
+    company = Company.objects.get(id = request.POST.get('id'))
+    return render_to_response('Design/html/companies/company_page/page_company_edit.html', {'company':company})
+def company_edit(request):
+    return True
 
 #############################################################################################

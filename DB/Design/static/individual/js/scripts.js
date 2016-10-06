@@ -335,6 +335,7 @@ function ShowDropDownMenu(menuItemID)//Передает код элемента 
 function ShowNotify(_type, _notifyText, _closeType, _showTime){
 
         _type = String(_type);
+        _showTime = String(_showTime);
     $('.notification').remove();
     var type = {
         error:"1",
@@ -400,7 +401,6 @@ function ShowNotify(_type, _notifyText, _closeType, _showTime){
     }
     $('body').append(notifyElement);
     notifyElement.animate({height : "60px", bottom:"0px", opacity:"1"}, 500);
-
     if(_closeType == closeType.auto){
         if(_showTime != undefined && _showTime != 0){
             setTimeout(HideNotify, _showTime);
@@ -422,3 +422,18 @@ function HideNotify(){
 }
 ///END NOTIFY MODULE//////////////////////////////////////////////////////
 
+//PAGE DATA FILLER////////////////////////////////////////////////////////
+function FillPageDataFromPython(_data){
+    data = $.parseJSON(_identifier, _data);
+    for(i in data)
+    {
+        $('#' + _identifier + "_" + i).html(_data[i]);
+    }
+}
+function FillPageDataFromJS(_recieverID, _transmitterID, _fields){
+    for(i in _fields)
+    {
+        $('#' + _recieverID + "_" + _fields[i]).html($('#' + _transmitterID + "_" + _fields[i]).html());
+    }
+
+}

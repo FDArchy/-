@@ -1,0 +1,49 @@
+<div>
+        <table>
+            <tr>
+                <td width="10%">Тип учреждения: </td>
+                <td>
+                    <select id="companyEditType" class="value">
+                        <option value="ДC" selected>ДС</option>
+                        <option value="ШК">ШК</option>
+                        <option value="ДК">ДК</option>
+                        <option value="ДО">ДО</option>
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <td>Наименование: </td>
+                <td><input type="text" id="companyEditName" class="value" value="{{company.name}}"></td>
+            </tr>
+            <tr>
+                <td>Адрес: </td>
+                <td><input type="text" id="companyEditAdress" class="value" value="{{company.adress}}"></td>
+            </tr>
+            <tr>
+                <td>Телефон: </td>
+                <td><input type="text" id="companyEditTelephone" class="value" value="{{company.telephone}}"></td>
+            </tr>
+            <tr>
+                <td>Контакты: </td>
+                <td><input type="text" id="companyEditContacts" class="value" value="{{company.contacts}}"></td>
+            </tr>
+            <tr>
+                <td>Почта: </td>
+                <td><textarea id="companyEditEmail" class="value" rows="5">{{company.email}}</textarea></td>
+            </tr>
+             <tr>
+                <td>Сайт: </td>
+                <td><input type="text" id="companyEditSite" class="value" value="{{company.site}}"></td>
+            </tr>
+            <tr>
+                <td>Комментарий: </td>
+                <td><textarea id="companyEditComment" class="value" rows="5">{{company.comment}}</textarea></td>
+            </tr>
+        </table>
+        <script>
+        function fillType() {
+            var optionBox = document.getElementById("companyEditType");
+            optionBox.value = "{{company.ctype}}";
+        }
+        </script>
+    </div>
