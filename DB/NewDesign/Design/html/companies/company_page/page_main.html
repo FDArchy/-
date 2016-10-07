@@ -80,6 +80,8 @@ div.container-settings{
             <div class="col-md-10">
                 {% if company.ctype %}
                 <span class="companyType">{{ company.ctype }}</span>
+                {% else %}
+                    <span class="companyType"></span>
                 {% endif %}
                 <span class="h1 panel-title "> {{ company.name }}</span></div>
             <div class="col-md-2 text-right">
@@ -94,7 +96,7 @@ div.container-settings{
         <div class="panel-body">
             <div class="row" title="Показать на карте">
                 <div class="col-md-12 text-left ">
-                    <button type="button" class="btn btn-default" style="white-space: normal" onclick="window.open('https://yandex.ru/maps/?text={{ company.city }}%20{{ company.adress }}')"> <span class="glyphicon glyphicon-road text-primary" ></span><span> {{ company.city }}, {{ company.adress }}</span></button>
+                    <button type="button" class="btn btn-default" style="white-space: normal" onclick="window.open('https://yandex.ru/maps/?text={{ company.city }}%20{{ company.adress }}')"> <span class="glyphicon glyphicon-road text-primary" ></span><span> <span> {{ company.city}}</span>,<span>  {{ company.adress }}</span> </span></button>
                 </div>
             </div>
              <hr class="primary">
@@ -102,7 +104,7 @@ div.container-settings{
                 <div class="col-md-12 text-left">
                     <span title="Телефон" class="glyphicon glyphicon-phone text-primary icon"></span>
                     {% if company.telephone %}
-                        <span>{{ company.telephone }}</span><br>
+                        <span >{{ company.telephone }}</span><br>
                     {% else %}
                         <span class="text-primary">Телефоны не указаны.</span>
                     {% endif %}
@@ -158,12 +160,13 @@ div.container-settings{
 
 
             </ul>
+
                 <div class="container-fluid" id="dinamic_content">
 
                 </div>
             </div>
     </div>
-
+    <input type="button" onclick="TEST();">
     <script>
 
 
@@ -187,7 +190,10 @@ div.container-settings{
     }//Удаление учреждения
     function EditCompany(){
         $.post("/aj_company_edit_page/", {id:{{company.id}}}, function(response) {
-            showModalWindow_new("okcancel", "Редактировать учреждение", response, function(){});
+            showModalWindow_new("okcancel", "Редактировать учреждение", response, function(){
+                alert($('#modalWindow0').outerHeight());
+                alert($('#modalWindow0')[0].scrollHeight);
+            });
         })
     }//Редактирование учреждения
     function NR_MarkCall(){
@@ -202,6 +208,7 @@ div.container-settings{
                 $('#mark-call-button').attr("style", "color:#5CB85C");
 
             }
+
 
         }//Отметка звонка
     function ChangeTab(tab){
@@ -237,7 +244,13 @@ div.container-settings{
 
 
         }//Переключение вкладки
+    function UpdateCompanyData(){
+        $.post("/aj_company_edit_page/", {id:{{company.id}}}, function(response) {});
+    }
 
+    function TEST(){
+
+    }
     </script>
 
     <script>

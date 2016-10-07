@@ -1503,6 +1503,17 @@ def company_show_page(request, company_number):
 
     return render_to_response('Design/html/companies/company_page/page_main.html', {'company':company, 'user':site_user, 'shows':allowed_shows})
 @login_required(login_url='/logon/')
+def company_show_update_company_data(request):
+    try:
+        company = Company.objects.get(id = request.POST.get("id"))
+    except Company.DoesNotExist:
+        company = None
+    if(company == None):
+        return redirect('/showcompaniesnew')
+
+
+    return render_to_response('Design/html/companies/company_page/page_main.html', {'company':company})
+@login_required(login_url='/logon/')
 def company_show_manager_work_content(request):
 
     company = Company.objects.get(id = request.POST.get('company'))

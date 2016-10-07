@@ -151,26 +151,42 @@ function showModalWindow_new(_button_types, _tittle, _content, _on_ok, _other_bu
     background.css("visibility", "visible");
 
 
+
+
+
     var modalWindow = $('<div>').addClass("modalWindow");
     modalWindowID = "modalWindow" + $('.modalWindow').length;
-    modalWindow.attr("id", modalWindowID);
+    $(modalWindow).addClass("container-fluid panel panel-primary");
+
+
+    var panelTitle = $('<div>').addClass("row panel-heading");
+
 
     var closeCross = $('<a>').addClass("closecross").attr("onclick", "hideModalWindow('" + modalWindowID + "');");
-    var crossIcon = $('<span>').addClass("glyphicon glyphicon-remove btn btn-default");
+    var crossIcon = $('<span>').addClass("glyphicon glyphicon-remove btn btn-primary");
     closeCross.append(crossIcon);
-    modalWindow.append(closeCross);
+    panelTitle.append(closeCross);
 
-    var modalTittle = $('<div>').addClass("modalWindowHeader textMiddle");
-    modalTittle.html(_tittle);
-    $(modalWindow).append(modalTittle);
+    var tittleText = $('<div>').addClass("modalWindowHeader textMiddle");
+    tittleText.html(_tittle);
+    tittleText.attr("style", "color:#fff");
+    $(panelTitle).append(tittleText);
 
-    var modalContent = $('<div>').addClass("textMiddle");
-    modalContent.html(_content);
-    $(modalWindow).append(modalContent);
+    $(modalWindow).append(panelTitle);
 
-    var container = $('<div>').addClass("textMiddle");
-    var buttons = $('<div>').addClass("textFooter displayInline");
-    $(container).append(buttons);
+    var panelText = $('<div>').addClass("panel-body textMiddle");
+    panelText.html(_content);
+    $(modalWindow).append(panelText);
+    modalWindow.attr("id", modalWindowID);
+
+
+
+
+    var footer = $('<div>').addClass("textMiddle footer panel-footer");
+
+    var buttons = $('<div>').addClass("displayInline");
+    $(footer).append(buttons);
+
 
     switch (_button_types) {
         case "ok":
@@ -207,17 +223,25 @@ function showModalWindow_new(_button_types, _tittle, _content, _on_ok, _other_bu
     }
 
 
-    $(modalWindow.append(container));
+    $(modalWindow.append(footer));
     modalModule.append(modalWindow);
 
     var topCoord = -1000;
     topCoord -= $(modalWindow).offset().top  - $(window).scrollTop();
     topCoord += 60;
 
+
+
     modalWindow.animate({
         top:topCoord + "px"
     }, 50).css("visibility", "visible");
 
+    if($(modalWindow).outerHeight() < $(modalWindow)[0].scrollHeight){
+        $(footer).css("position", "static");
+    }
+    else{
+        $(footer).css("position", "absolute");
+    }
 
 
 }
@@ -437,3 +461,4 @@ function FillPageDataFromJS(_recieverID, _transmitterID, _fields){
     }
 
 }
+//END PAGE DATA FILLER MODULE

@@ -1,0 +1,71 @@
+<div class="row panel-heading " >
+            <div class="col-md-10">
+                {% if company.ctype %}
+                <span class="companyType">{{ company.ctype }}</span>
+                {% else %}
+                    <span class="companyType"></span>
+                {% endif %}
+                <span class="h1 panel-title "> {{ company.name }}</span></div>
+            <div class="col-md-2 text-right">
+                <button title="Редактировать учреждение" type="button" class="btn btn-primary" onclick="EditCompany();">
+                    <span class="glyphicon glyphicon-pencil"></span>
+                </button>
+                <button title="Удалить учреждение" type="button" class="btn btn-primary" onclick="RemoveCompany();">
+                    <span class="glyphicon glyphicon glyphicon-trash"></span>
+                </button>
+            </div>
+        </div>
+        <div class="panel-body">
+            <div class="row" title="Показать на карте">
+                <div class="col-md-12 text-left ">
+                    <button type="button" class="btn btn-default" style="white-space: normal" onclick="window.open('https://yandex.ru/maps/?text={{ company.city }}%20{{ company.adress }}')"> <span class="glyphicon glyphicon-road text-primary" ></span><span> <span> {{ company.city}}</span>,<span>  {{ company.adress }}</span> </span></button>
+                </div>
+            </div>
+             <hr class="primary">
+            <div class="row" >
+                <div class="col-md-12 text-left">
+                    <span title="Телефон" class="glyphicon glyphicon-phone text-primary icon"></span>
+                    {% if company.telephone %}
+                        <span >{{ company.telephone }}</span><br>
+                    {% else %}
+                        <span class="text-primary">Телефоны не указаны.</span>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="row" >
+                <div class="col-md-12 text-left">
+                    <span title="Контактные данные" class="glyphicon glyphicon-user text-primary icon"></span>
+                    {% if company.contacts %}
+                    <span>{{ company.contacts }}</span><br>
+                    {% else %}
+                    <span class="text-primary">Контактные данные отсутствуют.</span>
+                    {% endif %}
+                </div>
+            </div>
+            {% if company.comment %}
+            <hr class="primary">
+            <div class="row">
+                <div class="col-md-12 text-left">
+                    <span title="Комментарий"  class="glyphicon glyphicon-comment text-primary icon"></span><span>{{ company.comment }}</span><br>
+                </div>
+            </div>
+            {% endif %}
+            {% if company.email or company.site %}
+                <hr class="primary">
+            {% else %}
+            {% endif %}
+                {% if company.email %}
+                    <div class="row">
+                        <div class="col-md-12 text-left">
+                            <span title="Электронная почта"  class="glyphicon glyphicon-envelope text-primary icon"></span><span class="text-primary">{{ company.email }}</span><br>
+                        </div>
+                    </div>
+                {% endif %}
+                {% if company.site %}
+                <div class="row">
+                    <div class="col-md-12 text-left">
+                        <span title="Сайт"  class="glyphicon glyphicon-globe text-primary icon"></span><span class="text-primary">{{ company.site }}</span><br>
+                    </div>
+                </div>
+                {% endif %}
+        </div>
