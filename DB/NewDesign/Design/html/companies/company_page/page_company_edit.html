@@ -1,9 +1,9 @@
 <form class="form-horizontal" role="form">
     <div class="form-group">
-        <label class="col-md-3 text-primary control-label text-left" for="companyEdit_ctype">Тип</label>
+        <label class="col-md-3 small text-primary control-label text-left" for="companyEdit_ctype">Тип</label>
 
         <div class="col-md-9">
-            <select id="companyEdit_ctype" class="form-control">
+            <select id="companyEdit_ctype" class="form-control input-sm">
                 <option value="ДC" selected>ДС</option>
                 <option value="ШК">ШК</option>
                 <option value="ДК">ДК</option>
@@ -13,59 +13,56 @@
     </div>
 
     <div class="form-group">
-        <label class="col-md-3 text-primary control-label" for="companyEdit_name">Название</label>
+        <label class="col-md-3 small text-primary control-label" for="companyEdit_name">Название</label>
 
         <div class="col-md-9">
-            <input type="text" class="form-control" id="companyEdit_name" placeholder="Укажите название компании"
+            <input type="text" class="form-control input-sm" id="companyEdit_name" placeholder="Укажите название компании"
                    value="{{ company.name }}">
         </div>
     </div>
     <div class="form-group">
-        <label class="col-md-3 text-primary control-label" for="companyEdit_adress">Адрес</label>
+        <label class="col-md-3 small text-primary control-label" for="companyEdit_adress">Адрес</label>
 
         <div class="col-md-9">
-            <input type="text" class="form-control" id="companyEdit_adress"
+            <input type="text" class="form-control input-sm" id="companyEdit_adress"
                    placeholder="Укажите адрес, разделяя запятыми части адреса" value="{{ company.adress }}">
         </div>
     </div>
     <div class="form-group">
-        <label class="col-md-3 text-primary control-label" for="companyEdit_telephone">Телефон</label>
+        <label class="col-md-3 small text-primary control-label" for="companyEdit_telephone">Телефоны</label>
 
         <div class="col-md-9">
-            <input type="text" class="form-control" id="companyEdit_telephone"
-                   placeholder="Укажите номера телефонов, разделяя символом \';\'" value="{{ company.telephone }}">
+            <textarea id="companyEdit_telephone" class="form-control input-sm" rows="2" style="resize: none"  placeholder="Укажите номера телефонов, разделяя символом ;">{{ company.telephone }}</textarea>
         </div>
     </div>
     <div class="form-group">
-        <label class="col-md-3 text-primary control-label" for="companyEdit_contacts">Контакты</label>
+        <label class="col-md-3 small text-primary control-label" for="companyEdit_contacts">Контакты</label>
 
         <div class="col-md-9">
-            <input type="text" class="form-control" id="companyEdit_contacts" placeholder="Укажите контактные данные"
+            <input type="text" class="form-control input-sm" id="companyEdit_contacts" placeholder="Укажите контактные данные"
                    value="{{ company.contacts }}">
         </div>
     </div>
     <div class="form-group">
-        <label class="col-md-3 text-primary control-label" for="companyEdit_site">Сайт</label>
+        <label class="col-md-3 small text-primary control-label" for="companyEdit_site">Сайт</label>
 
         <div class="col-md-9">
-            <input type="text" class="form-control" id="companyEdit_site" placeholder="Укажите адрес сайта"
+            <input type="text" class="form-control input-sm" id="companyEdit_site" placeholder="Укажите адрес сайта"
                    value="{{ company.site }}">
         </div>
     </div>
     <div class="form-group">
-        <label class="col-md-3 text-primary control-label" for="companyEdit_email">Почта</label>
+        <label class="col-md-3 small text-primary control-label" for="companyEdit_email">Почта</label>
 
         <div class="col-md-9">
-            <input type="text" class="form-control" id="companyEdit_email"
-                   placeholder="Укажите почтовые адреса, разделяя символом \';\' " value="{{ company.email }}">
+            <textarea id="companyEdit_email" class="form-control input-sm" rows="2" style="resize: none"  placeholder="Укажите почтовые адреса, разделяя символом ;">{{ company.email }}</textarea>
         </div>
     </div>
     <div class="form-group">
-        <label class="col-md-3 text-primary control-label" for="companyEdit_comment">Комментарий</label>
+        <label class="col-md-3 small text-primary control-label" for="companyEdit_comment">Комментарий</label>
 
         <div class="col-md-9">
-            <input type="text" class="form-control" id="companyEdit_comment" placeholder="Укажите комментарий"
-                   value="{{ company.comment }}">
+            <textarea id="companyEdit_comment" class="form-control input-sm" rows="3" style="resize: none"  placeholder="Укажите комментарий">{{ company.comment }}</textarea>
         </div>
     </div>
 </form>
