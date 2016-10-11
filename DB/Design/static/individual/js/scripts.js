@@ -91,6 +91,19 @@ function sendAjaxRequest(_type, _adress, _params, _getResponseFunction, _errorFu
         }
     
 }
+
+
+function GetVariablesFromModalToDict(_container, _substring){
+    var controls = $('.' + _container + ' [id ^= ' + _substring + ']');
+    var dict = {}
+    for(i = 0; i < controls.length; i++)
+    {
+        dict[$(controls[i]).attr("id").replace(_substring + "_", "" )] = $(controls[i]).val();
+    }
+    return JSON.stringify(dict);
+
+}//Забирает потомков с id, начинающихся на _substring из окна с классом _container и возвращает их в формате json в виде ключ:значение
+
 ///END AJAX MODULE////////////////////////////////////////////////////////////////////////////////
 
 //MODAL WINDOWS Module////////////////////////////////////////////////////////////////////////////////
@@ -151,9 +164,6 @@ function showModalWindow_new(_button_types, _tittle, _content, _on_ok, _other_bu
     background.css("visibility", "visible");
 
 
-
-
-
     var modalWindow = $('<div>').addClass("modalWindow");
     modalWindowID = "modalWindow" + $('.modalWindow').length;
     $(modalWindow).addClass("container-fluid panel panel-primary");
@@ -179,9 +189,6 @@ function showModalWindow_new(_button_types, _tittle, _content, _on_ok, _other_bu
     $(modalWindow).append(panelText);
     modalWindow.attr("id", modalWindowID);
 
-
-
-
     var footer = $('<div>').addClass("textMiddle footer panel-footer");
 
     var buttons = $('<div>').addClass("displayInline");
@@ -189,8 +196,8 @@ function showModalWindow_new(_button_types, _tittle, _content, _on_ok, _other_bu
 
 
     switch (_button_types) {
-        case "ok":
-            var button = $('<input>').attr("type", "button").addClass("btn btn-default").attr("onclick", 'hideModalWindow("' + modalWindowID + '");').val("Oк");
+        case "cancel":
+            var button = $('<input>').attr("type", "button").addClass("btn btn-default").attr("onclick", 'hideModalWindow("' + modalWindowID + '");').val("Выход");
             $(buttons).append(button);
             break;
         case "okcancel":
@@ -218,6 +225,8 @@ function showModalWindow_new(_button_types, _tittle, _content, _on_ok, _other_bu
             }
             break;
         default:
+            alert("Неверно выбран тип кнопок модального окна");
+            return;
             break;
 
     }
@@ -245,13 +254,23 @@ function showModalWindow_new(_button_types, _tittle, _content, _on_ok, _other_bu
 
 
 }
-function hideModalWindow(_modalWindowID){
+function hideModalWindow(_modalWindow){
+    switch (typeof (_modalWindow)) {
+        case "string":
+            var modalWindow = $('#' + _modalWindow)
+            break;
+        case "object":
+            var modalWindow = $(_modalWindow).parents('.modalWindow');
+            break;
+        default:
+            alert("Ошибка в выборе типа модального окна.")
+            return;
 
-    var modalWindow = $('#' + _modalWindowID);
+    }
 
     var allModalWindows = $('.modalWindow');
 
-    var modalWindowNumber = parseInt(_modalWindowID.replace("modalWindow",""));
+    var modalWindowNumber = parseInt(modalWindow.attr("id").replace("modalWindow",""));
     var modalWindowNumberLast = allModalWindows.length - 1;
     var modalWindowNumberFirst = 0;
     var shift = modalWindowNumberLast - modalWindowNumber + 1;
@@ -295,6 +314,37 @@ function hideAllModalWindows(){
     $('#modalWindowBackground').css("visibility", "hidden");
 
     setTimeout(function(){$('#modal-module').remove()},200);
+}
+function DataFormCreate(_data, _generatedID){
+    for(item in _data)
+    {
+        var form = $('form').addClass("form-horizontal").attr("role", "form");
+        var divContainer = $('div').addClass("form-group");
+        var label = $('label').addClass("col-md-2 control-label").attr("for", _generatedID + "_" + item["name"]);
+        var divInputContainer = $('div').addClass("col-sm-10");
+
+
+
+
+        switch(item["type"]){
+            case "select":
+
+                break;
+            case "text":
+                var input = $('input').addClass("form-control").attr("id", _generatedID + "_" + item["varName"]).attr("type", "text").attr("placeholder", "Введите значение " + item["name"] + " в это поле"  );
+                break;
+            case "checkbox":
+                break;
+            default:
+                alert("Неверно выбран тип элемента управления");
+        }
+
+        $(divInputContainer).append(input);
+        $(divContainer).append(label).append(divInputContainer);
+        $(form).append(divContainer);
+
+    }
+
 }
 //END MODAL WINDOWS Module/////////////////////////////////////////////////////////////////////////////
 

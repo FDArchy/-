@@ -1,51 +1,78 @@
-<div>
-        <table>
-            <tr>
-                <td width="10%">Тип учреждения: </td>
-                <td>
-                    <select id="companyEditType" class="value">
-                        <option value="ДC" selected>ДС</option>
-                        <option value="ШК">ШК</option>
-                        <option value="ДК">ДК</option>
-                        <option value="ДО">ДО</option>
-                    </select>
-                </td>
-            </tr>
-            <tr>
-                <td>Наименование: </td>
-                <td><input type="text" id="companyEditName" class="value" value="{{company.name}}"></td>
-            </tr>
-            <tr>
-                <td>Адрес: </td>
-                <td><input type="text" id="companyEditAdress" class="value" value="{{company.adress}}"></td>
-            </tr>
-            <tr>
-                <td>Телефон: </td>
-                <td><input type="text" id="companyEditTelephone" class="value" value="{{company.telephone}}"></td>
-            </tr>
-            <tr>
-                <td>Контакты: </td>
-                <td><input type="text" id="companyEditContacts" class="value" value="{{company.contacts}}"></td>
-            </tr>
-            <tr>
-                <td>Почта: </td>
-                <td><textarea id="companyEditEmail" class="value" rows="5">{{company.email}}</textarea></td>
-            </tr>
-             <tr>
-                <td>Сайт: </td>
-                <td><input type="text" id="companyEditSite" class="value" value="{{company.site}}"></td>
-            </tr>
-            <tr>
-                <td>Комментарий: </td>
-                <td><textarea id="companyEditComment" class="value" rows="5">{{company.comment}}</textarea></td>
-            </tr>
-        </table>
-        <script>
-        function fillType() {
-            var optionBox = document.getElementById("companyEditType");
-            optionBox.value = "{{company.ctype}}";
-        }
-        </script>
+<form class="form-horizontal" role="form">
+    <div class="form-group">
+        <label class="col-md-3 text-primary control-label text-left" for="companyEdit_ctype">Тип</label>
+
+        <div class="col-md-9">
+            <select id="companyEdit_ctype" class="form-control">
+                <option value="ДC" selected>ДС</option>
+                <option value="ШК">ШК</option>
+                <option value="ДК">ДК</option>
+                <option value="ДО">ДО</option>
+            </select>
+        </div>
     </div>
 
+    <div class="form-group">
+        <label class="col-md-3 text-primary control-label" for="companyEdit_name">Название</label>
 
+        <div class="col-md-9">
+            <input type="text" class="form-control" id="companyEdit_name" placeholder="Укажите название компании"
+                   value="{{ company.name }}">
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-md-3 text-primary control-label" for="companyEdit_adress">Адрес</label>
+
+        <div class="col-md-9">
+            <input type="text" class="form-control" id="companyEdit_adress"
+                   placeholder="Укажите адрес, разделяя запятыми части адреса" value="{{ company.adress }}">
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-md-3 text-primary control-label" for="companyEdit_telephone">Телефон</label>
+
+        <div class="col-md-9">
+            <input type="text" class="form-control" id="companyEdit_telephone"
+                   placeholder="Укажите номера телефонов, разделяя символом \';\'" value="{{ company.telephone }}">
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-md-3 text-primary control-label" for="companyEdit_contacts">Контакты</label>
+
+        <div class="col-md-9">
+            <input type="text" class="form-control" id="companyEdit_contacts" placeholder="Укажите контактные данные"
+                   value="{{ company.contacts }}">
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-md-3 text-primary control-label" for="companyEdit_site">Сайт</label>
+
+        <div class="col-md-9">
+            <input type="text" class="form-control" id="companyEdit_site" placeholder="Укажите адрес сайта"
+                   value="{{ company.site }}">
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-md-3 text-primary control-label" for="companyEdit_email">Почта</label>
+
+        <div class="col-md-9">
+            <input type="text" class="form-control" id="companyEdit_email"
+                   placeholder="Укажите почтовые адреса, разделяя символом \';\' " value="{{ company.email }}">
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-md-3 text-primary control-label" for="companyEdit_comment">Комментарий</label>
+
+        <div class="col-md-9">
+            <input type="text" class="form-control" id="companyEdit_comment" placeholder="Укажите комментарий"
+                   value="{{ company.comment }}">
+        </div>
+    </div>
+</form>
+<script>
+    function fillType() {
+        var optionBox = document.getElementById("companyEdit_ctype");
+        optionBox.value = "{{company.ctype}}";
+    }
+    fillType();
+</script>

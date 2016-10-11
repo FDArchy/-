@@ -1,4 +1,4 @@
-<div class="row panel-heading " >
+<div id="company_page_tittle" class="row panel-heading " >
             <div class="col-md-10">
                 {% if company.ctype %}
                 <span class="companyType">{{ company.ctype }}</span>
@@ -15,7 +15,7 @@
                 </button>
             </div>
         </div>
-        <div class="panel-body">
+        <div id="company_page_text" class="panel-body">
             <div class="row" title="Показать на карте">
                 <div class="col-md-12 text-left ">
                     <button type="button" class="btn btn-default" style="white-space: normal" onclick="window.open('https://yandex.ru/maps/?text={{ company.city }}%20{{ company.adress }}')"> <span class="glyphicon glyphicon-road text-primary" ></span><span> <span> {{ company.city}}</span>,<span>  {{ company.adress }}</span> </span></button>

@@ -75,8 +75,8 @@ div.container-settings{
 }
 </style>
 
-    <div style="width:85%" class="container-fluid panel panel-primary">
-        <div class="row panel-heading " >
+    <div id="company_info_container" style="width:85%" class="container-fluid panel panel-primary">
+        <div id="company_page_tittle" class="row panel-heading " >
             <div class="col-md-10">
                 {% if company.ctype %}
                 <span class="companyType">{{ company.ctype }}</span>
@@ -93,7 +93,7 @@ div.container-settings{
                 </button>
             </div>
         </div>
-        <div class="panel-body">
+        <div id="company_page_text" class="panel-body">
             <div class="row" title="Показать на карте">
                 <div class="col-md-12 text-left ">
                     <button type="button" class="btn btn-default" style="white-space: normal" onclick="window.open('https://yandex.ru/maps/?text={{ company.city }}%20{{ company.adress }}')"> <span class="glyphicon glyphicon-road text-primary" ></span><span> <span> {{ company.city}}</span>,<span>  {{ company.adress }}</span> </span></button>
@@ -147,7 +147,7 @@ div.container-settings{
                 </div>
                 {% endif %}
         </div>
-        <div  class="container-fluid container-settings">
+        <div id="company_page_manager_work"  class="container-fluid container-settings">
             <ul class="nav nav-tabs" >
                 {% if shows.count == 1 %}
                     <li   class="active" onclick="ChangeTab('{{ shows.0.id }}')" data-id="{{ shows.0.id }}" data-color="{{ shows.0.color }}"><a href="" data-toggle="tab">{{ shows.0.name }}</a></li>
@@ -166,12 +166,10 @@ div.container-settings{
                 </div>
             </div>
     </div>
-    <input type="button" onclick="TEST();">
     <script>
 
 
 
-    function ShowEditCompanyPanel(){}//Отображение панели редактирования учреждения
     function RemoveCompany(){
         if(!confirm("Вы уверены что хотите удалить учреждение? При удалении, пропадут все связанные с учреждением задачи, звонки и мероприятия."))
             return
@@ -190,9 +188,16 @@ div.container-settings{
     }//Удаление учреждения
     function EditCompany(){
         $.post("/aj_company_edit_page/", {id:{{company.id}}}, function(response) {
+
             showModalWindow_new("okcancel", "Редактировать учреждение", response, function(){
-                alert($('#modalWindow0').outerHeight());
-                alert($('#modalWindow0')[0].scrollHeight);
+
+                $.post("/aj_company_data/", {id:{{company.id}}, changed:GetVariablesFromModalToDict("modalWindow", "companyEdit")}, function(response) {
+
+                    $('#company_page_tittle').remove();
+                    $('#company_page_text').remove();
+                    $('#company_page_manager_work').before(response);
+                });
+                hideModalWindow(this);
             });
         })
     }//Редактирование учреждения
@@ -248,9 +253,7 @@ div.container-settings{
         $.post("/aj_company_edit_page/", {id:{{company.id}}}, function(response) {});
     }
 
-    function TEST(){
 
-    }
     </script>
 
     <script>

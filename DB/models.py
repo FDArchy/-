@@ -8,15 +8,15 @@ class City(models.Model):#Город
     class Meta:
         ordering = ["name"]
 class Company(models.Model):#Учреждение
-    ctype = models.CharField(max_length = 10,verbose_name = "Тип учреждения", null=False)
-    name = models.CharField(max_length = 80,verbose_name = 'Наименование', null=False)
+    ctype = models.CharField(max_length = 10,verbose_name = "Тип", null=False)
+    name = models.CharField(max_length = 80,verbose_name = 'Название', null=False)
     city = models.ForeignKey('City', null=False)
     adress = models.CharField(max_length = 100,  verbose_name = 'Адрес', null=False)
     telephone = models.CharField(max_length = 100, verbose_name = 'Телефоны')
-    contacts = models.CharField(max_length = 100, verbose_name = 'Контактные лица')
+    contacts = models.CharField(max_length = 100, verbose_name = 'Контакты')
     site = models.CharField(max_length=25, verbose_name='Сайт')
     email = models.CharField(max_length=200, verbose_name='Почта')
-    comment = models.CharField(max_length = 200, verbose_name = 'Комментарии')
+    comment = models.CharField(max_length = 200, verbose_name = 'Комментарий')
     date = models.DateTimeField(auto_now = True, verbose_name="Дата", null=True)
     def  __str__(self):
         counter = 0
