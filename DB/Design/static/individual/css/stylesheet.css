@@ -1,4 +1,4 @@
-﻿.modalWindow{
+.modalWindow{
         position:absolute;
         top:-1000px;
         left:35%;
@@ -117,14 +117,6 @@ a:hover{
 
 
 }
-.container {
-  width: 100%;
-  max-width: 680px;
-  padding: 0 15px;
-}
-.container .text-muted {
-  margin: 20px 0;
-}
 .notification-error{
     background-color: rgba(255, 0, 0, 0.4);
     color: red;
@@ -193,4 +185,3 @@ a:hover{
 }
 
 /*NOTIFICATIONS*/
-

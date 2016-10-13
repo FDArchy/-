@@ -1,299 +1,78 @@
 ﻿{% load staticfiles %}
 <html>
-	<head>
-		<title> Шоуконтроль
-		</title>
-<script src={% static "jquery/jquery.js" %}></script>
-<script type="text/javascript">$(document).ready(function(){});</script>
-<script src={% static "bootstrap/js/bootstrap.min.js" %}></script>
-<script src={% static "individual/js/scripts.js" %}></script>
+<head>
+
+    <script src={% static "jquery/jquery.js" %}></script>
+    <script type="text/javascript">$(document).ready(function () {});</script>
+    <script src={% static "bootstrap/js/bootstrap.min.js" %}></script>
+    <script src={% static "individual/js/scripts.js" %}></script>
 
 
-<link href= {% static "bootstrap/css/bootstrap.min.css" %} rel="stylesheet">
-<link href= {% static "individual/css/stylesheet.css" %} rel="stylesheet">
+    <link href={% static "bootstrap/css/bootstrap.min.css" %} rel="stylesheet">
+    <link href={% static "individual/css/stylesheet.css" %} rel="stylesheet">
+    <style>
+        body {
+  min-height: 2000px;
+}
 
+.navbar-static-top {
+  margin-bottom: 19px;
+}
+    </style>
+</head>
 
+  <body>
 
-<style type="text/css">
-
-
-    /*TODAYTASKS MODULE*/
-    .arrow-left {
-        display: inline-block;
-        position:absolute;
-        top:100px;
-        left:0px;
-        width: 0;
-        height: 0;
-        border: 20px solid transparent; 
-        border-left-color: rgb(255, 126, 1);  
-        border-right: 0;
-        cursor:pointer;
-        opacity:0.5;
-    }
-    .arrow-left:hover{
-        position:absolute;
-        opacity:1;
-        box-shadow:
-            1px -0px rgb(220,195,35), 1px -1px rgb(192,167,7);         
-        z-index:5;
-    }
-    .todayTasks{
-        position:absolute;
-        top:100px;
-        left:-550px;
-        width: 500px;
-        height: 600px;
-        background-color:white;
-        opacity:0.8;
-        border-radius:20px;
-        text-align:center;
-        box-shadow: 23px 25px 45px 1px #000000;
-        visibility:hidden;
-        transition: 1s;
-        
-    }
-
-    
-    .textInTasksPanel{
-        text-align:center;
-        opacity:1;
-        
-    }
-    li.currentTasks{
-        text-align:left;
-        cursor:pointer;
-    }
-    li.currentTasks:hover{
-        
-        background-color:brown;
-    }
-    hr.style-seven {
-    height: 30px;
-    border-style: solid;
-    border-color: black;
-    border-width: 1px 0 0 0;
-    border-radius: 20px;
-    }
-    hr.style-seven:before { /* Not really supposed to work, but does */
-    display: block;
-    content: "";
-    height: 30px;
-    margin-top: -31px;
-    border-style: solid;
-    border-color: black;
-    border-width: 0 0 1px 0;
-    border-radius: 20px;
-    }
-    /*TODAYTASKS MODULE*/
-
-
-    .headerWrapper{
-        width:100%;
-        height: 50px;
-    }
-    .headerPanel{
-        /*background-color:#36BBCE;*/
-        background: linear-gradient(to top, #36BBCE, #FFFFFF);
-        width:97%;
-        position:absolute;
-        top:0px;
-        left:0px;
-        padding:3px 15px 5px 25px;
-        vertical-align: middle;
-
-    }/*Панель с именем и настройками*/
-    .menu{
-        background-color:#36BBCE;
-        width:97%;
-        position:absolute;
-        top:28px;
-        left:0px;
-        padding:0px 15px 5px 25px;
-        border-top: solid 1px #000000;
-
-        background: rgba(54,186,206,0.95);
-        background: -moz-linear-gradient(top, rgba(54,186,206,0.95) 0%, rgba(54,186,206,0.99) 82%, rgba(255,255,255,1) 100%);
-        background: -webkit-gradient(left top, left bottom, color-stop(0%, rgba(54,186,206,0.95)), color-stop(82%, rgba(54,186,206,0.99)), color-stop(100%, rgba(255,255,255,1)));
-        background: -webkit-linear-gradient(top, rgba(54,186,206,0.95) 0%, rgba(54,186,206,0.99) 82%, rgba(255,255,255,1) 100%);
-        background: -o-linear-gradient(top, rgba(54,186,206,0.95) 0%, rgba(54,186,206,0.99) 82%, rgba(255,255,255,1) 100%);
-        background: -ms-linear-gradient(top, rgba(54,186,206,0.95) 0%, rgba(54,186,206,0.99) 82%, rgba(255,255,255,1) 100%);
-        background: linear-gradient(to bottom, rgba(54,186,206,0.95) 0%, rgba(54,186,206,0.99) 82%, rgba(255,255,255,1) 100%);
-        filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#36bace', endColorstr='#ffffff', GradientType=0 );
-
-    }/*Панель меню*/
-    .mainMenuElement{
-        padding-left: 5px;
-        padding-right: 5px;
-        color: #444;
-        font-family: "Arial Black";
-        font-feature-settings: "'liga' 1";
-        font-kerning: auto;
-        font-style: normal;
-        font-size: 0.8em;
-        font-weight: 200;
-        letter-spacing: -0.075em;
-        line-height: 0.8em;
-        text-align: center;
-        text-decoration: none;
-        text-transform: uppercase;
-
-        border-style: solid;
-        border-color: #36BBCE;
-    }/*Элемент меню*/
-    .dropDownMenuElement{
-        background-color: #36BBCE;
-        border-radius: 5px;
-        border: solid 1px  #1E90FF;
-        margin: 2px 2px 2px 2px;
-        padding-bottom: 6px;
-        padding-top: 6px;
-        font-size: 0.6em;
-    }
-    .mainMenuElement:hover{/*При наведении выделить объемом и цветом*/
-        border-style: outset;
-        border-radius: 5px;
-        cursor: pointer;
-        box-shadow: inset 0 0 10px #1E90FF;
-    }
-    .middleAllign{
-        width:100%;
-        margin:auto;
-        text-align: center;
-        padding:5px 5px 5px 5px;
-    }/*Растягивает блок и выравнивает посередине*/
-    .usernameDecoration{/*Оформление имени пользователя*/
-        font-family: "Arial Black";
-        font-feature-settings: "'liga' 1";
-        font-kerning: auto;
-        font-style: normal;
-        font-size: 0.8em;
-        font-weight: 200;
-        letter-spacing: -0.075em;
-        line-height: 0.8em;
-        text-align: center;
-        text-decoration: none;
-        text-transform: uppercase;
-        color:#0C4BE9;
-        padding-right: 10px;
-        padding-right: 10px;
-    }
-
-    .rightFloat{
-
-        float:right;
-    }
-    
- </style>
-
- <script>
-
-    function showTasks()    {
-        var tasksPanel = document.getElementById("todayTasksID");
-        if (tasksPanel.style.visibility != "visible") {
-            tasksPanel.style.visibility = "visible";
-            tasksPanel.style.left = "20px";
-        }
-        else
-        {
-            tasksPanel.style.left = "-550px";
-            tasksPanel.style.visibility = "hidden";
-        }
-            
-            
-    }
-    function showTask()    {
-       
-        var tasksPanel = document.getElementById("taskData");
-        if (tasksPanel.style.visibility != "visible") {
-            tasksPanel.style.visibility = "visible";
-            
-        }
-        
-    }
-    
-</script>
-    </head>
-<body bgcolor="#f1f1f1" leftmargin="40" topmargin="60"  rightmargin="40" bottommargin="60" text="black">
-
-
-    {%block overridemain %}
-            {%if is_manager%}<div class="arrow-left" onclick="showTasks();"></div>
-            <div id="todayTasksID" class="todayTasks">
-                <div class="textInTasksPanel">
-                    <p>
-                        <script>document.write(getCurrentDate());</script>
-                    </p>
-                    <hr class="style-seven">
-                    <p>Список задач:</p>
-                    {%if currentTasks%}
-                    {% for currentTask in currentTasks %}
-                    <ul>
-                        <li class="currentTasks" onclick='location.href="/task/{{currentTask.id}}"'>{{currentTask.company.name}}:{{currentTask.datetime.time}}</li>
-                    </ul>
-                    {%endfor%}
-                    {%else%}
-                    Задачи отсутствуют.
-                    {%endif%}
-
-                    <hr class="style-seven">
-                </div>
-            </div>{%endif%}
-    <div class="headerWrapper">
-        <div class="headerPanel">
-        <!--    <select onchange="ChangeFilterValues()" id="headerCity" class="noway">
-                {% for city in allowedCities %}
-                    {% if city.id == choosenCity %}
-                        <option selected value="{{ city.id }}">{{ city.name }}</option>
-                    {% else %}
-                       <option value="{{ city.id }}">{{ city.name }}</option>
-                    {% endif %}
-
-                {% endfor %}
-            </select>
-            &nbsp;&nbsp;
-            <select onchange="ChangeFilterValues()" id="headerArtist" class="noway">
-                {% for artist in allowedArtists %}
-                    {% if artist.id == choosenArtist %}
-                        <option selected value="{{ artist.id }}">{{ artist.name }}</option>
-                    {% else %}
-                        <option value="{{ artist.id }}">{{ artist.name }}</option>
-                    {% endif %}
-
-                {% endfor %}
-            </select>-->
-         <div class="rightFloat">{% if currentUser == "Нагуманов Артем" %}<a href="/testfunc/">Скрипт</a>&nbsp{% endif %}<span class="usernameDecoration">{{ currentUser }}</span><span id="dropDownUserMenu" style="padding-top: 8px; " class="mainMenuElement"> <img style="padding-right: 14px"  onclick="ShowDropDownMenu('dropDownUserMenu', 'Выход', '/logout');" width="20px" height="20px" alt="userMenu"> </span> </div>
-
+    <div class="navbar navbar-inverse navbar-static-top" role="navigation">
+      <div class="container">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="#">Project name</a>
         </div>
+        <div class="navbar-collapse collapse">
+          <ul class="nav navbar-nav">
+            <li class="active"><a href="#">Home</a></li>
+            <li><a href="#about">About</a></li>
+            <li><a href="#contact">Contact</a></li>
+            <li class="dropdown">
+              <a href="#" class="dropdown-toggle" data-toggle="dropdown">Dropdown <b class="caret"></b></a>
+              <ul class="dropdown-menu">
+                <li><a href="#">Action</a></li>
+                <li><a href="#">Another action</a></li>
+                <li><a href="#">Something else here</a></li>
+                <li class="divider"></li>
+                <li class="dropdown-header">Nav header</li>
+                <li><a href="#">Separated link</a></li>
+                <li><a href="#">One more separated link</a></li>
+              </ul>
+            </li>
+          </ul>
+          <ul class="nav navbar-nav navbar-right">
+            <li><a href="../navbar/">Меню</a></li>
+            <li class="active"><a href="./">Статическое</a></li>
+            <li><a href="../navbar-fixed-top/">Фиксированное</a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+
+<div class="container-fluid">
+      {% block body%}
+{%block overridemain %}
+            {%endblock%}
+            {%endblock%}
 </div>
-        <div class="menu"><div class="middleAllign" >
-            {%if is_manager%}
-            <span class="mainMenuElement" onclick="location.href = '/showcompaniesnew'">Клиенты</span>
-            <span class="mainMenuElement" onclick="location.href = '/showtasksnew'">Задачи</span>
-            <span class="mainMenuElement" onclick="location.href = '/showevents/page/1'">Мероприятия</span>
-            {%endif%}
-            <span class="mainMenuElement" onclick="location.href = '/calendar'">Календарь</span>
-            {% if is_superuser %}
-            <span class="mainMenuElement" onclick="location.href = '/companiescontrol'">Управление</span>
-            {% endif %}
-            {%if is_manager%}
-            <span class="mainMenuElement" onclick="location.href = '/showfullcompanieslist'">Полный список</span>
-            <span class="mainMenuElement" onclick="location.href = '/statspanel'">Статистика</span>
-            {% endif %}
-            <span class="mainMenuElement" onclick="location.href = '/help'">Помощь</span>
-            </div></div>
 
 
 
-
-            {% block body%}
-
-            {%endblock%}
-            {%endblock%}
-
-    </body>
+  </body>
 </html>
-
 
 
 

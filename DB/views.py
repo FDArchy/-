@@ -292,21 +292,8 @@ def getcompanydataforantidouble(request):
         dictItem["controlData"] = {}
         for artist in artists:
             dictItem["controlData"]["artist"] = artist.id
-            #dictItem["controlData"]["lastcall"]
 
-            """
-        dictItem["lastcall"] = calls.filter(company = company.id).order_by("-datetime")[:1]
-        if events.filter(company = company.id, startTime__gte = datetime.now()).order_by("startTime")[:1].count() != 0:
-            dictItem["lastevent"] = events.filter(company = company.id, startTime__gte = datetime.now()).order_by("startTime")[:1]
-        else:
-            dictItem["lastevent"] = events.filter(company = company.id, startTime__lte = datetime.now()).order_by("-startTime")[:1]
 
-        links = CMSILink.objects.filter(company__id = company.id, show = artistID)
-        tmplist = []
-        for link in links:
-            tmplist.append(link.manager.name)
-        dictItem["managers"] = tmplist
-        filtredCompanies.append(dictItem)"""
 
     return  render_to_response('html/companies/getcompaniesdata.html', {'filtredCompanies':filtredCompanies, 'page':pages}, context_instance=RequestContext(request))
 def deletecompanies(request):
@@ -345,7 +332,6 @@ def showcompany(request, company_number):
     last_task = Task.objects.filter(manager = manager.id, company = company.id).order_by("-datetime")[:1]
     last_call = Call.objects.filter(manager = manager.id, company = company.id).order_by("-datetime")[:1]
 
-    currentDateTime = datetime.now()
 
 
     return render_to_response('html/companies/showcompany.html', {'company':company, 'tasks':tasks, 'artists':artists, 'manager':manager, 'last_task':last_task, 'last_call':last_call, 'last_event':last_event, 'next_event':next_event}, context_instance=RequestContext(request))
@@ -1502,7 +1488,6 @@ def company_show_page(request, company_number):
 
 
     return render_to_response('Design/html/companies/company_page/page_main.html', {'company':company, 'user':site_user, 'shows':allowed_shows})
-@login_required(login_url='/logon/')
 def company_show_manager_work_content(request):
 
     company = Company.objects.get(id = request.POST.get('company'))
@@ -1534,7 +1519,55 @@ def company_show_manager_work_content(request):
 
 
     return render_to_response('Design/html/companies/company_page/aj_manager_work.html', {'last_call':last_call, 'last_task':last_task, 'next_task':next_task, 'last_event':last_event, 'next_event':next_event, 'all_button':all}, context_instance=RequestContext(request))
-@login_required(login_url='/logon/')
+def company_manager_work_mark_call_and_add_task(request):
+    result = {}
+    type = ""
+    text = ""
+    show_time = 0
+    close_type = 0
+
+
+    company = Company.objects.get(id = request.POST.get("company"))
+    artist = Artist.objects.get(id = request.POST.get("artist"))
+    manager = Manager.objects.get(username = request.user.username)
+
+
+    if request.POST.get("call_tittle") == None:
+        datetime_low_lim = datetime.utcnow().replace(hour=0, minute=0, second=0, microsecond=0)
+        datetime_high_lim = datetime.utcnow().replace(hour=23, minute=59, second=59, microsecond=999999)
+        today_calls = Call.objects.filter(company = company, artist = artist, datetime__range = (datetime_low_lim, datetime_high_lim))
+        if(today_calls.count() > 0):
+            if(today_calls.filter(manager = manager).count() > 0):
+                Call.objects.filter(id__in = today_calls.filter(manager = manager).order_by('-datetime')[:1]).delete()
+                type = "2"
+                text = "Отметка звонка успешно отменена"
+                close_type = "0"
+                show_time = "2000"
+
+
+            else:
+                type = "1"
+                text = "Сегодня в это учреждение по поводу этого шоу уже звонил другой менеджер. Если вы также хотите отметить звонок на этом учреждении и оставить комментарий, воспользуйтесь кнопкой добавления звонка"
+                close_type = "0"
+                show_time = "3000"
+        else:
+            call = Call(
+                manager = manager,
+                company = company,
+                artist = Artist.objects.get(id = request.POST.get('artist')),
+                comment = request.POST.get('callComment'))
+            call.save()
+    else:
+        print("TO")
+
+
+
+    result["type"] = type
+    result["text"] = text
+    result["show_time"] = show_time
+    result["close_type"] = close_type
+    serialized = json.dumps(result)
+    return HttpResponse(serialized)
 def company_remove(request):
     company = Company.objects.get(id = request.POST.get('id'))
 
@@ -1576,7 +1609,6 @@ def company_remove(request):
 def company_edit_show_page(request):
     company = Company.objects.get(id = request.POST.get('id'))
     return render_to_response('Design/html/companies/company_page/page_company_edit.html', {'company':company})
-@login_required(login_url='/logon/')
 def company_edit_or_add(request):
     company = Company.objects.filter(id = request.POST.get("id"))
     if company.count() == 0:
@@ -1586,5 +1618,4 @@ def company_edit_or_add(request):
         company.update(**json.loads(request.POST.get("changed")))
 
     return render_to_response('Design/html/companies/company_page/aj_company_data.html', {'company':company[0]})
-
 #############################################################################################

@@ -34,11 +34,12 @@
     <div style="padding-left:0px;" class="col-md-2 text-right">
         {% if not all_button %}
             {% if last_call.0.datetime.date|datecountdown == "Сегодня" %}
-                <span id="mark-call-button" title="Отменить звонок" onclick="markCall();" style="color:#5CB85C"
+
+                <span id="mark-call-button" title="Отменить звонок" onclick="MarkCall('fastmarkcall');" style="color:#5CB85C"
                       class="glyphicon glyphicon-ok-sign icon-pressed text-primary"></span>
 
             {% else %}
-                <span id="mark-call-button" title="Отметить звонок сегодня" onclick="NR_MarkCall();"
+                <span id="mark-call-button" title="Отметить звонок сегодня" onclick="MarkCall('fastmarkcall');"
                       class="glyphicon glyphicon-ok-circle icon-pressed text-primary"></span>
             {% endif %}
         {% endif %}

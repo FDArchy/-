@@ -28,6 +28,7 @@
     cursor: help;
 }
 .icon-pressed{
+
     border: 1px solid #fff;
     margin-right: 6px;
     font-size: 17px;
@@ -39,6 +40,7 @@
 
 }
 .icon-small-pressed{
+    margin-right: 6px;
     border: 1px transparent outset;
     border-radius: 8px;
 }
@@ -165,7 +167,7 @@ div.container-settings{
 
             </ul>
 
-                <div class="container-fluid" id="dinamic_content">
+                <div class="container-fluid" data-currentArtist = "0" id="dinamic_content">
 
                 </div>
             </div>
@@ -202,16 +204,42 @@ div.container-settings{
                     $('#company_page_manager_work').before(response);
                 });
                 hideModalWindow(this);
+                ShowNotify("2", "Данные компании успешно изменены",0, 2000);
             });
         })
     }//Редактирование учреждения
-    function NR_MarkCall(){
+    function MarkCall(_type, _callText, _task_date, _taskDescription, _taskComment){
+
+        var artist = $('#dinamic_content').attr('data-currentArtist')
+        switch (_type){
+
+                case "fastmarkcall":
+                    $.post("/aj_company_manager_work_call_and_task/", {company:"{{ company.id }}", artist:artist}, function(response){
+                        debugger;
+                    var responseResult = $.parseJSON(response);
+                    ShowNotify(responseResult.type, responseResult.text, responseResult.close_type, responseResult.show_time);
+                    })
+                    break;
+                case "markcall":
+                    break;
+                case "tooaddtask":
+                    break;
+                default:
+                    alert("Выбран неправильный тип отметки звонка");
+                    return;
+                    break;
+            }
             if($('#mark-call-button').hasClass("glyphicon-ok-sign")){
+
+
+
                 $('#mark-call-button').removeClass("glyphicon-ok-sign");
                 $('#mark-call-button').addClass("glyphicon-ok-circle");
                 $('#mark-call-button').attr("style", "color:#428bca");
             }
             else{
+
+
                 $('#mark-call-button').addClass("glyphicon-ok-sign");
                 $('#mark-call-button').removeClass("glyphicon-ok-circle");
                 $('#mark-call-button').attr("style", "color:#5CB85C");
@@ -220,12 +248,13 @@ div.container-settings{
 
 
         }//Отметка звонка
-    function ChangeTab(tab){
+    function ChangeTab(_tab){
 
             //Подгружаем содержимое вкладки:
-            $.post("/aj_company_manager_work/", {company:"{{ company.id }}", artist:tab}, function(response){
+            $.post("/aj_company_manager_work/", {company:"{{ company.id }}", artist:_tab}, function(response){
                 $('#dinamic_content').html(response);
             })
+            $('#dinamic_content').attr("data-currentArtist", _tab);
             //Дизайн
             //Переводим свойства всех зависимых элементов в стандартное значение.
             $('.nav li a').css("border-left", "1px solid #fff");
@@ -237,25 +266,23 @@ div.container-settings{
 
             })
 
-            $('li[data-id=' + tab +'] a').css('border-left', '1px solid ' + $('li[data-id=' + tab +']').data("color"));
+            $('li[data-id=' + _tab +'] a').css('border-left', '1px solid ' + $('li[data-id=' + _tab +']').data("color"));
 
-            $('li[data-id=' + tab +'] a').css('border-left', '1px solid ' + $('li[data-id=' + tab +']').data("color"));
-            $('li[data-id=' + tab +'] a').css('border-right', '1px solid ' + $('li[data-id=' + tab +']').data("color"));
-            $('li[data-id=' + tab +'] a').css('border-top', '1px solid ' + $('li[data-id=' + tab +']').data("color"));
+            $('li[data-id=' + _tab +'] a').css('border-left', '1px solid ' + $('li[data-id=' + _tab +']').data("color"));
+            $('li[data-id=' + _tab +'] a').css('border-right', '1px solid ' + $('li[data-id=' + _tab +']').data("color"));
+            $('li[data-id=' + _tab +'] a').css('border-top', '1px solid ' + $('li[data-id=' + _tab +']').data("color"));
 
-            $('li[data-id=' + tab +'] a').css('border-top', '1px solid ' + $('li[data-id=' + tab +']').data("color"));
+            $('li[data-id=' + _tab +'] a').css('border-top', '1px solid ' + $('li[data-id=' + _tab +']').data("color"));
 
-            $('#dinamic_content').css('border-left', '1px solid ' + $('li[data-id=' + tab +']').data("color"));
-            $('#dinamic_content').css('border-right', '1px solid ' + $('li[data-id=' + tab +']').data("color"));
-            $('#dinamic_content').css('border-bottom', '1px solid ' + $('li[data-id=' + tab +']').data("color"));
+            $('#dinamic_content').css('border-left', '1px solid ' + $('li[data-id=' + _tab +']').data("color"));
+            $('#dinamic_content').css('border-right', '1px solid ' + $('li[data-id=' + _tab +']').data("color"));
+            $('#dinamic_content').css('border-bottom', '1px solid ' + $('li[data-id=' + _tab +']').data("color"));
 
-            $('.nav').css("border-bottom", "1px solid" + $('li[data-id=' + tab +']').data("color"));
-
+            $('.nav').css("border-bottom", "1px solid" + $('li[data-id=' + _tab +']').data("color"));            
+            
 
         }//Переключение вкладки
-    function UpdateCompanyData(){
-        $.post("/aj_company_edit_page/", {id:{{company.id}}}, function(response) {});
-    }
+
 
 
     </script>
