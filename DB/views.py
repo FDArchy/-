@@ -746,30 +746,30 @@ def companies_list(request):
     current_page = request.POST.get("page")
     if(current_page):
         current_page = int(current_page)
-    city_id = request.POST.get("city_id")
-    show_id = request.POST.get("show_id")
+    city_id = int_convertor_error_0(request.POST.get("city_id"))
+    show_id = int_convertor_error_0(request.POST.get("show_id"))
     search_string = request.POST.get("search")
     manager = Manager.objects.get(siteuser__user=request.user)
 
     companies_filter_params = {}  # Словарь kwargs с параметрами ддя фильтрации учреждений
     companies_filter_params["manager__id"] = manager.id  # Добавление параметра фильтрации по менеджеру
-    if (request.POST.get("city_id") != "0" and request.POST.get("city_id") != None):
-        companies_filter_params["company__city__id"] = request.POST.get("city_id")  # Добавление параметра фильтрации по городу
-    if (request.POST.get("show_id") != "0" and request.POST.get("show_id") != None):
-        companies_filter_params["show__id"] = request.POST.get("show_id")  # Добавление параметра фильтрации по шоу
+    if (city_id != 0):
+        companies_filter_params["company__city__id"] = city_id  # Добавление параметра фильтрации по городу
+    if (show_id != 0):
+        companies_filter_params["show__id"] = show_id  # Добавление параметра фильтрации по шоу
     if(filter_type) == "any":
         filter_type = ""
     if(paginator):
         if(admin_mode):
-            if(city_id != "0"):
+            if(city_id != 0):
                 companies_count = Company.objects.filter(Q(city_id=city_id), Q(name__icontains=search_string) | Q(
                     adress__icontains=search_string), Q(ctype__icontains=filter_type)).count()
             else:
                 allowed_cities_list = get_worked_cities()
-                if(show_id != "0"):
+                if(show_id != 0):
                     allowed_cities_by_shows = set(
                         City.objects.filter(enabled=True,
-                                            worked_shows__id=request.POST.get("show_id")).distinct().values_list(
+                                            worked_shows__id=show_id).distinct().values_list(
                             "id", flat=True))
                     allowed_cities_list = list(set(allowed_cities_list) & allowed_cities_by_shows)
                 companies_count = Company.objects.filter(Q(city__id__in = allowed_cities_list), Q(name__icontains=search_string) | Q(
@@ -780,7 +780,6 @@ def companies_list(request):
         pages_count = calc_pages_count(elements_on_page, companies_count)
         return JsonResponse(create_response("data", "", {"page_count": pages_count}))
 
-
     result = {}
     filtred_companies_list = []#Список компаний
 
@@ -789,16 +788,13 @@ def companies_list(request):
     #Список выводимых параметров
     params_list = {"id":"Код", "type":"Тип", "name":"Название", "city_name":"Город", "adress":"Адрес", "last_call":"Звонок", "last_task":"Задача", "last_event":"Мероприятие", "is_have_contacts":"Контакты указаны", "is_have_telephone":"Телефоны указаны", "is_have_comment":"Комментарии указаны", "is_have_site":"Сайт указан", "is_have_email":"Почта указана"}
 
-
-
     #Заполнение фидьтрующего компании списка:
-    if city_id != "0":
+    if city_id != 0:
         company_filter_values["company__city__id"] = city_id
-    if show_id != "0":
+    if show_id != 0:
         company_filter_values["show__id"] = show_id
     if search_string == None:
         search_string = ""
-
 
     company_filter_values["manager__id"] = manager.id
 
@@ -810,15 +806,15 @@ def companies_list(request):
     #Если есть сортировка, одни условия выбора, иначе - другие
     if(sort_by == "id" or sort_by == "ctype" or sort_by == "name" or sort_by == "city__name" or sort_by == "adress"):
         if(admin_mode):
-            if (city_id != "0"):
+            if (city_id != 0):
                 companies = Company.objects.filter(Q(city_id=city_id), Q(name__icontains=search_string) | Q(
                     adress__icontains=search_string), Q(ctype__icontains=filter_type)).order_by(sort_by)[first_index:last_index]
             else:
                 allowed_cities_list = get_worked_cities()
-                if (show_id != "0"):
+                if (show_id != 0):
                     allowed_cities_by_shows = set(
                         City.objects.filter(enabled=True,
-                                            worked_shows__id=request.POST.get("show_id")).distinct().values_list(
+                                            worked_shows__id=show_id).distinct().values_list(
                             "id", flat=True))
                     allowed_cities_list = list(set(allowed_cities_list) & allowed_cities_by_shows)
                 companies = Company.objects.filter(Q(city__id__in = allowed_cities_list), Q(name__icontains=search_string) | Q(
@@ -830,7 +826,7 @@ def companies_list(request):
         if(sort_by == "call"):
             #Все выбранные компании
             if(admin_mode):
-                if (city_id != "0"):
+                if (city_id != 0):
                     companies = Company.objects.filter(Q(city_id=city_id), Q(name__icontains=search_string) | Q(
                         adress__icontains=search_string), Q(ctype__icontains=filter_type)).order_by(sort_by).values_list(
                     "id", flat=True)
@@ -849,7 +845,7 @@ def companies_list(request):
             end = 900
             #Поиск всех звонков и id компаний со звонками
             show_filter_values = {}
-            if(show_id != "0"):
+            if(show_id != 0):
                 show_filter_values["artist__id"] = show_id
             companies_with_calls = list(Call.objects.filter(company__id__in=companies[begin:end], type = "company", **show_filter_values).values("company__id", "datetime").distinct())
             companies_with_calls_ids_only = list(Call.objects.filter(company__id__in=companies[begin:end], type = "company", **show_filter_values).values("company__id").distinct())
@@ -900,7 +896,7 @@ def companies_list(request):
         elif(sort_by == "task"):
             # Все выбранные компании
             if (admin_mode):
-                if (city_id != "0"):
+                if (city_id != 0):
                     companies = Company.objects.filter(Q(city_id=city_id), Q(name__icontains=search_string) | Q(
                         adress__icontains=search_string), Q(ctype__icontains=filter_type)).order_by(
                         sort_by).values_list(
@@ -979,51 +975,38 @@ def companies_list(request):
             companies = presorted_companies
         elif(sort_by == "event"):
             pass
-    current_datetime = datetime.now().replace(hour=0, minute=0, second=0, microsecond=0)
 
-    manager_work_filter_values = {}
-    manager_work_task_filter_values = {}
-    if (show_id != '0'):
-        manager_work_filter_values["artist__id"] = show_id
-        manager_work_task_filter_values["artist__id"] = show_id
+    calls_filter_values = {}
+    tasks_filter_values = {}
+    events_filter_values = {}
+    if(not admin_mode):
+        tasks_filter_values["manager__id"] = manager.id
+    if (show_id != 0):
+        calls_filter_values["artist__id"] = show_id
+        tasks_filter_values["artist__id"] = show_id
+        events_filter_values["artist__id"] = show_id
+        allowed_shows = [show_id, ]
     else:
         if (admin_mode):
             allowed_shows = Artist.objects.all().values_list("id", flat=True)
-            manager_work_filter_values["artist__in"] = allowed_shows
-            manager_work_task_filter_values["artist__in"] = allowed_shows
         else:
             getted_links = CMSILink.objects.filter(manager=manager, company__id__in = companies.values_list("id", flat=True)).values("show__id", "company__id").distinct()
 
     companies_ids = companies.values_list("id", flat=True)
 
-    calls_all = Call.objects.filter(company__id__in = companies_ids)
-    if(admin_mode):
-        tasks_all = Task.objects.filter(company__id__in=companies_ids)
-    else:
-        tasks_all = Task.objects.filter(company__id__in=companies_ids, manager__id = manager.id)
-    events_all = Event.objects.filter(company__id__in=companies_ids)
-    
-    #start_time = time.time()
-    #tasks = list(Task.objects.filter(company__id__in = companies).values("id", "company__id", "artist__id", "artist__name", "artist__color", "manager__siteuser__id", "manager__siteuser__alias", "datetime", "done", "doneDateTime").order_by("-datetime"))
-    #filtred_tasks = filter(lambda x: x["company__id"] == 16, tasks)
-    #print("--- %s seconds ---" % (time.time() - start_time))
+    calls_all = list(Call.objects.filter(company__id__in = companies_ids, type="company", **calls_filter_values).order_by("-datetime").values("id", "company__id", "artist__id", "artist__name", "artist__color", "manager__siteuser__id", "manager__siteuser__alias", "datetime", "comment"))
+    tasks_all = list(Task.objects.filter(company__id__in=companies_ids, **tasks_filter_values).values("id", "company__id", "artist__id", "artist__name", "artist__color", "manager__siteuser__id", "manager__siteuser__alias", "datetime", "done", "doneDateTime").order_by("-datetime"))
+    events_all = list(Event.objects.filter(company__id__in=companies_ids, **events_filter_values).order_by("startTime").values("id", "manager__id", "company__id", "artist__id", "artist__name", "manager__siteuser__id", "manager__siteuser__alias", "artist__color", "startTime", "statsdt", "removed", "crashBool", "sumTransfered", "resultSum"))
+
+    current_date_time = datetime.now().replace(hour=0, minute=0, second=0, microsecond=0)
     for company in companies:
         current_company_id = company.id
-        if(not admin_mode):
-            manager_work_task_filter_values["manager__id"] = manager.id
-
-
+        if(not admin_mode and show_id == 0):
             allowed_shows = []
             for link in getted_links:
                 if(link["company__id"] == current_company_id):
                     allowed_shows.append(link["show__id"])
-            manager_work_filter_values["artist__in"] = allowed_shows
-            manager_work_task_filter_values["artist__in"] = allowed_shows
         dict_item = {}
-        manager_work_filter_values["company__id"] = current_company_id
-        manager_work_task_filter_values["company__id"] = current_company_id
-
-
         for param in params_list:
             if(param == "id"):
                 dict_item["id"] = company.id
@@ -1037,35 +1020,25 @@ def companies_list(request):
                 dict_item["adress"] = company.adress
 
             elif(param == "last_call"):
-                if(Call.objects.filter(type="company", **manager_work_filter_values).count() != 0):
-                    last_call = list(Call.objects.filter(type="company", **manager_work_filter_values).order_by("-datetime")[:1].values("id", "artist__id", "artist__name", "artist__color", "manager__siteuser__id", "manager__siteuser__alias", "datetime", "comment"))[0]
-                    dict_item["last_call"] = last_call
+                choosen_company_calls = list(filter(lambda x: (x["company__id"] == current_company_id and x["artist__id"] in allowed_shows), calls_all))
+                if(len(choosen_company_calls) != 0):
+                    dict_item["last_call"] = choosen_company_calls[0]
                     dict_item["last_call"]["datetime"] = convert_datetime_to_javascript(dict_item["last_call"]["datetime"])
-                    dict_item["call_comment"] = last_call["comment"]
+                    dict_item["call_comment"] = choosen_company_calls[0]["comment"]
                 else:
                     dict_item["last_call"] = ""
                     dict_item["call_comment"] = ""
             elif(param == "last_task"):
-                if(Task.objects.filter(**manager_work_task_filter_values).order_by("-datetime").count() != 0):
-
-                    all_tasks = list(Task.objects.filter(**manager_work_task_filter_values).values("id", "artist__id", "artist__name", "artist__color", "manager__siteuser__id", "manager__siteuser__alias", "datetime", "done", "doneDateTime").order_by("-datetime"))
-
-
-                    done_tasks = sorted(filter(lambda x: x["done"] == True, all_tasks), key=lambda y: y["datetime"])
-                    undone_tasks = sorted(filter(lambda x: x["done"] == False, all_tasks), key=lambda y: y["datetime"], reverse=True)
+                choosen_company_tasks = list(filter(lambda x: (x["company__id"] == current_company_id and x["artist__id"] in allowed_shows),tasks_all))
+                if(len(choosen_company_tasks) != 0):
+                    done_tasks = sorted(filter(lambda x: x["done"] == True, choosen_company_tasks), key=lambda y: y["doneDateTime"], reverse=True)
+                    undone_tasks = sorted(filter(lambda x: x["done"] == False, choosen_company_tasks), key=lambda y: y["datetime"])
 
                     last_task = False
                     if(len(undone_tasks) > 0):
-                        last_task = undone_tasks[-1]
-                    else:
-                        done_tasks_timedeltas = (list(map(lambda x: (x["datetime"] - current_datetime).days, done_tasks)))
-                        try:
-                            check_min = min(filter(lambda y: y > 0, done_tasks_timedeltas))
-                            index = done_tasks_timedeltas.index(check_min)
-                            last_task = done_tasks[index]
-                        except:
-                            last_task = done_tasks[0]
-
+                        last_task = undone_tasks[0]
+                    elif(len(done_tasks) > 0):
+                        last_task = done_tasks[0]
                     if (last_task):
                         dict_item["last_task"] = last_task
                         if(last_task["done"]):
@@ -1076,19 +1049,32 @@ def companies_list(request):
                         dict_item["last_task"] = ""
                 else:
                     dict_item["last_task"] = ""
-
             elif(param == "last_event"):
+                choosen_company_events = list(filter(lambda x: (x["company__id"] == current_company_id and x["artist__id"] in allowed_shows), events_all))
+                if (len(choosen_company_events) != 0):
+                    before_today_events = list(sorted(filter(lambda x: x["startTime"] < current_date_time, choosen_company_events), key=lambda y: y["startTime"], reverse=True))
+                    after_today_events = list(sorted(filter(lambda x: x["startTime"] > current_date_time, choosen_company_events), key=lambda y: y["startTime"]))
 
-                if(Event.objects.filter(**manager_work_filter_values).count() != 0):
-                    if Event.objects.filter(**manager_work_filter_values).order_by("-startTime")[0].startTime >= timezone.now():
-                        dict_item["last_event"] = list(Event.objects.filter(startTime__gte=timezone.now()).filter(**manager_work_filter_values).order_by("startTime")[:1].values("id", "artist__id", "artist__name", "manager__siteuser__id", "manager__siteuser__alias", "artist__color", "startTime", "statsdt"))[0]
+                    last_event = False
+                    if (len(after_today_events) > 0):
+                        last_event = after_today_events[0]
+                    elif (len(before_today_events) > 0):
+                        last_event = before_today_events[0]
+
+                    if (last_event):
+                        dict_item["last_event"] = last_event
+                        dict_item["last_event"]["datetime"] = convert_datetime_to_javascript(last_event["startTime"])
+                        dict_item["last_event"]["status"] = events_fill_events_statuses([last_event, ], request)[0]["status"]
+
+                        dict_item["last_event"]["datetime"] = convert_datetime_to_javascript(
+                        dict_item["last_event"]["startTime"])
+                        dict_item["last_event"].pop("startTime")
+                        dict_item["last_event"].pop("resultSum")
+                        dict_item["last_event"].pop("sumTransfered")
                     else:
-                        dict_item["last_event"] = list(Event.objects.filter(startTime__lte=timezone.now()).filter(**manager_work_filter_values).order_by("-startTime")[:1].values("id", "artist__id", "artist__name", "manager__siteuser__id", "manager__siteuser__alias", "artist__color", "startTime", "statsdt"))[0]
-                    dict_item["last_event"]["status"] = events_fill_events_statuses(Event.objects.filter(id = dict_item["last_event"]["id"]).values(*events_get_values_list_for_calc_statuses()), request)[0]["status"]
+                        dict_item["last_event"] = ""
 
 
-                    dict_item["last_event"]["datetime"] = convert_datetime_to_javascript(dict_item["last_event"]["startTime"])
-                    dict_item["last_event"].pop("startTime")
                 else:
                     dict_item["last_event"] = ""
 
@@ -1300,7 +1286,21 @@ def companies_full_list(request):
             companies = companies[first_index: last_index]
         else:
             companies = companies[0: elements_on_page]
+
+    calls_filter_values = {}
+    if (show_id != '0'):
+        calls_filter_values["artist__id"] = show_id
+        allowed_shows = [int_convertor_error_0(show_id), ]
+    else:
+        allowed_shows = Artist.objects.all().values_list("id", flat=True)
+
+    companies_ids = companies.values_list("id", flat=True)
+
+    calls_all = list(Call.objects.filter(company__id__in = companies_ids, type="company", **calls_filter_values).order_by("-datetime").values("id", "company__id", "artist__id", "artist__name", "artist__color", "manager__siteuser__id", "manager__siteuser__alias", "datetime", "comment"))
+
     for company in companies:
+        current_company_id = company.id
+
         dict_item = {}
 
         manager_work_filter_values = {}
@@ -1326,11 +1326,11 @@ def companies_full_list(request):
             if(param == "comment"):
                 dict_item["comment"] = company.comment
             if (param == "last_call"):
-                if (Call.objects.filter(type="company", **manager_work_filter_values).count() != 0):
-                    last_call = list(
-                        Call.objects.filter(type="company", **manager_work_filter_values).order_by("-datetime")[:1].values("id","comment"))[0]
-                    dict_item["last_call"] = last_call
-                    dict_item["call_comment"] = last_call["comment"]
+                choosen_company_calls = list(filter(lambda x: (x["company__id"] == current_company_id and x["artist__id"] in allowed_shows), calls_all))
+                if (len(choosen_company_calls) != 0):
+                    dict_item["last_call"] = choosen_company_calls[0]
+                    dict_item["last_call"]["datetime"] = convert_datetime_to_javascript(dict_item["last_call"]["datetime"])
+                    dict_item["call_comment"] = choosen_company_calls[0]["comment"]
                 else:
                     dict_item["last_call"] = ""
                     dict_item["call_comment"] = ""
@@ -1357,7 +1357,6 @@ def companies_full_list(request):
                     manager_show_data["show__name"] = cms["show__name"]
                     sorted_manager["shows"].append(manager_show_data)
             sorted_managers_list.append(sorted_manager)
-
 
 
         dict_item["managers"] = sorted_managers_list
@@ -6305,5 +6304,8 @@ def bool_convertor_error_json_response(_value):
     else:
         return False
 
-
+def time_checker():
+    # start_time = time.time()
+    # print("--- %s seconds ---" % (time.time() - start_time))
+    return  0
 
