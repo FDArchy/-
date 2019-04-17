@@ -3569,7 +3569,7 @@ function AddNewTask_GenerateContent(_companyId, _showId, _year, _month, _date, _
 
     return container;
 }
-function ShowTask(_taskId, _companyName) {
+function ShowTask(_taskId, _companyName, _elemToChange, _modalToHide) {
     ShowNotify_LoadData();
     $.post("/aj_tasks_get_task/", {id: _taskId}, function (response) {
         var controlButtons = {};
@@ -3595,7 +3595,7 @@ function ShowTask(_taskId, _companyName) {
             controlButtons["Выполнить со звонком"] = {
                 "button": $('<button>').attr("title", "Выполнить со звонком").append($('<span>').addClass("glyphicon glyphicon-earphone text-primary")),
                 "function": function () {
-                    AddCall(task_data["company__id"], task_data["company__name"], _taskId, task_data["artist__id"], task_data["type"]);
+                    AddCall(task_data["company__id"], task_data["company__name"], _taskId, task_data["artist__id"], task_data["type"], _elemToChange, _modalToHide);
                     return;
                 }
             };
@@ -3779,7 +3779,7 @@ function ShowTasksHistory_Content(_container, _data) {
     ChangeModalListFontSize();
     return;
 }
-function AddCall(_company, _companyName, _taskId, _showId, _taskType) {
+function AddCall(_company, _companyName, _taskId, _showId, _taskType, _elemToChange, _modalToHide) {
     _showId = _showId || GetCurrentChoosenShow();
     _showId = +_showId;
     var modalWindowHeader = "Отметить звонок";
@@ -3798,9 +3798,7 @@ function AddCall(_company, _companyName, _taskId, _showId, _taskType) {
                 var status = ResponseToNotify(response);
                 if(status == "success"){
                     hideAllModalWindows();
-                    if (UpdateData) {
-                        UpdateData(true, true, true);
-                    }
+                    UpdateData(true, true, true);
                 }
             });
         }, false, true);
@@ -3835,10 +3833,16 @@ function AddCall(_company, _companyName, _taskId, _showId, _taskType) {
                 $.post("/aj_company_manager_work_mark_call_and_add_task/", requestParams, function (response) {
                     var status = ResponseToNotify(response);
                     if (status == "success") {
-                        hideAllModalWindows();
-                        if (UpdateData) {
-                            UpdateData(true, true, true);
+                        if(_elemToChange){
+                            $(_elemToChange).val($('#addCall_callComment').val()).css("color", "green").css("border-color", "green");
+                            $(_elemToChange).prev().css("color", "green");
+                            hideModalWindow(modalWindow);
+                            hideModalWindow($(modalWindow).prev());
+                        }else{
+                            hideAllModalWindows();
                         }
+
+                        UpdateData(true, true, true);
 
                     }
                 });
@@ -4781,14 +4785,7 @@ function ShowEvent(_id, _item) {
         header.append(statusIcon);
         header.append($('<span>').text("Просмотр мероприятия"));
 
-        //Звонки
-        var callsContainer = $('<span>').css("margin-left", "10px").css("margin-right", "10px").appendTo(header);
-        var button = $('<button>').addClass("btn").attr("title", "Отзвон за день").appendTo(callsContainer);
-        ReturnCallStatusIconStyle(eventData["events_calls_data"], eventData["startTime"], 1, button);
-        var button = $('<button>').addClass("btn").attr("title", "Отзвон за неделю").appendTo(callsContainer);
-        ReturnCallStatusIconStyle(eventData["events_calls_data"], eventData["startTime"], 7, button);
-        var button = $('<button>').addClass("btn").attr("title", "Отзвон за месяц").appendTo(callsContainer);
-        ReturnCallStatusIconStyle(eventData["events_calls_data"], eventData["startTime"], 30, button);
+
 
 
         var button = $('<button>').attr("title", "История изменений мероприятия").addClass("btn").css("height", "30px").css("background-color", HexToRGB(eventData["artist__color"], 1)).appendTo(header);
@@ -5078,8 +5075,32 @@ function ShowEvent_GenerateContent(_event, _status) {
         default:
         break;
     }
-    var noteLabel = $('<div>').addClass("header").text("Примечание:").appendTo(container);
-    $('<textarea>').addClass("form-control input-sm").attr("rows", 3).attr("id", idStartText + "note").attr("checknotneed", "checknotneed").attr("placeholder", "Примечание").css("resize", "none").val(_event['note']).appendTo(container);
+    //Звонки
+    var noteLabel = $('<div>').addClass("header").text("Отзвоны:").appendTo(container);
+    var callsContainer = $('<div>').appendTo(container);
+
+    var callContainer = $('<div>').css("margin-bottom", 5).css("text-align", "left").appendTo(callsContainer);
+    var button = $('<button>').addClass("btn").attr("title", "Отзвон за день").css("margin-right", 5).css("position", "relative").css("top", -2).appendTo(callContainer);
+    var callInput = $('<input>').attr("readonly", "readonly").css("cursor", "default").css("border-radius", 5).css("width", "92%").css("border-style", "groove").addClass("form-input", "input-lg").appendTo(callContainer);
+    ReturnCallStatusIconStyle(_event["events_calls_data"], _event["startTime"], 1, button, false, callInput);
+
+    var callContainer = $('<div>').css("margin-bottom", 5).css("text-align", "left").appendTo(callsContainer);
+    var button = $('<button>').addClass("btn").attr("title", "Отзвон за неделю").css("margin-right", 5).css("position", "relative").css("top", -2).appendTo(callContainer);
+    var callInput = $('<input>').attr("readonly", "readonly").css("cursor", "default").css("border-radius", 5).css("width", "92%").css("border-style", "groove").addClass("form-input", "input-lg").appendTo(callContainer);
+    ReturnCallStatusIconStyle(_event["events_calls_data"], _event["startTime"], 7, button, false, callInput);
+
+    var callContainer = $('<div>').css("margin-bottom", 5).css("text-align", "left").appendTo(callsContainer);
+    var button = $('<button>').addClass("btn").attr("title", "Отзвон за месяц").css("margin-right", 5).css("position", "relative").css("top", -2).appendTo(callContainer);
+    var callInput = $('<input>').attr("readonly", "readonly").css("cursor", "default").css("border-radius", 5).css("width", "92%").css("border-style", "groove").addClass("form-input", "input-lg").appendTo(callContainer);
+    ReturnCallStatusIconStyle(_event["events_calls_data"], _event["startTime"], 30, button, false, callInput);
+
+
+    var noteLabel = $('<div>').addClass("header").text("Примечание менеджера:").appendTo(container);
+    var managerNote = $('<textarea>').addClass("form-control input-sm").attr("rows", 3).attr("id", idStartText + "note").attr("checknotneed", "checknotneed").attr("placeholder", "Примечание менеджера").css("resize", "none").val(_event['note']).appendTo(container);
+
+    var noteLabel = $('<div>').addClass("header").text("Примечание артиста:").appendTo(container);
+    var artistNote = $('<textarea>').addClass("form-control input-sm").attr("rows", 3).attr("id", idStartText + "artistNote").attr("checknotneed", "checknotneed").attr("placeholder", "Примечание артиста").css("resize", "none").val(_event['artistNote']).appendTo(container);
+
 
     var countPrecendChildSection = $('<table>').css("width", "100%").css("border-collapse", "separate").css("border-spacing", "5px").appendTo(container);
     tr = $('<tr>').appendTo(countPrecendChildSection);
@@ -5147,12 +5168,14 @@ function ShowEvent_GenerateContent(_event, _status) {
         case "manager":
             button.click(function () {
                 AddChatMessage(_event["id"], "Event", $("#lastManagerMessage"));
+                artistNote.attr("readonly", "readonly");
             });
             break;
         case "presentator":
             button.click(function () {
                 AddChatMessage(_event["id"], "Event", $("#lastArtistMessage"));
             });
+            managerNote.attr("readonly", "readonly");
             break;
     }
     var tr = $('<tr>').appendTo(table);
@@ -5203,6 +5226,9 @@ function ShowEvent_GenerateContent(_event, _status) {
             artistDataEditTd.remove();
             break;
     }
+    $('<div>').addClass("events_date_label-decoration").css("margin-top", "25px").text("Дата добавления мероприятия:").appendTo(container);
+    $('<div>').addClass("events_date_label-decoration").html(ConvertDateTimeToDateLabel(ConvertOnlyDateFromStringValue(_event["statsdt"], true), "date")).appendTo(container);
+
     return container;
 }
 //Events History functions:
@@ -7164,8 +7190,13 @@ function ConvertDateFromStringValue(_value, _outputType) {
     }
 
 }
-function ConvertOnlyDateFromStringValue(_value){
-    var dateTime = _value.split("-");
+function ConvertOnlyDateFromStringValue(_value, _dotType){
+    if(_dotType){
+        var date = _value.split(" ");
+        var dateTime = date[0].split(".");
+    }else{
+        var dateTime = _value.split("-");
+    }
     return new Date(dateTime[0], dateTime[1] - 1, dateTime[2], 0, 0, 0);
 }
 function ConvertDateTimeToPythonType(_dt) {
@@ -7945,7 +7976,7 @@ function ReturnTaskStatusIconSpan(_strDate, _done) {
 function ReturnEventStatusIconSpan(_event) {
     return EventStatusIconPick(_event["status"]);
 }
-function ReturnCallStatusIconStyle(_callData, _eventStartTime, _days, _button, _inList) {
+function ReturnCallStatusIconStyle(_callData, _eventStartTime, _days, _button, _inList, _inputContainer) {
     var eventDate = ConvertDateFromStringValue(_eventStartTime);
     var nowDate = new Date();
     var dateDifferenceDays = (eventDate.getTime() - nowDate.getTime()) / (1000 * 60 * 60 * 24);
@@ -7956,12 +7987,52 @@ function ReturnCallStatusIconStyle(_callData, _eventStartTime, _days, _button, _
         callLabel.css("top", "-1px").css("left", "-20px");
     }
     _button.addClass("event-call-button");
-    
+
+    if(_inputContainer){
+        _inputContainer.css("padding-left", 7);
+        switch (_days) {
+            case 1:
+                if (_callData["day"]["status"] == "notneed") {
+                } else if (_callData["day"]["status"] == "done") {
+                    _inputContainer.css("color", "green").css("border-color", "green").css("border-width", 1).val(_callData["day"]["result"]);
+
+                } else if (dateDifferenceDays > 1) {
+                    _inputContainer.css("color", "rgb(51, 122, 183)").css("border-color", "rgb(51, 122, 183)").css("border-width", 1).val("Ожидает отзвона");
+                } else {
+                    _inputContainer.css("color", "red").css("border-color", "red").css("border-width", 1).val("Отзвон просрочен");
+                }
+                break;
+            case 7:
+                if (_callData["week"]["status"] == "notneed") {
+                } else if (_callData["week"]["status"] == "done") {
+                    _inputContainer.css("color", "green").css("border-color", "green").css("border-width", 1).val(_callData["week"]["result"]);
+
+                } else if (dateDifferenceDays > 1) {
+                    _inputContainer.css("color", "rgb(51, 122, 183)").css("border-color", "rgb(51, 122, 183)").css("border-width", 1).val("Ожидает отзвона");
+                } else {
+                    _inputContainer.css("color", "red").css("border-color", "red").css("border-width", 1).val("Отзвон просрочен");
+                }
+                break;
+            case 30:
+                if (_callData["month"]["status"] == "notneed") {
+                } else if (_callData["month"]["status"] == "done") {
+                    _inputContainer.css("color", "green").css("border-color", "green").css("border-width", 1).val(_callData["month"]["result"]);
+
+                } else if (dateDifferenceDays > 1) {
+                    _inputContainer.css("color", "rgb(51, 122, 183)").css("border-color", "rgb(51, 122, 183)").css("border-width", 1).val("Ожидает отзвона");
+                } else {
+                    _inputContainer.css("color", "red").css("border-color", "red").css("border-width", 1).val("Отзвон просрочен");
+                }
+                break;
+            default:
+                break;
+        }
+    }
     switch (_days) {
         case 1:
             callLabel.text("1");
             if (_callData["day"]["status"] == "notneed") {
-                _button.css("color", "gray").css("cursor", "default");
+                _button.css("color", "gray").css("cursor", "pointer");
                 _button.attr("data-status", "not_need");
                 _button.attr("title", "Отзвон за день не нужен");
                 (function(_but){
@@ -8001,7 +8072,7 @@ function ReturnCallStatusIconStyle(_callData, _eventStartTime, _days, _button, _
                 (function(_but, _id){
                     _but.click(function (event) {
                         event.stopPropagation();
-                        ShowTask(_id);
+                        ShowTask(_id, false, _inputContainer);
                     });
                 })(_button, _callData["day"]["id"]);
             }
@@ -8009,7 +8080,7 @@ function ReturnCallStatusIconStyle(_callData, _eventStartTime, _days, _button, _
         case 7:
             callLabel.text("7");
             if (_callData["week"]["status"] == "notneed") {
-                _button.css("color", "gray").css("cursor", "default");
+                _button.css("color", "gray").css("cursor", "pointer");
                 _button.attr("data-status", "not_need");
                 _button.attr("title", "Отзвон за неделю не нужен");
                 (function(_but){
@@ -8049,7 +8120,7 @@ function ReturnCallStatusIconStyle(_callData, _eventStartTime, _days, _button, _
                 (function(_but, _id){
                     _but.click(function (event) {
                         event.stopPropagation();
-                        ShowTask(_id);
+                        ShowTask(_id, false, _inputContainer);
                     });
                 })(_button, _callData["week"]["id"]);
             }
@@ -8057,7 +8128,7 @@ function ReturnCallStatusIconStyle(_callData, _eventStartTime, _days, _button, _
         case 30:
             callLabel.text("30");
             if (_callData["month"]["status"] == "notneed") {
-                _button.css("color", "gray").css("cursor", "default");
+                _button.css("color", "gray").css("cursor", "pointer");
                 _button.attr("data-status", "not_need");
                 _button.attr("title", "Отзвон за месяц не нужен");
                 (function(_but){
@@ -8097,7 +8168,7 @@ function ReturnCallStatusIconStyle(_callData, _eventStartTime, _days, _button, _
                 (function(_but, _id){
                     _but.click(function (event) {
                         event.stopPropagation();
-                        ShowTask(_id);
+                        ShowTask(_id, false, _inputContainer);
                     });
                 })(_button, _callData["month"]["id"]);
             }

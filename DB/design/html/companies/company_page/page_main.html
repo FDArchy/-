@@ -240,42 +240,6 @@
         sccal.Create();
         return;
     }
-    function UpdateCalendar(_onlyEvents) {
-        var companyData = {};
-        companyData["companyName"] = "{{ company.name }}";
-        companyData["companyAdress"] = "{{ company.adress }}";
-        companyData["companyContacts"] = "{{ company.contacts }}";
-
-        sccal.PostVarChange("city", $('#cityPickerTittle').attr("data-id"));
-        sccal.PostVarChange("show", GetCurrentChoosenShow());
-        sccal.PostVarChange("presentator", $('#selectPresentator').val());
-        sccal.PostVarChange("only_this_company", $('#onlyThisCompany').is(':checked'));
-        sccal.AddEventParamsChange(['{{ company.id }}', GetCurrentChoosenShow(), companyData]);
-
-        if(_onlyEvents){
-            switch (sccal.CurrentCalType()) {
-                case "oldcal":
-                    sccal.Update();
-                    break;
-                case "mycal":
-                    if (sccal.CurrentCalOption() == "week") {
-                        sccal.Update();
-                    } else {
-                        sccal.UpdateEvents();
-                    }
-                    break;
-                case "datelist":
-                    sccal.UpdateEvents();
-                    break;
-                case "fulllist":
-                    sccal.UpdateEvents();
-                    break;
-            }
-        }else{
-            sccal.Update();
-        }
-
-    }
     </script>
     <script>
     $('#cityPickerTittle').css("cursor", "default").text("{{ company.city.name }}").click(function (event) {

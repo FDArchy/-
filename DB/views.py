@@ -317,8 +317,10 @@ def company_show_manager_work_content(request):
     if(not user_type == "admin"):
         task_filter_values["manager"] = manager
 
-    last_task = Task.objects.filter(datetime__lte = datetime.now(), **task_filter_values).order_by("-datetime")[:1]
-    next_task = Task.objects.filter(datetime__gte = datetime.now(), **task_filter_values).order_by("datetime")[:1]
+
+
+    last_task = Task.objects.filter(done = True, **task_filter_values).order_by("-doneDateTime")[:1]
+    next_task = Task.objects.filter(done = False, **task_filter_values).order_by("datetime")[:1]
 
     last_event = Event.objects.filter(company = company, startTime__lte = datetime.now(), artist__in = artist).order_by("-startTime")[:1]
     next_event = Event.objects.filter(company = company, startTime__gte = datetime.now(), artist__in = artist).order_by("startTime")[:1]
@@ -991,6 +993,16 @@ def companies_list(request):
             manager_work_task_filter_values["artist__in"] = allowed_shows
         else:
             getted_links = CMSILink.objects.filter(manager=manager, company__id__in = companies.values_list("id", flat=True)).values("show__id", "company__id").distinct()
+
+    companies_ids = companies.values_list("id", flat=True)
+
+    calls_all = Call.objects.filter(company__id__in = companies_ids)
+    if(admin_mode):
+        tasks_all = Task.objects.filter(company__id__in=companies_ids)
+    else:
+        tasks_all = Task.objects.filter(company__id__in=companies_ids, manager__id = manager.id)
+    events_all = Event.objects.filter(company__id__in=companies_ids)
+    
     #start_time = time.time()
     #tasks = list(Task.objects.filter(company__id__in = companies).values("id", "company__id", "artist__id", "artist__name", "artist__color", "manager__siteuser__id", "manager__siteuser__alias", "datetime", "done", "doneDateTime").order_by("-datetime"))
     #filtred_tasks = filter(lambda x: x["company__id"] == 16, tasks)
@@ -1039,9 +1051,8 @@ def companies_list(request):
                     all_tasks = list(Task.objects.filter(**manager_work_task_filter_values).values("id", "artist__id", "artist__name", "artist__color", "manager__siteuser__id", "manager__siteuser__alias", "datetime", "done", "doneDateTime").order_by("-datetime"))
 
 
-
                     done_tasks = sorted(filter(lambda x: x["done"] == True, all_tasks), key=lambda y: y["datetime"])
-                    undone_tasks = sorted(filter(lambda x: x["done"] == False, all_tasks), key=lambda y: y["datetime"])
+                    undone_tasks = sorted(filter(lambda x: x["done"] == False, all_tasks), key=lambda y: y["datetime"], reverse=True)
 
                     last_task = False
                     if(len(undone_tasks) > 0):
@@ -2061,7 +2072,7 @@ def events_get_event_data(request):
                                                                        "artist__name", "artist__color",
                                                                        "startTime", "crash", "crashBool", "sumTransfered", "resultSum",
                                                                        "price", "childCount", "percent", "removed",
-                                                                       "removedDescription", "note", "sumPercent")
+                                                                       "removedDescription", "note", "sumPercent", "artistNote", "statsdt")
 
         converted_event = replace_datetime_to_string((event))[0]
         #Добавление значений Filled некоторых параметров - для определения статуса мероприятия
@@ -2087,7 +2098,7 @@ def events_get_event_data(request):
                                                                          "artist__id", "artist__name", "artist__color",
                                                                          "manager__siteuser__alias", "startTime",
                                                                          "price", "childCount", "resultSum", "sumTransfered",
-                                                                         "crashBool", "crash", "removed", "removedDescription", "note", "percent")
+                                                                         "crashBool", "crash", "removed", "removedDescription", "note", "percent", "artistNote", "statsdt")
         response = replace_datetime_to_string((event))[0]
         response["own"] = True
         response["allowed"] = True
@@ -2453,7 +2464,7 @@ def events_edit_event(request):
 
     if (current_user_type == "admin"):
         allowed_fields = ["price", "childCount", "resultSum", "percent", "sumTransfered", "artist", "manager",
-                          "removed", "removedDescription", "removedDate", "note"]
+                          "removed", "removedDescription", "removedDate", "note", "artistNote"]
     elif(current_user_type == "presentator"):
         presentator = get_current_presentator(request)
         allowed_try = PCSLink.objects.filter(presentator__id=presentator.id,
@@ -2463,7 +2474,7 @@ def events_edit_event(request):
             result = create_response("error", "Невозможно редактировать чужое мероприятие")
             JsonResponse(result)
         else:
-            allowed_fields = ["price", "childCount", "resultSum", "sumTransfered", "note", "percent"]
+            allowed_fields = ["price", "childCount", "resultSum", "sumTransfered", "percent", "artistNote"]
     elif(current_user_type == "manager"):
         allowed_fields = ["price", "childCount", "sumTransfered", "resultSum", "note", "percent"]
 
@@ -4368,6 +4379,7 @@ def control_unload_events(request):
         events_filter_values["manager__id"] = get_manager_from_site_user(user).id
 
     events = Event.objects.filter(**events_filter_values).order_by(*sort_list)
+    events = events.filter(Q(crashBool=False) & Q(removed=False))
     if(request.POST.get("unload")):
         if(events.count() == 0):
             return  HttpResponse("Нет данных для выгрузки")
@@ -5416,72 +5428,115 @@ def individual_script(request):
     if(siteuser.user.username != "archy"):
         JsonResponse(create_response("info", "Только суперадмин может исполнять индивидуальные скрипты"))
     try:
-        companies = Company.objects.filter(ctype = "ДC")
-        print(companies.count())
-        companies = Company.objects.filter(ctype="ДC").update(ctype="ДС")
-        companies = Company.objects.filter(ctype="ДC")
-        print(companies.count())
+        datelimit = datetime.now() + timedelta(days=1)
+        # events = Event.objects.filter(startTime__gte=datelimit)
+        # for event in events:
+        #     if(event.attentionCallDayComment != "" and event.attentionCallDayComment != "None"):
+        #         print("fff")
+        #         call = Call(
+        #             datetime=datetime.now(),
+        #             manager=event.manager,
+        #             company=event.company,
+        #             artist=event.artist,
+        #             comment=event.attentionCallDayComment,
+        #             type="event"
+        #         )
+        #         call.save()
+        #         event.callDay = call
+        #         event.save()
+        #     if (event.attentionCallWeekComment != "" and event.attentionCallWeekComment != "None"):
+        #         print("fff")
+        #         call = Call(
+        #             datetime=datetime.now(),
+        #             manager=event.manager,
+        #             company=event.company,
+        #             artist=event.artist,
+        #             comment=event.attentionCallWeekComment,
+        #             type="event"
+        #         )
+        #         call.save()
+        #         event.callWeek = call
+        #         event.save()
+        #     if (event.attentionCallMonthComment != "" and event.attentionCallMonthComment != "None"):
+        #         print("fff")
+        #         call = Call(
+        #             datetime=datetime.now(),
+        #             manager=event.manager,
+        #             company=event.company,
+        #             artist=event.artist,
+        #             comment=event.attentionCallMonthComment,
+        #             type="event"
+        #         )
+        #         call.save()
+        #         event.callMonth = call
+        #         event.save()
 
-        companies = Company.objects.filter(comment="None")
-        print(companies.count())
-        companies = Company.objects.filter(comment="None").update(comment="")
-        companies = Company.objects.filter(comment="None")
-        print(companies.count())
+        # companies = Company.objects.filter(ctype = "ДC")
+        # print(companies.count())
+        # companies = Company.objects.filter(ctype="ДC").update(ctype="ДС")
+        # companies = Company.objects.filter(ctype="ДC")
+        # print(companies.count())
+        #
+        # companies = Company.objects.filter(comment="None")
+        # print(companies.count())
+        # companies = Company.objects.filter(comment="None").update(comment="")
+        # companies = Company.objects.filter(comment="None")
+        # print(companies.count())
+        #
+        # companies = Company.objects.filter(telephone="None")
+        # print(companies.count())
+        # companies = Company.objects.filter(telephone="None").update(telephone="")
+        # companies = Company.objects.filter(telephone="None")
+        # print(companies.count())
+        #
+        # companies = Company.objects.filter(contacts="None")
+        # print(companies.count())
+        # companies = Company.objects.filter(contacts="None").update(contacts="")
+        # companies = Company.objects.filter(contacts="None")
+        # print(companies.count())
+        #
+        # companies = Company.objects.filter(site="None")
+        # print(companies.count())
+        # companies = Company.objects.filter(site="None").update(site="")
+        # companies = Company.objects.filter(site="None")
+        # print(companies.count())
+        #
+        # companies = Company.objects.filter(email="None")
+        # print(companies.count())
+        # companies = Company.objects.filter(email="None").update(email="")
+        # companies = Company.objects.filter(email="None")
+        # print(companies.count())
+        # #Categorizer
+        # ds_patterns = ["детский сад", "детскийсад", "дескийсад", "доу", "детский клуб"]
+        # sc_patterns = ["сош", "школа", "оош"]
 
-        companies = Company.objects.filter(telephone="None")
-        print(companies.count())
-        companies = Company.objects.filter(telephone="None").update(telephone="")
-        companies = Company.objects.filter(telephone="None")
-        print(companies.count())
-
-        companies = Company.objects.filter(contacts="None")
-        print(companies.count())
-        companies = Company.objects.filter(contacts="None").update(contacts="")
-        companies = Company.objects.filter(contacts="None")
-        print(companies.count())
-
-        companies = Company.objects.filter(site="None")
-        print(companies.count())
-        companies = Company.objects.filter(site="None").update(site="")
-        companies = Company.objects.filter(site="None")
-        print(companies.count())
-
-        companies = Company.objects.filter(email="None")
-        print(companies.count())
-        companies = Company.objects.filter(email="None").update(email="")
-        companies = Company.objects.filter(email="None")
-        print(companies.count())
-        #Categorizer
-        ds_patterns = ["детский сад", "детскийсад", "дескийсад", "доу", "детский клуб"]
-        sc_patterns = ["сош", "школа", "оош"]
-
-        all_companies = Company.objects.all()
-        for company in all_companies:
-            if (company.ctype == "Детский сад"):
-                company.ctype = "ДС"
-                company.save()
-                continue
-            if (company.ctype == "Школа"):
-                company.ctype = "ШК"
-                company.save()
-                continue
-            if (company.ctype == ""):
-                lower_company_name = company.name.lower()
-                type_finded = False
-                for ds_pattern in ds_patterns:
-                    if (lower_company_name.find(ds_pattern) != -1):
-                        company.ctype = "ДС"
-                        company.save()
-                        type_finded = True
-                        break
-                if (type_finded):
-                    continue
-                for sc_pattern in sc_patterns:
-                    if (lower_company_name.find(sc_pattern) != -1):
-                        company.ctype = "ШК"
-                        company.save()
-                        type_finded = True
-                        break
+        # all_companies = Company.objects.all()
+        # for company in all_companies:
+        #     if (company.ctype == "Детский сад"):
+        #         company.ctype = "ДС"
+        #         company.save()
+        #         continue
+        #     if (company.ctype == "Школа"):
+        #         company.ctype = "ШК"
+        #         company.save()
+        #         continue
+        #     if (company.ctype == ""):
+        #         lower_company_name = company.name.lower()
+        #         type_finded = False
+        #         for ds_pattern in ds_patterns:
+        #             if (lower_company_name.find(ds_pattern) != -1):
+        #                 company.ctype = "ДС"
+        #                 company.save()
+        #                 type_finded = True
+        #                 break
+        #         if (type_finded):
+        #             continue
+        #         for sc_pattern in sc_patterns:
+        #             if (lower_company_name.find(sc_pattern) != -1):
+        #                 company.ctype = "ШК"
+        #                 company.save()
+        #                 type_finded = True
+        #                 break
 
 
 
