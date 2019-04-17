@@ -1,0 +1,122 @@
+{% load staticfiles %}
+#notification {
+    position: fixed;
+    left: 0px;
+    bottom: 0;
+    width: 100%;
+    /* Set the fixed height of the footer here */
+    height: 60px;
+    background-color: #f5f5f5;
+}
+
+#footer {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    /* Set the fixed height of the footer here */
+    height: 60px;
+    background-color: #f5f5f5;
+}
+
+.container {
+    width: 100%;
+    max-width: 680px;
+    padding: 0 15px;
+}
+
+.container .text-muted {
+    margin: 20px 0;
+}
+
+html {
+    position: relative;
+    min-height: 100%;
+}
+.logon-footer{
+    opacity: 0.6;
+    height: 28px;
+}
+.logon-navbar-header{
+    margin-top: 3px;
+    user-select: none;
+    cursor: default;
+}
+.logo-char-SH{
+    font-weight: bold;
+    font-size: 40px;
+    height: 40px;
+    margin-left: 5px
+}
+.logo-char-K{
+    font-weight: bold;
+    font-size: 40px;
+    height: 40px;
+    margin-left: 5px;
+    position: relative;
+    left: -16px
+}
+.form-signin {
+    max-width: 330px;
+    padding: 15px;
+    margin: 0 auto;
+}
+
+.form-signin .form-signin-heading,
+.form-signin .checkbox {
+    margin-bottom: 10px;
+    font-weight: normal;
+}
+
+.form-signin .form-control {
+    position: relative;
+    height: auto;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    padding: 10px;
+    font-size: 16px;
+}
+
+.form-signin .form-control:focus {
+    z-index: 2;
+}
+
+.form-signin input[type="email"] {
+    margin-bottom: -1px;
+    border-bottom-right-radius: 0;
+    border-bottom-left-radius: 0;
+}
+
+.form-signin input[type="password"] {
+    margin-bottom: 10px;
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+}
+
+.container-login {
+    position: relative;
+    margin-top: 9%;
+    border-radius: 15px;
+    background-color: #f8f8f8;
+    border: 1px solid #a1a1a1;
+    opacity: 0.8;
+    transition: 0.2s;
+
+
+}
+@media (min-width: 750px) {  /* для разрешения экрана от 470 до 930 пикселей */
+  .container-login{
+      width: 30%;
+  }
+}
+.container-login:hover {
+    opacity: 1;
+}
+
+.footer-container {
+    margin-left: 1%;
+    font-weight: bold;
+    font-size: 12px;
+    cursor: default;
+    text-align: center;
+}

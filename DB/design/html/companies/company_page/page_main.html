@@ -1,0 +1,300 @@
+﻿{% extends  "main.html" %}
+
+{% block body %}
+
+    {% load filters %}
+    {% load staticfiles %}
+
+
+    <div id="company_info_container" style="width:85%" class="container-fluid panel panel-primary">
+
+        <div id="company_page_tittle" class="row panel-heading " >
+            <div class="col-md-9" company-name-header>
+                <div class="col-md-2 company-type-background">
+                    <span id="page_ctype" class="company-type-text-decoration">{{ company.ctype }}</span>
+                </div>
+                <div class="col-md-8">
+                    <span id="page_name" class="company-name-text-decoration bold-text">{{ company.id}}&nbsp&nbsp&nbsp&nbsp    {{ company.name }}</span>
+                </div>
+                </div>
+            <div class="col-md-3 text-right">
+                <button title="Печать данных компании" type="button" class="btn btn-primary" style="height: 28px; background-color: green; margin-right: 10px;" onclick="PrintPagePart('company_info_container');">
+                    <span class="glyphicon glyphicon-print"></span>
+                {% if admin_mode %}
+                <button title="Управление менеджерами учреждения" type="button" class="btn btn-primary" style="height: 28px;" onclick="CompanyManagers({{ company.id }});">
+                    <span class="glyphicon" style="font-weight:800; top:-1px">M</span>
+                </button>
+                {% endif %}
+                <button style="height: 28px;" id="changeLog" title="История изменений" type="button" class="btn btn-primary"  onclick="LogsHistory_Paginator('companies_history', '{{ company.id }}');">
+                    <span class="glyphicon glyphicon-align-justify"></span>
+                    <div id="logsCountLabel" class="count-label {% if dinamic_parameters.logs_count == 0  %} hidden-count {% endif %}">{{ dinamic_parameters.logs_count  }} </div>
+                </button>
+                <button title="Редактировать учреждение" type="button" class="btn btn-primary" onclick="EditCompany(UpdateData, {{ company.id }});">
+                    <span class="glyphicon glyphicon-pencil"></span>
+                </button>
+                <button title="Удалить учреждение" type="button" class="btn btn-primary" onclick="RemoveCompany('{{ company.id }}', $('#mainContent'));">
+                    <span class="glyphicon glyphicon glyphicon-trash"></span>
+                </button>
+            </div>
+        </div>
+
+        <div id="company_page_text" class="panel-body">
+        {% if admin_mode and dinamic_parameters.managers.count != 0 %}
+            <div class="datestamp" style="margin-bottom: 7px;font-weight: 600; left: 0px;">Менеджеры учреждения:</div>
+            <div id="managersList" class="row" title="Менеджеры учреждения">
+
+            {% for manager in dinamic_parameters.managers %}
+                <div class="col-md-12 text-left ">
+                    <button type="button" class="btn btn-default" style="white-space: normal; margin-bottom: 5px;" onclick="ShowUser('{{ manager.manager__siteuser__id  }}')"><span class="glyphicon glyphicon-headphones text-primary"></span> {{ manager.manager__siteuser__alias  }}</button>
+                </div>
+            {% endfor %}
+            </div>
+            <hr class="company-primary-divider">
+        {% endif %}
+        <div class="datestamp" style="margin-bottom: 7px;font-weight: 600; left: 0px;">Добавил компанию:</div>
+        <div class="row" title="Добавивший компанию пользователь">
+            <div class="col-md-12 text-left ">
+                {% if  company.whoAdd %}
+
+                    <button type="button" class="btn btn-default" style="white-space: normal; margin-bottom: 5px;"
+                            onclick="ShowUser('{{ company.whoAdd.id }}')"><span
+                            class="glyphicon glyphicon-headphones text-primary"></span> {{ company.whoAdd.alias }}
+                    </button>
+
+
+                {% else %}
+                    <button type="button" class="btn btn-default" style="white-space: normal; margin-bottom: 5px;"><span
+                            class="glyphicon glyphicon-headphones text-primary"></span> Администратор
+                    </button>
+                {% endif %}
+            </div>
+
+        </div>
+        <hr class="company-primary-divider">
+            <div class="row" title="Показать на карте">
+                <div class="col-md-12 text-left ">
+                    <button type="button" class="btn btn-default" style="white-space: normal" onclick="window.open('https://yandex.ru/maps/?text={{ company.city }}%20{{ company.adress }}')"> <span class="glyphicon glyphicon-road text-primary" ></span><span> <span> {{ company.city}}</span>,<span id="page_adress" >  {{ company.adress }}</span> </span></button>
+                </div>
+            </div>
+             <hr class="company-primary-divider">
+            <div class="row" >
+                <div class="col-md-12 text-left">
+                     <span  title="Телефон" class="glyphicon glyphicon-phone text-primary company-icon " onclick='ShowSmallChangeWindow((GetValueElement(this)).children().html(), this.title, (GetValueElement(this)), function(){ChangeOneField({{company.id}}, "Company", "telephone", $("#changeWindowTextarea").val())});'></span>
+                    {% if company.telephone %}
+                        <span id="page_telephone"><a class="interactive_element" href="tel:{{ company.telephone }}">{{ company.telephone }}</a></span><br>
+                    {% else %}
+                        <span id="page_telephone" class="text-primary " onclick='ShowSmallChangeWindow((GetValueElement(this)).html(), this.title, (GetValueElement(this)), function(){ChangeOneField({{company.id}}, "Company", "telephone", $("#changeWindowTextarea").val())});'>Телефоны не указаны.</span>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="row" id="contactsContainer">
+                <div class="col-md-12 text-left">
+                    <span title="Контактные данные" class="glyphicon glyphicon-user text-primary company-icon" onclick='ShowSmallChangeWindow((GetValueElement(this)).html(), this.title, (GetValueElement(this)), function(){ChangeOneField({{company.id}}, "Company", "contacts", $("#changeWindowTextarea").val())});'></span>
+                    {% if company.contacts %}
+                    <span id="page_contacts"> {{ company.contacts }}</span><br>
+                    {% else %}
+                    <span id="page_contacts" class="text-primary" onclick='ShowSmallChangeWindow((GetValueElement(this)).html(), this.title, (GetValueElement(this)), function(){ChangeOneField({{company.id}}, "Company", "contacts", $("#changeWindowTextarea").val())});'>Контактные данные отсутствуют.</span>
+                    {% endif %}
+                </div>
+            </div>
+            {% if company.comment %}
+            <hr id="commentDivider" class="company-primary-divider">
+            <div class="row" id="commentContainer">
+                <div class="col-md-12 text-left">
+                    <span  title="Комментарий" class="glyphicon glyphicon-comment text-primary company-icon" onclick='ShowSmallChangeWindow((GetValueElement(this)).html(), this.title, (GetValueElement(this)), function(){ChangeOneField({{company.id}}, "Company", "comment", $("#changeWindowTextarea").val())});'></span><span id="page_comment">{{ company.comment }}</span><br>
+                </div>
+            </div>
+            {% endif %}
+            {% if company.email or company.site %}
+                <hr id="netContactsDivider" class="company-primary-divider">
+            {% else %}
+            {% endif %}
+                {% if company.email %}
+                    <div class="row" id="emailContainer">
+                        <div class="col-md-12 text-left">
+                            <span title="Электронная почта" class="glyphicon glyphicon-envelope text-primary company-icon" onclick='ShowSmallChangeWindow((GetValueElement(this)).children().html(), this.title, (GetValueElement(this)), function(){ChangeOneField({{company.id}}, "Company", "email", $("#changeWindowTextarea").val())}, CheckEmail);'></span>
+                            <span  class="text-primary"><a id="page_email" class="interactive_element" href="mailto:{{ company.email }}"> {{ company.email }}</a>
+                        </span>
+                            <br>
+                        </div>
+                    </div>
+                {% endif %}
+                {% if company.site %}
+                <div class="row" id="siteContainer">
+                    <div class="col-md-12 text-left">
+                        <span title="Сайт" class="glyphicon glyphicon-globe text-primary company-icon" onclick='ShowSmallChangeWindow((GetValueElement(this)).children().html(), this.title, (GetValueElement(this)), function(){ChangeOneField({{company.id}}, "Company", "site", $("#changeWindowTextarea").val())}, CheckSite);'></span>
+                        <span  class="text-primary" ><a id="page_site" class="interactive_element"  href="http://{{ company.site }}" target="_blank">{{ company.site }}</a></span>
+                        <br>
+                    </div>
+                </div>
+                {% endif %}
+        </div>
+        <div id="company_page_manager_work"  class="container-fluid company-container-settings">
+            <ul id="tabsNav" class="nav nav-tabs" >
+                {% if shows.count == 1 %}
+                    <li   class="active" onclick="ChangeTab('{{ shows.0.id }}', '{{ company.id }}')" data-tab-id="{{ shows.0.id }}" data-color="{{ shows.0.color }}"><a href="" data-toggle="tab">{{ shows.0.name }}</a></li>
+                {% else %}
+                    {%   if choosen_show %}
+                            <li    onclick="ChangeTab('0', '{{ company.id }}')" data-tab-id="0" data-color="#555"><a href="" data-toggle="tab">Все</a></li>
+                        {% else %}
+                            <li  class="active"   onclick="ChangeTab('0','{{ company.id }}', true)" data-tab-id="0" data-color="#555"><a href="" data-toggle="tab">Все</a></li>
+                        {% endif %}
+                    {% for show in shows %}
+                        {%   if choosen_show == show.id %}
+                            <li class="active"  onclick="ChangeTab('{{ show.id }}', '{{ company.id }}', true)" data-tab-id="{{ show.id }}" data-color="{{ show.color }}"><a href="" data-toggle="tab">{{ show.name }}</a></li>
+                        {% else %}
+                            <li  onclick="ChangeTab('{{ show.id }}', '{{ company.id }}', true)" data-tab-id="{{ show.id }}" data-color="{{ show.color }}"><a href="" data-toggle="tab">{{ show.name }}</a></li>
+                        {% endif %}
+                        {% endfor %}
+                {% endif %}
+
+            </ul>
+                <div class="container-fluid" data-currentArtist = "0" id="company-dinamic-content">
+                </div>
+            </div>
+    </div>
+    <div id="choosePanel" style="width: 85%; margin: auto; margin-bottom: 20px;"></div>
+    <div id="calFrame"></div>
+    <script>
+
+    function UpdateData(_updateOnly, stab, _eventsOnly) {
+        UpdateCompanyData({{ company.id }});
+        ChangeTab($('#tabsNav li.active').attr("data-tab-id"), '{{ company.id }}', false);
+        if (_updateOnly && stab) {
+            var companyData = {};
+            companyData["companyName"] = "{{ company.name }}";
+            companyData["companyAdress"] = "{{ company.adress }}";
+            companyData["companyContacts"] = "{{ company.contacts }}";
+
+            sccal.PostVarChange("city", $('#cityPickerTittle').attr("data-id"));
+            sccal.PostVarChange("show", GetCurrentChoosenShow());
+            sccal.PostVarChange("presentator", $('#selectPresentator').val());
+            sccal.PostVarChange("only_this_company", $('#onlyThisCompany').is(':checked'));
+            sccal.AddEventParamsChange(['{{ company.id }}', GetCurrentChoosenShow(), companyData]);
+
+            if (_eventsOnly) {
+                switch (sccal.CurrentCalType()) {
+                    case "oldcal":
+                        sccal.Update();
+                        break;
+                    case "mycal":
+                        if (sccal.CurrentCalOption() == "week") {
+                            sccal.Update();
+                        } else {
+                            sccal.UpdateEvents();
+                        }
+                        break;
+                    case "datelist":
+                        sccal.UpdateEvents();
+                        break;
+                    case "fulllist":
+                        sccal.UpdateEvents();
+                        break;
+                }
+            } else {
+                sccal.PostVarChange("presentator", $("#selectPresentator").val());
+                sccal.Update();
+            }
+        } else {
+            LoadPresentatorsHeadPanel(_updateOnly);
+        }
+    }
+    function CreateCalendar() {
+
+        var companyData = {};
+        companyData["companyName"] = "{{ company.name }}";
+        companyData["companyAdress"] = "{{ company.adress }}";
+        companyData["companyContacts"] = "{{ company.contacts }}";
+
+        //Ссылки на получение и отправку данных
+        var urls = {};
+        urls["add"] = "/aj_events_add_event/";
+        urls["show"] = "/aj_events_get_event_data/";
+        urls["all"] = "/aj_events_get_in_daterange/";
+        urls["paginator"] = "/aj_events_get_in_daterange/";
+        urls["mycal_frame_data"] = "/aj_events_get_frame_counters/";
+
+        var functions = {};
+        functions["transformDate"] = TransformDateFromEvent;
+        functions["addEvent"] = AddEvent;
+        functions["showEvent"] = ShowEvent;
+        functions["oldcal"] = CreateOldCalEventDecoration;
+        functions["event_in_list"] = CreateInListEventDecoration;
+        functions["week"] = CreateMyCal_WeekEventDecoration;
+        functions["addition"] = ShowPresentatorEvents;
+        //Словарь с переменными
+        var params = {};
+        params["post_vars"] = {};
+        params["post_vars"]["city"] = $('#cityPickerTittle').attr("data-id");
+        params["post_vars"]["show"] = GetCurrentChoosenShow();
+        params["post_vars"]["presentator"] = $('#selectPresentator').val();
+        params["post_vars"]["only_this_company"] = false;
+        params["post_vars"]["company_id"] = "{{ company.id }}";
+        params["add_event"] = ['{{ company.id }}', GetCurrentChoosenShow(), companyData];
+
+        params["cookie_path"] = "/client/";
+        //Кнопки
+        var buttons = {};
+        buttons["only_own"] = true;
+        sccal = new SCCalendar("calFrame", "all", urls, functions, params, buttons);
+        sccal.Create();
+        return;
+    }
+    function UpdateCalendar(_onlyEvents) {
+        var companyData = {};
+        companyData["companyName"] = "{{ company.name }}";
+        companyData["companyAdress"] = "{{ company.adress }}";
+        companyData["companyContacts"] = "{{ company.contacts }}";
+
+        sccal.PostVarChange("city", $('#cityPickerTittle').attr("data-id"));
+        sccal.PostVarChange("show", GetCurrentChoosenShow());
+        sccal.PostVarChange("presentator", $('#selectPresentator').val());
+        sccal.PostVarChange("only_this_company", $('#onlyThisCompany').is(':checked'));
+        sccal.AddEventParamsChange(['{{ company.id }}', GetCurrentChoosenShow(), companyData]);
+
+        if(_onlyEvents){
+            switch (sccal.CurrentCalType()) {
+                case "oldcal":
+                    sccal.Update();
+                    break;
+                case "mycal":
+                    if (sccal.CurrentCalOption() == "week") {
+                        sccal.Update();
+                    } else {
+                        sccal.UpdateEvents();
+                    }
+                    break;
+                case "datelist":
+                    sccal.UpdateEvents();
+                    break;
+                case "fulllist":
+                    sccal.UpdateEvents();
+                    break;
+            }
+        }else{
+            sccal.Update();
+        }
+
+    }
+    </script>
+    <script>
+    $('#cityPickerTittle').css("cursor", "default").text("{{ company.city.name }}").click(function (event) {
+        event.stopPropagation();
+    });//Устанавливаем название города в фиксированное положение и останавливаем события при клике
+    $('#showPickerTittle').css("cursor", "default").text("").click(function (event) {
+        event.stopPropagation();
+    });//Устанавливаем в пустое значение название шоу и останавливаем события при клике
+    $('#search_panel').remove();
+    $('#cityPickerTittle').attr("data-id", {{ company.city.id }});
+
+    ChangePageTittle("{{ company.name }}");
+
+    TabUpdate('{{ choosen_show }}');
+    {% if not options.company_page_calendar %}
+        FillPresentatorsHeadPanel(false, true, false);
+        FillOnlyCurrentCompanyChecker();
+
+        LoadPresentatorsHeadPanel(false);
+    {% endif %}
+    </script>
+    {%endblock%}

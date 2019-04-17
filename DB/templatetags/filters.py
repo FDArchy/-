@@ -28,13 +28,39 @@ def dateCountdown(_value):
         compared = datetime.datetime(int(splitted[0]), int(splitted[1]), int(splitted[2]))
         now = datetime.datetime.now();
         difference = now-compared;
+        abs_difference = abs(int(difference.days))
+        end_word = ""
+        if(abs_difference < 10 or abs_difference > 20):
+
+            if(abs_difference % 10 == 1):
+                end_word = "день"
+            if(abs_difference % 10 > 1 and abs_difference % 10 < 5):
+                end_word = "дня"
+            if(abs_difference % 10 > 4 or abs_difference == 0):
+                end_word = "дней"
+        else:
+            end_word = "дней"
         if(difference.days < 0):
-            resstring = "Через " + str(-difference.days) + " дней."
+
+            resstring = "Через " + str(-difference.days) + " " + end_word# + " дней."
+
         elif(difference.days > 0):
-            resstring = str(difference.days) + " дней назад"
+            resstring = str(difference.days) + " " + end_word + " назад"
         else:
             resstring = "Сегодня"
         return resstring
+
+@register.filter(name='cutter')
+def cutter(_value, _symb_count):
+    if _value == None:
+        return ""
+    result = _value[:_symb_count - 3]
+
+    if(result != _value):
+        result = result.strip() + "..."
+
+
+    return  result
 
 @register.filter(name='replacenone')
 def replaceNone(_value):

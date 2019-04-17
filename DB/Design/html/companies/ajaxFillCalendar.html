@@ -1,8 +1,0 @@
-﻿{% load filters %}
-{%for event in events%}
-classifyEvent({{event.startTime.day}}, {{event.startTime.month}}, {{event.startTime.year}}, "{{event.startTime|time:"H:i"}}", "{{event.artist.name}}", {{event.company.id}}, "{{event.artist.color}}", {{event.id}}, "{{event.artist.name}}", {%if event.manager.username == user  or is_superuser%} true {%else%}false{%endif%}, {% if event.crashBool %} true {% else %} false {% endif %}, "{{ownEvent}}");
-
-{%endfor%}
-{% for presentatorEvent in presentatorEvents %}
-checkOffDays("{{ presentatorEvent.date|date:"Y-n-" }}", "{{  presentatorEvent.date|date:"d" }}", "{{ presentatorEvent.startTime|time:"H:i"}}", "{{ presentatorEvent.endTime|time:"H:i"}}", "{{ presentatorEvent.fullday}}", "{{ presentatorEvent.description}}", "{{presentatorEvent.comment}}", {{ presentatorEvent.id }})
-{% endfor %}

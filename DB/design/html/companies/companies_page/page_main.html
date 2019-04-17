@@ -1,0 +1,38 @@
+﻿{% extends  "main.html" %}
+
+{% block body %}
+    <div>
+        <div id="clientsPaginator" class="vertical-center"></div>
+        <div id="clientsContent"></div>
+        <div id="clientsBottomPaginator"></div>
+    </div>
+    <script>
+        //Глобальная переменная хранит в себе функцию обновления текущей выбранной страницы
+    var CLIENTS_PAGE_UPDATER;
+    //Обновление данных, при активном чекере _update, обновляется текущая страница, при неактивном - обновляются страницы
+        function UpdateData(_update){
+            if(_update){
+                CLIENTS_PAGE_UPDATER();
+            }else{
+                CLIENTS_PAGE_UPDATER = Companies_Paginator();
+            }
+        }
+    </script>
+
+    <script>
+
+        if(HAVEDATA){
+            //Заполняет из текущих опций панель фильтрации в шапке
+            FillFilterHeadPanel({{ clients_page_companies_count }}, "{{ clients_page_order_by }}");
+            FilterHeadPanelAddHandlers();
+        }else {
+            ShowNotify(3, "Для добавления новых учреждений, обратитесь к администратору", 1);
+        }
+        //Помечают кнопки клиенты и добавления компании как активные
+        StyliseMainMenuActiveButton("mainMenuClientsButton");
+        StyliseMainMenuActiveButton("mainMenuClientsDropDownButton");
+        ChangePageTittle("Клиенты");
+        //Добавляет обработчики событий на панель фильтрации
+
+    </script>
+{% endblock %}

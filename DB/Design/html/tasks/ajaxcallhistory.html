@@ -1,8 +1,0 @@
-﻿<table border="1" width="100%">
-
-    {%for call in calls%}
-    <tr><td width="15%" align="center">{{call.datetime|date:"d.m.y"}}</td><td width="42%" align="center">{{call.manager.name}}</td><td width="42%" align="center">{{call.comment}}</td></tr>
-    {%endfor%}
-
-
-</table>

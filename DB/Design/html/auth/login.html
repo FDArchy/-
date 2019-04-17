@@ -1,26 +1,85 @@
-﻿{% extends "html\main.html" %}
+{% load staticfiles %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <link rel="shortcut icon" href="{% static  "img/icon.png"%}">
 
-{% block overridemain%}
+    <title>Шоуконтроль: вход на сайт</title>
 
-{% if login_error %}
-Такой пользователь не найден.
-{% endif %}
-<hr>
-Для работы с сайтом необходима авторизация:
-<form action = "/logging/" method = "post">
-<table>
-  <tr>
-    <td>Имя пользователя: </td><td><input type= "text" name = "username" id = "username"></td>
-  </tr>
- <tr>  
-    <td>Пароль: </td><td><input type= "password" name = "password" id = "password"></td>
-</tr>
- <tr>  
-    <td></td><td><input class ="button" type = "submit" value = "Войти"></td>
-</tr>
-</table>
+    <script src={% static "jquery/jquery.js" %}></script>
+    <script src={% static "jquery/jquery.cookie.js" %}></script>
+    <script src={% static "bootstrap/js/bootstrap.min.js" %}></script>
+    <script src={% static "jquery-select/js/select2.full.js" %}></script>
+    <script src={% static "individual/js/scripts.js" %}></script>
 
-</form>
 
-<hr>
-{% endblock %}
+
+    <link href={% static "bootstrap/css/bootstrap.min.css" %} rel="stylesheet">
+    <link href={% static "individual/css/stylesheet.css" %} rel="stylesheet">
+    <link href={% static "individual/css/auth.css" %} rel="stylesheet">
+
+    <script>
+        var GLOBAL_CURRENT_NOTIFY_STATUS = false;//Текущий статус окна уведомления. true - открыто, false - закрыто.
+        var GLOBAL_CURRENT_AJAX_STATUS = true;//Текущий статус ajax запроса. true - completed, false - sended.
+        var GLOBAL_CURRENT_AJAX_RESPONSE_STATUS = "NORESPONSE"//Текущий тип ответа сервера. ERROR - ощибка, LOAD - загрузка (sended), SUCCESS - успешно.
+    </script>
+    <style>
+        body {
+            padding-top: 40px;
+            padding-bottom: 40px;
+            background-image: url({% static "img/4.jpg" %});
+            background-size: 100%
+        }
+
+        @media (max-width: 1270px) {
+            /* для разрешения экрана от 470 до 930 пикселей */
+            body {
+                background-image: none;
+                background-color: #835f06;
+            }
+        }
+    </style>
+</head>
+
+<body>
+{% csrf_token %}
+<div class="navbar navbar-default navbar-fixed-top" style="opacity: 0.6">
+    <div class="container-fluid">
+        <div class="navbar-header logon-navbar-header">
+            <span class="logo-char-SH">Ш</span><span class="logo-char-K">К</span>
+        </div>
+    </div>
+</div>
+<div class="container container-login">
+    <div id="loginContainer">
+        <form class="form-signin" action="javascript:void(null);" onsubmit="Authorize();">
+            <h4 style="text-align: center" class="form-signin-heading text-primary">Авторизация</h4>
+            <input id="login" type="text" class="form-control" placeholder="Логин" required autofocus
+                   style="margin-bottom: 5px">
+            <input id="password" type="password" class="form-control" placeholder="Пароль" required>
+
+            <button id="auth" class="btn btn-lg btn-primary btn-block" type="submit"><span></span>&nbsp Войти</button>
+        </form>
+    </div>
+</div>
+<div id="footer" class="logon-footer">
+      <div style="height: 100%" class="container-fluid footer-container">
+        <p style="top: 55%; position: relative;"  class="text-muted">©  2019 Шоуконтроль.рф </p>
+      </div>
+</div>
+
+<script type="text/javascript">
+
+
+</script>
+<script>
+    var csrftoken = $.cookie('csrftoken');
+    AddCsrfToAjaxRequest(csrftoken);
+</script>
+</body>
+</html>

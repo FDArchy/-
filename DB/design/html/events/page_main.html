@@ -1,0 +1,139 @@
+{% extends "main.html" %}
+{% block body %}
+    <div id="choosePanel" style="width: 85%; margin: auto; margin-bottom: 20px;"></div>
+    <div id="calFrame"></div>
+    <script>
+    //CALENDAR:=========================================================================================================================================================
+
+    function UpdateData(_updateOnly, stab, _eventsOnly) {
+        {% if user_type != "presentator" %}
+            if(_updateOnly && stab) {
+                sccal.PostVarChange("city", GetCurrentChoosenCity());
+                sccal.PostVarChange("show", GetCurrentChoosenShow());
+                sccal.PostVarChange("search", GetSearchPanelValue());
+
+                if(_eventsOnly){
+                    switch (sccal.CurrentCalType()) {
+                        case "oldcal":
+                            sccal.Update();
+                            break;
+                        case "mycal":
+                            if (sccal.CurrentCalOption() == "week") {
+                                sccal.Update();
+                            } else {
+                                sccal.UpdateEvents();
+                            }
+                            break;
+                        case "datelist":
+                            sccal.UpdateEvents();
+                            break;
+                        case "fulllist":
+                            sccal.UpdateEvents();
+                            break;
+                    }
+                }else{
+                    sccal.PostVarChange("presentator", $("#selectPresentator").val());
+                    sccal.Update();
+                }
+            }else {
+                LoadPresentatorsHeadPanel(_updateOnly);
+            }
+        {% else %}
+            if (_updateOnly) {
+                sccal.PostVarChange("city", GetCurrentChoosenCity());
+                sccal.PostVarChange("show", GetCurrentChoosenShow());
+                sccal.PostVarChange("search", GetSearchPanelValue());
+                if (_eventsOnly) {
+                    switch (sccal.CurrentCalType()) {
+                        case "oldcal":
+                            sccal.Update();
+                            break;
+                        case "mycal":
+                            if (sccal.CurrentCalOption() == "week") {
+                                sccal.Update();
+                            } else {
+                                sccal.UpdateEvents();
+                            }
+                            break;
+                        case "datelist":
+                            sccal.UpdateEvents();
+                            break;
+                        case "fulllist":
+                            sccal.UpdateEvents();
+                            break;
+                    }
+                } else {
+                    sccal.Update();
+                }
+            } else {
+                CreateCalendar();
+            }
+        {% endif %}
+
+        return;
+    }
+    function CreateCalendar() {
+        //Ссылки на получение и отправку данных
+        var urls = {};
+        urls["add"] = "/aj_events_add_event/";
+        urls["show"] = "/aj_events_get_event_data/";
+        urls["all"] = "/aj_events_get_in_daterange/";
+        urls["paginator"] = "/aj_events_get_in_daterange/";
+        urls["mycal_frame_data"] = "/aj_events_get_frame_counters/";
+
+        var functions = {};
+        functions["transformDate"] = TransformDateFromEvent;
+        {% if user_type  == "presentator"%}
+            functions["addEvent"] = AddPresentatorEvent;
+        {% else %}
+            functions["addEvent"] = AddEvent;
+        {% endif %}
+        functions["showEvent"] = ShowEvent;
+
+        functions["oldcal"] = CreateOldCalEventDecoration;
+        functions["event_in_list"] = CreateInListEventDecoration;
+        functions["week"] = CreateMyCal_WeekEventDecoration;
+
+        functions["addition"] = ShowPresentatorEvents;
+
+        //Словарь с переменными
+        var params = {};
+        params["post_vars"] = {};
+        params["post_vars"]["city"] = $('#cityPickerTittle').attr("data-id");
+        params["post_vars"]["show"] = $('#showPickerTittle').attr("data-id");
+        params["post_vars"]["search"] = $('#search_panel').find("input").val();
+        {% if user_type != "presentator" %}
+            params["post_vars"]["presentator"] = $("#selectPresentator").val();
+        {% else%}
+            params["post_vars"]["presentator"] = {{ presentator }};
+        {% endif %}
+
+
+        params["add_event"] = [false, false, false];
+        params["cookie_path"] = "/events/";
+
+        params["passed_days"] = false;
+
+        var buttons = {};
+        {% if user_type != "presentator" %}
+            buttons["only_own"] = true;
+        {% endif %}
+
+        sccal = new SCCalendar("calFrame", "all", urls, functions, params, buttons);
+        sccal.Create();
+        return;
+    }
+
+    </script>
+
+    <script>
+        var sccal;
+        {% if user_type != "presentator" %}
+            FillPresentatorsHeadPanel(false, true, false);
+            $('#search_panel').insertAfter($('#search_panel').next());
+        {% endif %}
+        $('#mainMenuEventsButton').addClass("main-menu-elements-button-clicked");
+        ChangePageTittle("Мероприятия");
+    </script>
+
+{% endblock %}

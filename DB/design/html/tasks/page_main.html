@@ -1,0 +1,94 @@
+{% extends "main.html" %}
+{% block body %}
+
+    <div id="calFrame"></div>
+    <hr class="company-primary-divider">
+    <div id = "expiredTasksFrame">
+        <div class="tasks-expired_header">Просроченные задачи</div>
+        <div class="events_frame_container-decoration" id="expiredTasksContainer" style="margin: 0 auto; width: 84%">
+        </div>
+    </div>
+
+
+    <script>
+    function CreateCalendar() {
+        //Ссылки на получение и отправку данных
+        var urls = {};
+        urls["add"] = "/aj_company_manager_work_mark_call_and_add_task/";
+        urls["show"] = "/aj_tasks_get_task/";
+        urls["all"] = "/aj_tasks_get_in_daterange/";
+        urls["paginator"] = "/aj_tasks_get_in_daterange/";
+        urls["mycal_frame_data"] = "/aj_tasks_get_frame_counters/";
+        var functions = {};
+        functions["transformDate"] = TransformDateFromTask;
+        functions["addEvent"] = AddNewTask;
+        functions["showEvent"] = ShowTask;
+
+        functions["addition"] = ShowUnExeTasks;
+
+        functions["oldcal"] = CreateOldCalTaskDecoration;
+        functions["event_in_list"] = CreateInListTaskDecoration;
+        functions["week"] = CreateMyCal_TaskEventDecoration;
+
+        //Словарь с переменными
+        var params = {};
+        params["post_vars"] = {};
+        params["post_vars"]["city"] = GetCurrentChoosenCity();
+        params["post_vars"]["show"] = GetCurrentChoosenShow();
+        params["post_vars"]["search"] = GetSearchPanelValue();
+
+        params["add_event"] = [false, false, false];
+        params["cookie_path"] = "/tasks/";
+
+        params["passed_days"] = true;
+
+        var buttons = {};
+
+        sccal = new SCCalendar("calFrame", "all", urls, functions, params, buttons);
+        sccal.Create();
+        return;
+    }
+    function UpdateData(_updateOnly, _onlyEvents){
+        if(_updateOnly){
+            sccal.PostVarChange("city", GetCurrentChoosenCity());
+            sccal.PostVarChange("show", GetCurrentChoosenShow());
+            sccal.PostVarChange("search", GetSearchPanelValue());
+            if(_onlyEvents){
+                switch (sccal.CurrentCalType()) {
+                    case "oldcal":
+                        sccal.Update();
+                        break;
+                    case "mycal":
+                        if (sccal.CurrentCalOption() == "week") {
+                            sccal.Update();
+                        } else {
+                            sccal.UpdateEvents();
+                        }
+                        break;
+                    case "datelist":
+                        sccal.UpdateEvents();
+                        break;
+                    case "fulllist":
+                        sccal.UpdateEvents();
+                        break;
+                }
+            }else{
+                sccal.Update();
+            }
+
+        }else{
+            CreateCalendar();
+        }
+        return;
+    }
+    </script>
+
+    <script>
+        var sccal;
+        $('#mainMenuTasksButton').addClass("main-menu-elements-button-clicked");
+        ChangePageTittle("Задачи");
+
+    </script>
+
+
+{% endblock %}

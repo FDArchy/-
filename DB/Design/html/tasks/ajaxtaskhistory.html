@@ -1,8 +1,0 @@
-﻿<table border="1" width="100%" >    
-    
-    {%for task in tasks%}
-    <tr><td width="15%" align="center">{{task.datetime|date:"d.m.y"}}</td><td width="42%" align="center">{{task.manager.name}}</td><td width="42%" align="center">{{task.description}}</td></tr>
-    {%endfor%}
-
-
-</table>

@@ -1,0 +1,102 @@
+﻿{% extends  "main.html" %}
+
+{% block body %}
+    <div>
+    {% if full_list_cities_count > 0 %}
+        <div id="fullListControlPanel">
+            <div class="col-md-3"></div>
+            <div class="col-md-2" style="margin-bottom: 15px;">
+                <span title="Только свободные" style="color: rgb(66, 139, 202); margin-top: 10px; width: 100%; text-align: left;">
+                    <input type="checkbox" id="onlyFree">
+                    <label for="onlyFree" class="header" style="user-select: none;">
+                        <span>Свободные
+                            </span>
+                    </label>
+                </span>
+                {% if not options.admin_mode %}
+                <span title="Свои" style="color: rgb(66, 139, 202); margin-top: 10px; width: 100%; text-align: left; margin-left: 10px;">
+                    <input type="checkbox" id="onlyOwn">
+                    <label for="onlyOwn" class="header" style="user-select: none;">
+                        <span>Свои
+                            </span>
+                    </label>
+                </span>
+                    {% else %}
+                    <span title="Занятые" style="color: rgb(66, 139, 202); margin-top: 10px; width: 100%; text-align: left; margin-left: 10px;">
+                    <input type="checkbox" id="onlyBusy">
+                    <label for="onlyBusy" class="header" style="user-select: none;">
+                        <span>Занятые
+                            </span>
+                    </label>
+                </span>
+                {% endif %}
+            </div>
+            <div class="col-md-6 vertical-line">
+                {% if options.admin_mode %}
+                    <input class="btn btn-success full-list-control-button" type="button" onclick="FullListMakeCompaniesFree();" value="Освободить">
+                    <input type="button" class="btn btn-success full-list-control-button" onclick="FullListTransferCompaniesTo($('#selectManagers').val(), $('#showPickerTittle').attr('data-id'));" value="Передать менеджеру">
+                    <input type="button" class="btn btn-success full-list-control-button" onclick="FullListDistributeCity($('#cityPickerTittle').attr('data-id'), $('#showPickerTittle').attr('data-id'), $('#selectManagers').val())" value="Распределить город">
+                    <input type="button" class="btn btn-danger full-list-control-button" style="margin-left: 10px;" onclick="FullListRemoveCompanies();" value="Удалить компании">
+                {% elif options.can_add_companies_to_self  %}
+                    <input type="button" class="btn btn-success full-list-control-button" onclick="FullListTransferCompaniesTo($('#selectManagers').val(), $('#showPickerTittle').attr('data-id'), true);" value="Забрать себе">
+                {% elif options.can_own_companies_free %}
+                    <input type="button" class="btn btn-success full-list-control-button"  onclick="FullListMakeCompaniesFree();" value="Освободить (только свои)">
+                {% endif %}
+            </div>
+            <div class="col-md-1"></div>
+        </div>
+        <hr style="width: 100%;">
+        <div id="fullListCompaniesInfo">
+            <div class="col-md-3"></div>
+            <div class="col-md-2">
+                <span class="small text-primary control-label">Всего компаний: </span>
+                <span class="small text-primary" id="fullListTotalCompaniesCount"></span>
+            </div>
+            <div class="col-md-2 vertical-line">
+                <span class="small text-primary control-label">Занятые: </span>
+                <span class="small text-primary" id="fullListBusyCompaniesCount"></span>
+            </div>
+            <div class="col-md-2  vertical-line">
+                <span class="small text-primary control-label">Свободные: </span>
+                <span class="small text-primary" id="fullListFreeCompaniesCount"></span>
+            </div>
+            <div class="col-md-3" style="margin-bottom: 25px";></div>
+        </div>
+        <hr style="width: 100%;">
+    {% endif %}
+        <div id="clientsPaginator" class="vertical-center"></div>
+        <div id="clientsContent"></div>
+        <div id="clientsBottomPaginator"></div>
+
+
+    </div>
+    <script>
+    //Обновление данных, при активном чекере _update, обновляется текущая страница, при неактивном - обновляются страницы
+        function UpdateData(_update){
+            if(_update){
+                CLIENTS_PAGE_UPDATER();
+            }else{
+                CLIENTS_PAGE_UPDATER = Companies_FullList_Paginator();
+            }
+        }
+    </script>
+
+    <script>
+        {% if full_list_cities_count > 0 %}
+            //Заполняет из текущих опций панель фильтрации в шапке
+            FillFilterHeadPanelFullList({{ options.full_list_page_companies_count  }}, "{{ options.clients_full_list_order_by }}", "{{ options.admin_mode }}", '{{ managers|safe}}');
+            FilterHeadPanelAddHandlers();
+            FillCitiesShowsHeadPanelFullList('{{ full_list_cities|safe }}', '{{ full_list_shows|safe }}');
+            FullListCheckersAddHandlers();
+            var CLIENTS_PAGE_UPDATER = Companies_FullList_Paginator();
+        {% else %}
+            FullListMarkAsNoCities();
+        {% endif %}
+        //Помечают кнопки клиенты и добавления компании как активные
+        StyliseMainMenuActiveButton("mainMenuClientsButton");
+        StyliseMainMenuActiveButton("mainMenuClientsDropDownButton");
+        ChangePageTittle("Полный список");
+        //Добавляет обработчики событий на панель фильтрации
+
+    </script>
+{% endblock %}

@@ -1,11 +1,80 @@
-﻿{% extends "html\main.html" %}
+﻿{% extends "main.html" %}
 {% block body %}
-    <p>26.06.16:</p>
-<p>На данный момент, из за ограничения базы данных, поиск по учреждениям ведется с обязательным учетом регистра.</p>
-<p>OLD:</p>
- <p>Задачи были изменены. Просмотр в календаре и на выбранные дни будет доступен позже.Для перехода к учреждению из списка задач необходимо нажать на белую стрелку в синем поле в конце задачи,
-которая проявляется при наведении. Для выполнения задачи необходимо кликнуть на нее.</p>
-<p>Работать необходимо в одном из следующих браузеров: Opera, Mozilla Firefox, Google Chrome, Safari</p>
-<p>По всем вопросам, пожеланиям и предложениям писать на fd_archy@mail.ru</p>
+    <div style="text-align: center;">
+    <div class="help-header">Связь с администрацией</div>
+        <input class="btn btn-success full-list-control-button" type="button" onclick="SendEmailToAdmin('administrator');" value="Написать администратору">
+        <input type="button" class="btn btn-info full-list-control-button" onclick="SendEmailToAdmin('developer');" value="Написать разработчику">
+    </div>
+    {% if user_type == "admin" or  user_type == "manager"%}
+        <div style="text-align: center; margin-top: 15px;">
+            <div>
+                <span style="text-align: center; margin-top: 25px; margin-bottom: 25px;" class="help-header">Данные SipPoint </span>
+            </div>
+
+            <div style="width: 35%; margin: auto;">
+                <div class="header">Логин</div>
+                <input class="form-control input" style="margin-bottom: 8px;" value="{{ options.sippoint_login }}">
+                <div class="header">Пароль</div>
+                <input class="form-control input" style="margin-bottom: 8px;" value="{{ options.sippoint_password }}">
+            </div>
+
+
+        </div>
+    {% endif %}
+
+    <div style="text-align: center; margin-top: 25px; margin-bottom: 25px;" class="help-header">Обучение
+        <div style="margin-bottom: 15px;">
+
+        </div>
+        {% if user_type == "admin" %}
+            <div style="text-align: center; margin-top: 25px; margin-bottom: 25px;" class="help-header">Администратор
+                <iframe width="760" height="415" style="margin: auto; display: block;"
+                        src="{{ links.admin }}" frameborder="0"
+                        allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
+                        allowfullscreen></iframe>
+            </div>
+            <div style="text-align: center; margin-top: 25px; margin-bottom: 25px;" class="help-header">Менеджер
+                <iframe width="760" height="415" style="margin: auto; display: block;"
+                        src="{{ links.manager }}" frameborder="0"
+                        allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
+                        allowfullscreen></iframe>
+            </div>
+            <div style="text-align: center; margin-top: 25px; margin-bottom: 25px;" class="help-header">Артист
+                <iframe width="760" height="415" style="margin: auto; display: block;"
+                        src="{{ links.presentator }}" frameborder="0"
+                        allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
+                        allowfullscreen></iframe>
+            </div>
+        {%elif user_type == "manager"  %}
+            <div style="text-align: center; margin-top: 25px; margin-bottom: 25px;" class="help-header">Основное руководство
+                <iframe width="760" height="415" style="margin: auto; display: block;"
+                        src="{{ links.main_tutorial }}" frameborder="0"
+                        allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
+                        allowfullscreen></iframe>
+            </div>
+            <div style="text-align: center; margin-top: 25px; margin-bottom: 25px;" class="help-header">Руководство по задачам
+                <iframe width="760" height="415" style="margin: auto; display: block;"
+                        src="{{ links.tasks_work }}" frameborder="0"
+                        allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
+                        allowfullscreen></iframe>
+            </div>
+        {% elif user_type == "presentator" %}
+            <div style="text-align: center; margin-top: 25px; margin-bottom: 25px;" class="help-header">Основное руководство
+                <iframe width="760" height="415" style="margin: auto; display: block;"
+                        src="{{ links.main_tutorial }}" frameborder="0"
+                        allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
+                        allowfullscreen></iframe>
+            </div>
+        {% endif %}
+    </div>
+    <script>
+    function UpdateData(){
+        return;
+    }
+    </script>
+    <script>
+    $('#mainMenuHelpButton').addClass("main-menu-elements-button-clicked");
+    ChangePageTittle("Помощь");
+    </script>
 
 {%endblock%}

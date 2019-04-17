@@ -1,0 +1,25 @@
+{% extends "main.html" %}
+{% block body %}
+
+    <div id="control_contentContainer" style="margin: 0 auto; width: 80%" class="main content-container">
+          </div>
+
+
+    <script>
+    function UpdateData(_updateOnly){
+        Stats_LoadStats();
+        return;
+    }
+    </script>
+
+    <script>
+        var sccal;
+        $('#mainMenuStatsButton').addClass("main-menu-elements-button-clicked");
+        HideCityShowPickers();
+        ChangePageTittle("Статистика");
+        ChooseNavMenuItem('stats', true, "{{ user_type }}");
+
+    </script>
+
+
+{% endblock %}

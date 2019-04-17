@@ -1,0 +1,62 @@
+{% extends "main.html" %}
+{% block body %}
+
+
+<div class="container-fluid">
+      <div class="row content-wrapper">
+        <div class="col-md-2 sidebar">
+          <ul id="controlNavbar" class="nav nav-sidebar">
+                <li data-label="users" class="active"><a onclick="ChooseNavMenuItem('users')" href="#">Пользователи</a></li>
+                <li data-label="lists"><a onclick="ChooseNavMenuItem('lists');" href="#">Списки</a></li>
+                <li data-label="options"><a onclick="ChooseNavMenuItem('options');" href="#">Настройки</a></li>
+                <li data-label="upload"><a onclick="ChooseNavMenuItem('upload');" href="#">Выгрузка</a></li>
+          </ul>
+        </div>
+          <div id="control_contentContainer" class="col-md-10 main content-container">
+          </div>
+      </div>
+    </div>
+<script>
+    //Загрузка данных в зависимости от секции
+    function UpdateData(_eventsOnly){
+        var _section = $.cookie("control_choosen_section") || $('#control_contentContainer').attr("data-current_section");
+        switch (_section) {
+            case "users":
+                FillUsersPaginator();
+                break;
+            case "options":
+                OptionsLoad();
+                break;
+            case "lists":
+                var currentType = $('#listsTypeChoose').val();
+                if(currentType == "shows"){
+                    Lists_ArtistPaginator();
+                }else if(currentType == "city"){
+                    Lists_CityPaginator();
+                }
+                break;
+            case "upload":
+                UnloadEventsPaginator();
+                break;
+            default:
+                break;
+        }
+    }
+
+
+
+</script>
+<script>
+    if($.cookie("control_choosen_section")){
+        ChooseNavMenuItem($.cookie("control_choosen_section"));
+    }else{
+        ChooseNavMenuItem("users");
+    }
+    HideCityShowPickers();
+    $('#mainMenuControlButton').addClass("main-menu-elements-button-clicked");
+    ChangePageTittle("Управление");
+</script>
+
+
+
+{%endblock%}

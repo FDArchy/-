@@ -1,0 +1,223 @@
+/*Common*/
+.bold-text{
+    font-weight: bold;
+}
+/*Client Page*/
+.company-name-header{
+    height: 35px;
+}
+.company-type-background{
+    width: 35px;
+    height: 35px;
+    background-color: #ffffff;
+    padding: 5px 5px 5px 5px;
+    color: #428bca;
+    border-radius: 15px;
+    font-weight: 900;
+    float:left;
+    margin-right: 10px;
+    text-align: center;
+    cursor: default;
+}
+.company-type-text-decoration{
+    position: relative;
+    top: 3px;
+    user-select: none;
+}
+.company-name-text-decoration{
+    display: table-cell;
+    vertical-align: middle;
+    height: 35px;
+    font-size: large;
+    cursor: default;
+}
+
+div.inner-content{
+    border: 1px inset #428bca;
+    margin-bottom: 8px;
+
+}
+.company-type-container{
+    width: 35px;
+    height: 35px;
+    background-color: #ffffff;
+    padding: 5px 5px 5px 5px;
+    color: #428bca;
+    border-radius: 15px;
+    font-weight: 900;
+    float:left;
+    margin-right: 10px;
+    text-align: center;
+    cursor: default;
+}
+.company-type-content{
+    top: 3px;
+    position: relative;
+}
+.company-icon{
+    margin-right: 6px;
+    border: 1px transparent outset;
+    border-radius: 8px;
+}
+.company-icon:hover{
+    cursor: pointer;
+    color: #5CB85C;
+}
+.company-icon-pressed{
+
+    border: 1px solid #fff;
+    margin-right: 6px;
+    font-size: 17px;
+}
+.company-icon-pressed:hover{
+
+    cursor: pointer;
+    color: #5cb85c;
+
+}
+.company-icon-small-pressed{
+    margin-right: 6px;
+    border: 1px transparent outset;
+    border-radius: 8px;
+}
+.company-icon-small-pressed:hover{
+    border: 1px #5cb85c outset;
+    border-radius: 8px;
+    cursor: pointer;
+    color: #5cb85c;
+
+}
+.company-icon-remove{
+    color:red;
+}
+.company-icon-disabled{
+    color: #636c72;
+    cursor: not-allowed;
+}
+.company-icon-disabled:hover{
+    color: #636c72;
+    cursor: not-allowed;
+}
+.inheritance-text-color{
+    color:inherit;
+}
+.company-vertical-allign {
+    display: flex;
+    align-items: center;
+}
+hr.company-primary-divider{
+    color: #428bca; /* Цвет линии для остальных браузеров */
+    background-color: #428bca; /* Цвет линии для браузера Firefox и Opera */
+    height: 1px;
+    margin-bottom: 7px;
+}
+div.company-container-settings{
+    padding-top: 15px;
+    padding-bottom: 15px;
+    margin-bottom: 15px;
+}
+div.manager-shows-labels{
+    padding-left: 5px;
+    padding-right: 5px;
+    border-radius: 5px;
+}
+div.manager-shows-labels:hover{
+    background-color: #00000030;
+}
+#company-dinamic-content{
+    padding-top: 5px;
+    padding-bottom: 10px;
+    padding-left: 7px;
+    padding-right: 7px;
+    border-left: 1px solid #ddd;
+    border-right: 1px solid #ddd;
+    border-bottom: 1px solid #ddd;
+}
+/*All Clients Page*/
+.icon-clients-list{
+    padding-right: 3px;
+    border: 1px transparent outset;
+    border-radius: 8px;
+    font-size: small;
+    }
+.icon-clients-list:hover{
+cursor: pointer;
+color: #5CB85C;
+}
+.icon-clients-list-unactive {
+    color: #525252;
+}
+td.td-with-checker{
+    cursor: pointer;
+}
+td.td-with-checker:hover{
+    background-color: #08192d !important;
+}
+tr.tr-checked{
+    background-color: #5cb85c !important;
+    color: white !important;
+    transition: 200ms;
+
+}
+table.clients-list{
+    margin-bottom: 3px;
+    width:100%;
+    /*display: none;*/
+    table-layout: fixed;
+    width: 100%;
+    margin-top: 3px;
+    margin-bottom: 3px;
+    -webkit-user-select: none;
+}
+
+.text-in-clients-table {
+    font-size: x-small;
+}
+.clients-table-header-row-decoration {
+    font-weight: bold;
+    font-size: small;
+    background-color: #08192d;
+    color: #ffffff;
+}
+table.clients-list td {
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+}
+table.clients-list tr:nth-child(2n) {
+    background-color: #dcdcdc;
+}
+table.clients-list tr:nth-child(2n) > td {
+    border: 1px solid white !important;
+}
+table.clients-list tr:nth-child(n+2):hover {
+    cursor: default;
+}
+table.clients-list td.active_content:hover {
+    background: #1e90ff;
+    color: #ffffff;
+    cursor: pointer;
+}
+
+.square {
+        margin-top: 2px;
+        margin-right: 3px;
+        width: 8px;
+        height: 8px;
+        float: right;
+        -moz-border-radius: 5px;
+        -webkit-border-radius: 5px;
+        border-radius: 5px;
+    }
+.square:hover{
+    border: 2px solid white;
+}
+a > .select2{
+    width: 120px !important;
+}
+a > label{
+    padding-right: 10px;
+}
+a.presentators-select > .select2{
+    width: 300px !important;
+}
