@@ -39,8 +39,8 @@ import operator
 import random
 #Сторонние библиотеки
 import xlsxwriter
-#import openpyxl #На продакшн сервере не нужна
-#from openpyxl import load_workbook
+import openpyxl #На продакшн сервере не нужна
+from openpyxl import load_workbook
 
 #Свои библиотеки
 from .python_funclib import connections as connections
@@ -184,7 +184,7 @@ def get_user_options_from_db(_request = False, _user = False, _individual = Fals
     else:
         return []
     if(_individual):
-        options_values = SiteUserOptions.objects.filter(id=siteuser.options.id).values("logout_request", "company_page_calendar", "larger_font", "scrolltop_show")[0]
+        options_values = SiteUserOptions.objects.filter(id=siteuser.options.id).values("logout_request", "company_page_calendar", "larger_font", "scrolltop_show", "only_own_tasks_for_admin")[0]
     else:
         options_values = SiteUserOptions.objects.filter(id = siteuser.options.id).values()[0]
         options_values["full_access_cities_list"] =  list(siteuser.options.full_access_cities_list.all().values_list("id", flat=True))
@@ -474,7 +474,7 @@ def company_company_data_page(request):
     site_user = get_current_site_user(request)
     if(company.count() == 0):
         return JsonResponse(create_response("error", "Компания не найдена"))
-    company_data = list(company.values("ctype", "name", "adress", "telephone", "contacts", "comment", "email", "site"))[0]
+    company_data = list(company.values("id", "ctype", "name", "adress", "telephone", "contacts", "comment", "email", "site"))[0]
     if(user_type == "admin"):
         result['managers'] = list(Manager.objects.filter(id__in=CMSILink.objects.filter(company__id=company[0].id).values("manager__id")).values("siteuser__id", "siteuser__alias"))
     else:
@@ -1731,6 +1731,12 @@ def tasks_get_in_daterange(request):
     # Параметры фильтрации по ролям
     pairs = None
     if (current_user_type == "admin"):
+        if(site_user.options.only_own_tasks_for_admin):
+            try:
+                current_manager_id = get_current_manager(request).id
+            except:
+                current_manager_id = 0
+            filter_values["manager__id"] = current_manager_id
         if (city_id != 0):
             filter_values["company__city__id"] = city_id
             if (show_id == 0):
@@ -1839,6 +1845,12 @@ def tasks_get_frame_counters(request):
     # Параметры фильтрации по ролям
     pairs = None
     if (current_user_type == "admin"):
+        if (site_user.options.only_own_tasks_for_admin):
+            try:
+                current_manager_id = get_current_manager(request).id
+            except:
+                current_manager_id = 0
+            filter_values["manager__id"] = current_manager_id
         if (city_id != 0):
             filter_values["company__city__id"] = city_id
             if (show_id == 0):
@@ -3134,6 +3146,8 @@ def events_fill_event_status(_event, _current_date_time, _user_type):
         return "alien"
     elif (_event["removed"]):
         return "removed"
+    elif (_event["crashBool"]):
+        return "crash"
     elif(_event["sumTransferedFilled"]):
         return  "success"
     elif(_event["resultSumFilled"]):
@@ -3141,8 +3155,6 @@ def events_fill_event_status(_event, _current_date_time, _user_type):
             return "late_money"
         else:
             return "wait_money"
-    elif(_event["crashBool"]):
-        return "crash"
     elif(_event["resultSumFilled"]):
         return "success"
     elif(datetime_dif_days < 0):
@@ -3613,7 +3625,7 @@ def control_users_user_individual_options_data(request):
     if(user_type == "presentator"):
         values_list = ["logout_request",]
     else:
-        values_list = ["logout_request", "company_page_calendar", "hide_done_tasks", "larger_font", "scrolltop_show"]
+        values_list = ["logout_request", "company_page_calendar", "hide_done_tasks", "larger_font", "scrolltop_show", "only_own_tasks_for_admin"]
     result["user_data"] = list(SiteUser.objects.filter(id = site_user).values("id", "alias"))[0]
     result["user_options"] = list(SiteUserOptions.objects.filter(id = SiteUser.objects.get(id = site_user).options.id).values(*values_list))[0]
     return JsonResponse(create_response("data", "", result))
@@ -3630,7 +3642,7 @@ def control_users_user_individual_options_edit(request):
     if (user_type == "presentator"):
         values_list = ["logout_request",]
     else:
-        values_list = ["logout_request", "company_page_calendar", "hide_done_tasks", "larger_font", "scrolltop_show"]
+        values_list = ["logout_request", "company_page_calendar", "hide_done_tasks", "larger_font", "scrolltop_show", "only_own_tasks_for_admin"]
     new_options = {}
     for option in loaded_options:
         if option in values_list:
@@ -4368,10 +4380,8 @@ def control_unload_events(request):
     events_filter_values = {}
 
     events_filter_values["startTime__gte"] = datetime.strptime(date_from, '%Y-%m-%d %H:%M').replace(hour=0, minute=0, second=0, microsecond=0)
-    events_filter_values["startTime__lte"] = datetime.strptime(date_to, '%Y-%m-%d %H:%M').replace(hour=0, minute=0, second=0, microsecond=0)
+    events_filter_values["startTime__lte"] = datetime.strptime(date_to, '%Y-%m-%d %H:%M').replace(hour=23, minute=59, second=59, microsecond=999)
 
-    #events_filter_values["removed"] = False
-    #events_filter_values["crashBool"] = False
     if(city != 0):
         events_filter_values["company__city__id"] = city
     if(user != 0):
@@ -5425,9 +5435,157 @@ def api_admin(request):
 def individual_script(request):
     siteuser = get_current_site_user(request, _type = "object")
     if(siteuser.user.username != "archy"):
-        JsonResponse(create_response("info", "Только суперадмин может исполнять индивидуальные скрипты"))
+        return JsonResponse(create_response("info", "Только суперадмин может исполнять индивидуальные скрипты"))
     try:
-        datelimit = datetime.now() + timedelta(days=1)
+        return JsonResponse(create_response("success", "Успешное исполнение индивидуального скрипта"))
+        nahodka_companies = Company.objects.filter(city__id = City.objects.get(name = "Владивосток").id, name__icontains = "Находка")
+        nahodka = City.objects.get(name = "Находка")
+        for company in nahodka_companies:
+            company.city = nahodka
+            company.save()
+        return JsonResponse(create_response("success", "Успешное исполнение индивидуального скрипта"))
+        wb = load_workbook('1.xlsx')
+        ws = wb.active
+        city = City.objects.get(name="Иркутск")
+        merged_ranges = []
+        low_range = 0
+        range_counter = 0
+        for i in range(2, 370):
+            if(ws[i][0].value != None):
+                if(int_convertor_error_0(ws[i][0].value) != 0):
+                    if(range_counter != 0):
+                        merged_ranges.append([low_range, range_counter])
+                        range_counter = 0
+                    low_range = i
+                    range_counter = i
+            else:
+                range_counter += 1
+        for merged_range in merged_ranges:
+            low_range = merged_range[0]
+            high_range = merged_range[1]
+
+            new_company_data = {}
+            new_company_data["ctype"] = "ДС"
+            new_company_data["name"] = ""
+            new_company_data["adress"] = ""
+            new_company_data["contacts"] = ""
+            new_company_data["telephone"] = ""
+            new_company_data["site"] = ""
+            new_company_data["email"] = ""
+            new_company_data["city"] = city
+            for i in range(low_range, high_range + 1):
+                if(ws[i][1].value != None):
+                    new_company_data["name"] += (" " + str(ws[i][1].value))
+                if (ws[i][2].value != None):
+                    new_company_data["adress"] += (" " + str(ws[i][2].value))
+                if (ws[i][3].value != None):
+                    new_company_data["contacts"] += (" " + str(ws[i][3].value))
+                if (ws[i][4].value != None):
+                    new_company_data["telephone"] += (" " + str(ws[i][4].value))
+                if (ws[i][5].value != None):
+                    new_company_data["email"] += (" " + str(ws[i][5].value))
+                if (ws[i][6].value != None):
+                    new_company_data["site"] += str(ws[i][6].value)
+            new_company_data["name"] = new_company_data["name"].replace("Муниципальное бюджетное дошкольное образовательное учреждение города Иркутска детский сад", "Детский сад")
+            new_company_data["name"] = new_company_data["name"].replace("Муниципальное бюджетное дошкольное образовательное учреждение г.Иркутска детский сад", "Детский сад")
+            new_company_data["name"] = new_company_data["name"].replace("Муниципальное бюджетное дошкольное образовательное учреждение  г. Иркутска детский сад", "Детский сад")
+            new_company_data["name"] = new_company_data["name"].replace("Муниципальное бюджетное дошкольное образовательное учреждение  г. Иркутска  детский сад", "Детский сад")
+            new_company_data["name"] = new_company_data["name"].replace("Муниципальное бюджетное дошкольное образовательное учреждение города  Иркутска детский сад", "Детский сад")
+            new_company_data["name"] = new_company_data["name"].replace("Муниципальное бюджетное дошкольное образовательное учреждение г. Иркутска детский сад", "Детский сад")
+            new_company_data["name"] = new_company_data["name"].replace("Муниципальное бюджетное дошкольное образовательное учреждение г.Иркутска детский", "Детский сад")
+            new_company_data["name"] = new_company_data["name"].replace("Муниципальное бюджетное дошкольное образовательное учреждение  г. Иркутска детский сад", "Детский сад")
+
+            new_company_data["name"] = new_company_data["name"].replace("Муниципальное автономное дошкольное образовательное учреждение центр развития ребенка - детский сад", "Детский сад")
+            new_company_data["name"] = new_company_data["name"].replace("Муниципальное бюджетное дошкольное образовательное учреждение города Иркутска  детский сад", "Детский сад")
+            new_company_data["name"] = new_company_data["name"].replace("Муниципальное бюджетное дошкольное образовательное учреждение города  Иркутска детский сад", "Детский сад")
+            new_company_data["name"] = new_company_data["name"].replace("Муниципальное бюджетное дошкольное образовательное учреждение  г. Иркутска детский сад", "Детский сад")
+            new_company_data["name"] = new_company_data["name"].replace("Муниципальное бюджетное дошкольное образовательное учреждение г. Иркутска  детский сад", "Детский сад")
+
+            new_company_data["name"] = new_company_data["name"].replace("Муниципальное автономное дошкольное образовательное учреждение города Иркутска детский сад", "Детский сад")
+            new_company_data["name"] = new_company_data["name"].replace("Муниципальное бюджетное дошкольное образовательное учреждение города  Иркутска детский сад", "Детский сад")
+            new_company_data["name"] = new_company_data["name"].replace("Муниципальное бюджетное дошкольное образовательное учреждение детский сад  г. Иркутска", "Детский сад")
+            new_company_data["name"] = new_company_data["name"].replace("Муниципальное бюджетное дошкольное образовательное учреждение г. Иркутска сад", "Детский сад")
+
+            new_company_data["name"] = new_company_data["name"].replace("Муниципальное бюджетное дошкольное образовательное учреждение города Иркутска", "Детский сад")
+            new_company_data["name"] = new_company_data["name"].replace("Муниципальное бюджетное дошкольное образовательное учреждение города  Иркутска детский сад", "Детский сад")
+            new_company_data["name"] = new_company_data["name"].replace("Муниципальное бюджетное дошкольное образовательное учреждение  г. Иркутска детский сад", "Детский сад")
+            new_company_data["name"] = new_company_data["name"].replace("Муниципальное бюджетное дошкольное образовательное учреждение  г. Иркутска  детский сад", "Детский сад")
+
+            new_company_data["name"] = new_company_data["name"].replace("Муниципальное бюджетное дошкольное образовательное учреждение города  Иркутска детский сад", "Детский сад")
+            new_company_data["name"] = new_company_data["name"].replace("Муниципальное бюджетное образовательное учреждение  г. Иркутска  детский сад", "Детский сад")
+            new_company_data["name"] = new_company_data["name"].replace("Муниципальное бюджетное дошкольное образовательное учреждение  г. Иркутска  детский сад", "Детский сад")
+            new_company_data["name"] = new_company_data["name"].replace("Муниципальное бюджетное дошкольное образовательное учреждение  г. Иркутска  детский сад", "Детский сад")
+
+            new_company_data["name"] = new_company_data["name"].replace("Муниципальное бюджетное дошкольное образовательное учреждение города  Иркутска детский сад", "Детский сад")
+            new_company_data["name"] = new_company_data["name"].replace("Муниципальное бюджетное дошкольное образовательное учреждение города  Иркутска детский сад", "Детский сад")
+            new_company_data["name"] = new_company_data["name"].replace("Муниципальное бюджетное дошкольное образовательное учреждение  г. Иркутска детский сад", "Детский сад")
+            new_company_data["name"] = new_company_data["name"].replace("Муниципальное бюджетное дошкольное образовательное учреждение  г. Иркутска детский сад", "Детский сад")
+
+
+            new_company = Company(**new_company_data)
+            new_company.save()
+
+        wb = load_workbook('2.xlsx')
+        ws = wb.active
+        for i in range(3, 80):
+            if(ws[i][1].value != None):
+                new_company_data = {}
+                new_company_data["ctype"] = "ШК"
+                new_company_data["name"] = ws[i][1].value.replace("МБОУ СОШ", "Школа").replace("МАОУ", "Школа")
+                new_company_data["adress"] = ws[i][2].value
+                new_company_data["contacts"] = ws[i][3].value
+                new_company_data["telephone"] = ws[i][4].value
+                new_company_data["site"] = ws[i][6].value
+                new_company_data["email"] = ws[i][5].value
+                new_company_data["city"] = city
+
+                new_company = Company(**new_company_data)
+                new_company.save()
+                #if(ws[i][0].value != 0):
+                #int_convertor_error_0(ws[i][0].value)
+            #print(ws[i][0].value)
+            #if (ws[i][0].value == None):
+                #continue
+        #print(merged_ranges)
+        #     ctype = ""
+        #     name = str(ws[i][0].value).strip().replace("_x000D_", " ")
+        #     adress = str(ws[i][1].value).strip().replace("_x000D_", " ")
+        #     contacts = ""
+        #     site = str(ws[i][4].value).strip().replace("_x000D_", " ")
+        #     email = str(ws[i][3].value).strip().replace("_x000D_", " ")
+        #     comment = ""
+        #     telephone = str(ws[i][2].value).strip().replace("_x000D_", " ")
+        #
+        #     if (comment == None):
+        #         comment = ""
+        #
+        #     company = Company(ctype=ctype, city=city, name=name, adress=adress, contacts=contacts, telephone=telephone,
+        #                       site=site, email=email, comment=comment)
+        #     company.save()
+        #
+        # #
+        # wb = load_workbook('LSV.xlsx')
+        # ws = wb.active
+        # city = City.objects.get(name="Пермь")
+        # for i in range(1, 76):
+        #     if (ws[i][1].value == None):
+        #         continue
+        #     ctype = ""
+        #     name = str(ws[i][1].value).strip().replace("_x000D_", " ")
+        #     adress = str(ws[i][2].value).strip().replace("_x000D_", " ")
+        #     contacts = str(ws[i][5].value).strip().replace("_x000D_", " ")
+        #     site = ""
+        #     email = str(ws[i][3].value).strip().replace("_x000D_", " ")
+        #     comment = ""
+        #     telephone = str(ws[i][4].value).strip().replace("_x000D_", " ")
+        #
+        #     if (comment == None):
+        #         comment = ""
+        #
+        #     company = Company(ctype=ctype, city=city, name=name, adress=adress, contacts=contacts, telephone=telephone,
+        #                       site=site, email=email, comment=comment)
+        #     company.save()
+        #datelimit = datetime.now() + timedelta(days=1)
         # events = Event.objects.filter(startTime__gte=datelimit)
         # for event in events:
         #     if(event.attentionCallDayComment != "" and event.attentionCallDayComment != "None"):

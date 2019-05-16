@@ -3,7 +3,7 @@
     {% if last_call.0 %}
         <div class="col-md-2 text-left" {% if last_call.0.manager.siteuser != currentUser %} style="opacity: 0.7" {% endif %}>
             <span title="Последний звонок: {{ last_call.0.artist.name }}" style="color:{{ last_call.0.artist.color }};'"
-                  class="glyphicon glyphicon-earphone company-icon text-primary inheritance-text-color company-icon-small-pressed" onclick="ShowCall('{{ last_call.0.id }}', '{{ last_call.0.company.name }}');"></span><span
+                  class="glyphicon glyphicon-earphone company-icon text-primary inheritance-text-color company-icon-small-pressed" onclick="ShowCall('{{ last_call.0.id }}', `{{ last_call.0.company.name }}`);"></span><span
                 class="text-primary">{{ last_call.0.manager.siteuser.alias }}</span>
         </div>
         <div class="col-md-1 text-left" {% if last_call.0.manager.siteuser != currentUser %} style="opacity: 0.7" {% endif %}></div>
@@ -34,13 +34,13 @@
     <div style="padding-left:0px;" class="col-md-2 text-right">
         <span title="Отметить звонок"
               class="glyphicon glyphicon-plus company-icon-pressed text-primary"
-              onclick="AddCall('{{ company.id }}', '{{ company.name }}', false, $('li.active').attr('data-tab-id'));";
+              onclick="AddCall('{{ company.id }}', `{{ company.name }}`, false, $('li.active').attr('data-tab-id'));";
                 ></span>
         <span title="История"
 
               {% if has_checkers.calls %}
                         class="glyphicon glyphicon-list company-icon-pressed text-primary"
-                        onclick="ShowCallsHistory('{{ company.id }}', $('li.active').attr('data-tab-id'), '{{ company.name }}');"
+                        onclick="ShowCallsHistory('{{ company.id }}', $('li.active').attr('data-tab-id'), `{{ company.name }}`);"
                     {% else %}
                         class="glyphicon glyphicon-list company-icon-pressed company-icon-disabled text-primary"
                         onclick='ShowNotify(3, "История звонков этого учреждения пуста", 0, 2000);'
@@ -54,7 +54,7 @@
         <div class="col-md-10 ">
         <div class="row">
             <div class="col-md-4 text-left" {% if last_task.0.manager.siteuser != currentUser %} style="opacity: 0.7" {% endif %}>
-                        <span style="color:{{ last_task.0.artist.color }}" class="company-icon-small-pressed" onclick="ShowTask('{{ last_task.0.id }}', '{{last_task.0.company.name}}');"
+                        <span style="color:{{ last_task.0.artist.color }}" class="company-icon-small-pressed" onclick="ShowTask('{{ last_task.0.id }}', `{{last_task.0.company.name}}`);"
                               title="Последняя задача: {{ last_task.0.artist.name }}">
                             <span class=" glyphicon glyphicon-chevron-left text-primary inheritance-text-color"></span>
                             <span class="glyphicon glyphicon-flag  text-primary inheritance-text-color" ></span>
@@ -101,7 +101,7 @@
     <div class="row">
         {% if next_task.0 %}
             <div class="col-md-4 text-left" {% if next_task.0.manager.siteuser != currentUser %}style="opacity: 0.7" {% endif %}>
-                        <span style="color:{{ next_task.0.artist.color }}" class="company-icon-small-pressed" onclick="ShowTask('{{ next_task.0.id }}', '{{next_task.0.company.name}}');"
+                        <span style="color:{{ next_task.0.artist.color }}" class="company-icon-small-pressed" onclick="ShowTask('{{ next_task.0.id }}', `{{next_task.0.company.name}}`);"
                               title="Следующая задача: {{ next_task.0.artist.name }}">
                             <span class="glyphicon glyphicon-chevron-right text-primary inheritance-text-color"></span>
                             <span class="glyphicon glyphicon-flag  text-primary inheritance-text-color"></span>
@@ -141,11 +141,11 @@
             </div>
         {% endif %}
 <div style="padding-left: 0px;" class="col-md-2 text-right">
-    <span title="Добавить задачу" onclick="AddNewTask('{{ company.id }}', '{{ company.name }}', $('li.active').attr('data-tab-id'));" class="glyphicon glyphicon-plus company-icon-pressed text-primary"></span>
+    <span title="Добавить задачу" onclick="AddNewTask('{{ company.id }}', `{{ company.name }}`, $('li.active').attr('data-tab-id'));" class="glyphicon glyphicon-plus company-icon-pressed text-primary"></span>
     <span title="История"
           {% if has_checkers.tasks %}
                         class="glyphicon glyphicon-list company-icon-pressed text-primary"
-                        onclick="ShowTasksHistory('{{ company.id }}', $('li.active').attr('data-tab-id'), '{{ company.name }}');"
+                        onclick="ShowTasksHistory('{{ company.id }}', $('li.active').attr('data-tab-id'), `{{ company.name }}`);"
                     {% else %}
                         class="glyphicon glyphicon-list company-icon-pressed company-icon-disabled text-primary"
                         onclick='ShowNotify(3, "История задач этого учреждения пуста", 0, 2000);'
@@ -237,11 +237,11 @@
         </div>
         </div>
         <div style="padding-left: 0px;" class="col-md-2 text-right">
-            <span title="Добавить мероприятие" class="glyphicon glyphicon-plus company-icon-pressed text-primary" onclick="AddEvent('{{ company.id }}', $('li.active').attr('data-tab-id'), {companyName: '{{ company.name }}', companyAdress: '{{ company.adress }}', companyContacts: '{{ company.contacts }}'});"></span>
+            <span title="Добавить мероприятие" class="glyphicon glyphicon-plus company-icon-pressed text-primary" onclick="AddEvent('{{ company.id }}', $('li.active').attr('data-tab-id'), {companyName: `{{ company.name }}`, companyAdress: `{{ company.adress }}`, companyContacts: `{{ company.contacts }}`});"></span>
             <span title="История"
                   {% if has_checkers.events %}
                         class="glyphicon glyphicon-list company-icon-pressed text-primary"
-                        onclick="ShowEventsHistory('{{ company.id }}', $('li.active').attr('data-tab-id'), '{{ company.name }}');"
+                        onclick="ShowEventsHistory('{{ company.id }}', $('li.active').attr('data-tab-id'), `{{ company.name }}`);"
                     {% else %}
                         class="glyphicon glyphicon-list company-icon-pressed company-icon-disabled text-primary"
                         onclick='ShowNotify(3, "История мероприятий этого учреждения пуста", 0, 2000);'

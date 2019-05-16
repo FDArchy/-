@@ -709,7 +709,7 @@ function ShowUser(_id, _type, _link) {
         AddUser(_type, data);
     });
 }
-function ShowUserOptionsIndividual() {
+function ShowUserOptionsIndividual(_adminMode) {
     $.post("/aj_user_individual_options_get/", {}, function (response) {
         var data = ResponseToNotify(response);
         if (response["status"] != "data") {
@@ -760,6 +760,15 @@ function ShowUserOptionsIndividual() {
             var toggleContainer = $('<div>').addClass("col-md-3").css("text-align", "right").css("margin-top", "7px").appendTo(outerDiv);
             $('<label>').attr("for", "check_scrolltop_show").addClass("text-primary control-label").css("text-align", "left").text("Отображать значок быстрой прокрутки наверх").css("user-select", "none").appendTo(labelContainer);
             var scrolltopShowToggle= $('<input>').attr("id", "check_scrolltop_show").attr("type", "checkbox").attr("data-toggle", "toggle").appendTo(toggleContainer);
+
+        }
+        if(_adminMode && "only_own_tasks_for_admin" in options){
+            $('<hr>').addClass("company-primary-divider").appendTo(frame);
+            var outerDiv = $('<div>').addClass("form-group").appendTo(frame);
+            var labelContainer = $('<div>').addClass("col-md-9").css("text-align", "left").appendTo(outerDiv);
+            var toggleContainer = $('<div>').addClass("col-md-3").css("text-align", "right").css("margin-top", "7px").appendTo(outerDiv);
+            $('<label>').attr("for", "check_only_own_tasks_for_admin").addClass("text-primary control-label").css("text-align", "left").text("Только свои задачи в режиме админа").css("user-select", "none").appendTo(labelContainer);
+            var onlyOwnTasksForAdminToggle= $('<input>').attr("id", "check_only_own_tasks_for_admin").attr("type", "checkbox").attr("data-toggle", "toggle").appendTo(toggleContainer);
 
         }
         var modalWindow = showModalWindow_new("okcancel", "Индивидуальные настройки", content, function () {
@@ -836,6 +845,15 @@ function ShowUserOptionsIndividual() {
         }
         if("scrolltop_show" in options){
             $(scrolltopShowToggle).bootstrapToggle({
+                on: "Да",
+                off: "Нет",
+                size: "small",
+                offstyle: "danger",
+                onstyle: "success"
+            });
+        }
+        if("only_own_tasks_for_admin" in options){
+            $(onlyOwnTasksForAdminToggle).bootstrapToggle({
                 on: "Да",
                 off: "Нет",
                 size: "small",
@@ -1941,7 +1959,6 @@ function Stats_CheckRangeValues(_rangeElem){
     return;
 }
 function Stats_LoadLogEntry(_id){
-    ShowNotify_LoadData();
     $.post('/aj_logs_log_data/', {
         id: _id
     }, function(response){
@@ -2350,7 +2367,6 @@ function Lists_CityContent(_container, _data){
                 $('<label>').attr("for", "removeConfirmToggle").addClass("text-primary control-label").text("Подтверждение блокировки").css("user-select", "none").appendTo(labelContainer);
 
                 var modalWindow = showModalWindow_new("okcancel", modalWindowTitle, frame, function () {
-                ShowNotify_LoadData();
                 $.post("/aj_control_lists_city_change_status/", {id: $(clickedItem).parents('.list-item').attr("data-id"), lock_confirm: $(removeConfirmToggle).prop("checked")}, function(response){
                     ResponseToNotify(response);
                     if(response["status"] == "success"){
@@ -2369,7 +2385,6 @@ function Lists_CityContent(_container, _data){
             }else{
                 modalWindowTitle = "Разблокировать город?";
                 var modalWindow = showModalWindow_new("okcancel", modalWindowTitle, false, function () {
-                ShowNotify_LoadData();
                 $.post("/aj_control_lists_city_change_status/", {id: $(clickedItem).parents('.list-item').attr("data-id")}, function(response){
                     ResponseToNotify(response);
                     if(response["status"] == "success"){
@@ -2663,7 +2678,6 @@ function Aggregators_Event_Transform(_eventData) {
 function CompanyManagers(_id){
     $.post("/aj_company_managers/", {company_id: _id}, function(response) {
         //Содержимое диалогового окна - таблица с менеджерами учреждения
-        ShowNotify_LoadData();
         var data = ResponseToNotify(response);
         if (response["status"] != "data") {
             return;
@@ -2683,7 +2697,6 @@ function CompanyManagers(_id){
                 td.click(function() {
                     var deletedElem = $(this).parent();
                     var currentModalWindow = showModalWindow_new("okcancel", "Забрать компанию у выбранного менеджера?", "", function () {
-                        ShowNotify_LoadData();
                         $.post("/aj_manager_steal_company/", {
                             company: _id,
                             site_user: _siteUserId
@@ -2722,7 +2735,6 @@ function CompanyManagers(_id){
 
 
                     div = $('<div>').addClass("header").html("Доступные шоу:").appendTo(topDiv);
-                    ShowNotify_LoadData();
                     $.post("/aj_manager_allowed_shows/", {company:_id, site_user:site_user}, function(response) {
                         var data = ResponseToNotify(response);
                         if (response["status"] != "data") {
@@ -2740,7 +2752,6 @@ function CompanyManagers(_id){
                                 tdRemoveShow.click(function (){
                                     var deletedElem = $(this).parent();
                                     var currentModalWindow = showModalWindow_new("okcancel", "Забрать шоу у выбранного менеджера?", "", function () {
-                                        ShowNotify_LoadData();
                                         $.post("/aj_manager_steal_company/", {
                                             company:_id,
                                             site_user:site_user,
@@ -2789,7 +2800,6 @@ function CompanyManagers(_id){
         var button = $('<button>').addClass("btn btn-primary").text("Добавить менеджера").appendTo(container);
         (function (_companyId) {//На кнопку вешаем обработчик - открывает диалоговое окно добавления менеджера
             button.click(function () {
-                ShowNotify_LoadData();
                 $.post("/aj_manager_manager_list/", {company_id: _companyId}, function(response) {
                     var data = ResponseToNotify(response);
                     if(response["status"] != "data"){
@@ -2807,7 +2817,6 @@ function CompanyManagers(_id){
                     }
                     var modalWindow = showModalWindow_new("okcancel", "Передать компанию менеджеру", div, function(){
                         if(TotalInputsValidator(modalWindow)){
-                            ShowNotify_LoadData();
                             $.post("/aj_manager_add_company_to_manager/", {company:_id, user: $("#chooseManagerSelect").val(), shows:JSON.stringify($('#chooseArtistSelect').val())}, function(response) {
                             ResponseToNotify(response);
                             if(response["status"] == "success"){
@@ -3391,7 +3400,6 @@ function AddNewTask(_company, _companyName, _showId, _dateDict) {
             var company = _company;
         }
         if(TotalInputsValidator(modalWindow)) {
-            ShowNotify_LoadData();
             $.post("/aj_company_manager_work_mark_call_and_add_task/", {
                 task: "True",
                 company: company,
@@ -3570,7 +3578,6 @@ function AddNewTask_GenerateContent(_companyId, _showId, _year, _month, _date, _
     return container;
 }
 function ShowTask(_taskId, _companyName, _elemToChange, _modalToHide) {
-    ShowNotify_LoadData();
     $.post("/aj_tasks_get_task/", {id: _taskId}, function (response) {
         var controlButtons = {};
         var data = ResponseToNotify(response);
@@ -3955,7 +3962,6 @@ function AddCall_GenerateContent(_companyId, _showId) {
     return container;
 }
 function ShowCall(_id, _companyName) {
-    ShowNotify_LoadData();
     $.post('/aj_call_get/', {id: _id}, function (response) {
         var data = ResponseToNotify(response);
         if (response["status"] != "data") {
@@ -4770,7 +4776,6 @@ function ShowEvent(_id, _item) {
         _item.find(".logscount-label").remove();
         _item.removeClass("event-mycalweek-haveevents").attr("title", "");
     }
-    ShowNotify_LoadData();
     $.post("/aj_events_get_event_data/", {
         id: _id
     }, function (response) {
@@ -5990,7 +5995,6 @@ function AddCrashTransferRemove(_eventData, _action, _abortCrash) {
 
 }
 function EventCallsControl(_eventId) {
-    ShowNotify_LoadData();
     $.post("/aj_events_get_event_data/",
         {
             id: _eventId,
@@ -7630,10 +7634,11 @@ function InitializeAjaxHandlers(){
         GLOBAL_CURRENT_AJAX_RESPONSE_STATUS = "SUCCESS";
     });
 }//Добавляет обработчки интерактивных запросов к документу
-function InitializeOptionsButtonsHandlers(_logoutRequest) {
+function InitializeOptionsButtonsHandlers(_logoutRequest, _adminMode) {
     $('#mainCancelButton').unbind();
     $('#mainOptionsButton').unbind();
 
+    _adminMode = ConvertBoolFromPython(_adminMode);
     $('#mainCancelButton').click(function(){
         if(_logoutRequest == "True"){
             var modalWindow = showModalWindow_new("okcancel", "Выйти из программы?", "", function () {
@@ -7646,7 +7651,7 @@ function InitializeOptionsButtonsHandlers(_logoutRequest) {
         }
     });
     $('#mainOptionsButton').click(function () {
-       ShowUserOptionsIndividual();
+       ShowUserOptionsIndividual(_adminMode);
     });
     return;
 }

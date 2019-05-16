@@ -4,6 +4,8 @@ from DB.models import Event
 from DB.models import Manager
 register = template.Library()
 import  datetime
+import os
+from django.template.defaultfilters import escape
 
 def cut(value, arg):
     "Удаляет все значения аргумента arg из строки value"
@@ -68,3 +70,10 @@ def replaceNone(_value):
         return ""
     else:
         return _value
+@register.filter(name="tojavascript")
+def tojavascript (value) :
+	if len(value.split(os.linesep)) > 1 :
+		__s = ["\"%s\"" % escape(i) for i in value.split(os.linesep)]
+		return "%s\n%s" % (__s[0], "\n".join([" + %s" % i for i in __s[1:]]), )
+	else :
+		return "\"%s\"" % escape(value)

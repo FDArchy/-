@@ -1572,9 +1572,7 @@ function ChangeTab(_tab, _companyId, _needCalUpdate) {
     //Делаем цвет всех надписей вкладок соответствующим их цвету в базе
     $('.nav li a').each(function (i, elem) {
         $(this).css("color", $(this).parent('li').attr("data-color"));
-
     });
-
     //Делаем цвет рамок вкладки соответствующим ее цвету в базе, кроме нижней границы
     $('li[data-tab-id=' + _tab + '] a').css('border-left', '1px solid ' + $('li[data-tab-id=' + _tab + ']').attr("data-color"));
     $('li[data-tab-id=' + _tab + '] a').css('border-right', '1px solid ' + $('li[data-tab-id=' + _tab + ']').attr("data-color"));
@@ -1598,7 +1596,6 @@ function ChangeTab(_tab, _companyId, _needCalUpdate) {
         } catch (err) {
         }
     }
-
     return;
 }//Переключение вкладки
 function TabUpdate(_showId, _needCalUpdate) {
@@ -1610,7 +1607,6 @@ function TabUpdate(_showId, _needCalUpdate) {
     return;
 }
 function UpdateCompanyData(_id) {
-    ShowNotify_LoadData();
     ContainerLoadIndicatorShow($('#company_page_text'));
     $.post('/aj_updated_company_data/', {id: _id}, function (response) {
         var data = ResponseToNotify(response);
@@ -1627,7 +1623,10 @@ function UpdateCompanyData(_id) {
             $('#logsCountLabel').addClass("hidden-count");
         }
         $('#page_ctype').text(data["data"]["ctype"]);
-        $('#page_name').text(data["data"]["name"]);
+        $('#page_name').html("");
+        $('#page_name').append($('<span>').css("margin-right", 20).text(data["data"]["id"]));
+        $('#page_name').append($('<span>').text(data["data"]["name"]));
+
         $('#page_adress').text(data["data"]["adress"]);
         if(data["data"]["telephone"] != ""){
             $('#page_telephone').text(data["data"]["telephone"]);
@@ -1661,7 +1660,8 @@ function UpdateCompanyData(_id) {
             }
             if(data["data"]["site"] != ""){
                 if($('#siteContainer').length != 0){
-                    $('#page_site').text(data["data"]["site"]).attr("href", "http://" + data["data"]["site"]);
+                    var siteHref = data["data"]["site"].replace("http://", "");
+                    $('#page_site').text(data["data"]["site"]).attr("href", "http://" + siteHref);
                 }else{
                     var container = $('<div>').addClass("row").attr("id", "siteContainer").insertAfter($('#netContactsDivider'));
                     var row = $('<div>').addClass("col-md-12 text-left").appendTo(container);
@@ -1707,9 +1707,11 @@ function FillManagersCompanyPage(_managers) {
     for(var i = 0; i < _managers.length; i++){
         var row = $('<div>').addClass("col-md-12 text-left").appendTo(container);
         var elem = $('<button>').addClass("btn btn-default").css("white-space", "normal").css("margin-bottom", "5px").appendTo(row);
-        elem.click(function () {
-           ShowUser(_managers[i]["siteuser__id"]);
-        });
+        (function (x) {
+            elem.click(function () {
+                ShowUser(_managers[x]["siteuser__id"]);
+            })
+        })(i);
         var icon = $('<span>').css("margin-right", "5px").addClass("glyphicon glyphicon-headphones text-primary").appendTo(elem);
         var text = $('<span>').text(_managers[i]["siteuser__alias"]).appendTo(elem);
     }

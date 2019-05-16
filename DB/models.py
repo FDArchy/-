@@ -40,7 +40,7 @@ class SiteUserOptions(models.Model):#Настройки пользователя
     larger_font = models.BooleanField(verbose_name="Увеличенный шрифт в программе", default=False)
     scrolltop_show = models.BooleanField(verbose_name="Отображать кнопку быстрой прокрутки", default=True)
     presentator_show_events_limit = models.IntegerField(verbose_name="Ограничение просмотра компаний артистом", default=400)
-
+    only_own_tasks_for_admin = models.BooleanField(verbose_name="Отображать только свои задачи в режиме админа", default=True)
     def __str__(self):
         return u"%s" % (self.admin_mode)
 class SiteUser(models.Model):#ПОЛЬЗОВАТЕЛЬ САЙТА (Включает права)

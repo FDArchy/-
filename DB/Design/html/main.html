@@ -215,7 +215,7 @@
     var search_safe_timeout;
     var search_notify_timeout;
 
-    InitializeOptionsButtonsHandlers("{{ options.logout_request }}");
+    InitializeOptionsButtonsHandlers("{{ options.logout_request }}", "{{ admin_mode }}");
     InitializeAjaxHandlers();
     ShowChoosePanels();
     //Загрузка текущих значений шоу (ускорение работы)
